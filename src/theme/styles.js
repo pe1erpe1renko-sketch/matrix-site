@@ -417,4 +417,123 @@ export const S = {
     color: C.muted,
   },
   stubActions: { display: "flex", flexWrap: "wrap", gap: 12, marginTop: 28, justifyContent: "center" },
+
+  /* ---------- страница результата ---------- */
+
+  resultHead: {
+    display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-end",
+    justifyContent: "space-between", marginBottom: 26,
+  },
+  resultDate: {
+    fontFamily: FONT.serif, fontSize: "clamp(28px, 3vw, 40px)",
+    color: C.white, margin: "0 0 6px", fontWeight: 600, lineHeight: 1.1,
+  },
+
+  /* аркан дня */
+  dayCard: {
+    display: "grid", gridTemplateColumns: "minmax(190px, 240px) minmax(260px, 1fr)",
+    gap: 30, alignItems: "start", padding: "28px 32px", borderRadius: R.xl,
+    background: SURFACE.cardHi, border: `1px solid ${C.borderHi}`,
+  },
+  dayBigWrap: { textAlign: "center" },
+  dayBig: {
+    fontFamily: FONT.serif, fontSize: 96, lineHeight: 1,
+    color: C.gold, display: "block",
+  },
+  dayArcName: { color: C.white, fontSize: 17, marginTop: 8 },
+  dayTomorrow: {
+    marginTop: 16, paddingTop: 14, borderTop: `1px solid ${C.border}`,
+    fontSize: 13.5, color: C.text,
+  },
+  dayPeriod: {
+    marginTop: 10, fontSize: 12.5, color: C.muted, lineHeight: 1.5,
+  },
+
+  /* предназначения */
+  purposeGrid: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14,
+  },
+  purposeCard: {
+    padding: "20px 22px 22px", borderRadius: R.lg,
+    background: SURFACE.card, border: `1px solid ${C.border}`,
+    transition: "border-color .18s ease",
+  },
+  purposeVal: {
+    fontFamily: FONT.serif, fontSize: 40, color: C.gold, lineHeight: 1, display: "block",
+  },
+  purposeTitle: { color: C.white, fontSize: 16, fontWeight: 500, margin: "12px 0 6px" },
+  purposeHint: { color: C.muted, fontSize: 13, margin: 0, lineHeight: 1.5 },
+  purposeFormula: {
+    marginTop: 12, paddingTop: 10, borderTop: `1px solid ${C.border}`,
+    fontSize: 12, color: C.text,
+  },
+
+  /* родовые программы */
+  lineGrid: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14,
+  },
+  lineCard: {
+    padding: "22px 24px", borderRadius: R.lg,
+    background: SURFACE.card, border: `1px solid ${C.border}`,
+  },
+  lineRow: {
+    display: "flex", alignItems: "center", gap: 14,
+    padding: "10px 0", borderTop: `1px solid ${C.border}`,
+  },
+  lineVal: {
+    fontFamily: FONT.serif, fontSize: 24, color: C.lilac,
+    minWidth: 38, textAlign: "center", lineHeight: 1,
+  },
+  lineValStrong: {
+    fontFamily: FONT.serif, fontSize: 30, color: C.gold,
+    minWidth: 38, textAlign: "center", lineHeight: 1,
+  },
+  lineLbl: { fontSize: 14, color: C.text },
+
+  /* 25 разделов */
+  sectionsWrap: { display: "flex", flexDirection: "column", gap: 10 },
+  sectionItem: {
+    border: "1px solid", borderRadius: R.lg, overflow: "hidden",
+    transition: "border-color .18s ease, background .18s ease",
+  },
+  sectionHead: {
+    width: "100%", background: "none", border: "none", fontFamily: "inherit",
+    textAlign: "left", padding: "17px 22px", display: "flex",
+    alignItems: "center", gap: 16,
+  },
+  sectionNum: {
+    fontFamily: FONT.serif, fontSize: 15, minWidth: 26,
+    flexShrink: 0, textAlign: "center",
+  },
+  sectionTitle: { display: "block", fontSize: 15.5, fontWeight: 500, lineHeight: 1.35 },
+  sectionLead: { display: "block", fontSize: 12.5, color: C.muted, marginTop: 3, lineHeight: 1.45 },
+  sectionSign: { marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: 10 },
+  sectionBody: { padding: "0 22px 20px", borderTop: `1px solid ${C.border}` },
+  slotBlock: { marginTop: 18 },
+  slotHead: { display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8 },
+  slotArcana: {
+    fontFamily: FONT.serif, fontSize: 22, color: C.gold, lineHeight: 1,
+  },
+  slotLabel: { color: C.white, fontSize: 14.5, fontWeight: 500 },
+  slotArcName: { color: C.lilac, fontSize: 12.5 },
+  slotText: {
+    margin: 0, color: C.text, fontSize: 14.5, lineHeight: 1.62,
+    whiteSpace: "pre-line", maxWidth: 760,
+  },
+  lockNote: {
+    display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center",
+    padding: "18px 22px 20px", borderTop: `1px solid ${C.border}`,
+  },
+
+  /* DEV-переключатель тарифа */
+  devBar: {
+    display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10,
+    padding: "12px 18px", borderRadius: R.md, marginBottom: 26,
+    background: "rgba(10,8,23,0.66)", border: `1px dashed ${C.borderHi}`,
+  },
+  devLabel: {
+    fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase",
+    color: C.lilac, marginRight: 4,
+  },
+  devHint: { fontSize: 12, color: C.muted, width: "100%", margin: 0 },
 };

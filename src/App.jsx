@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
 import Home from "./pages/Home.jsx";
 import CalcResult from "./pages/CalcResult.jsx";
+import MatricaResult from "./pages/MatricaResult.jsx";
 import Chat from "./pages/Chat.jsx";
 import Tarify from "./pages/Tarify.jsx";
 import Profil from "./pages/Profil.jsx";
@@ -37,8 +38,11 @@ export default function App() {
             <Route key={c.id} path={c.path} element={<Home />} />
           ))}
 
-          {/* результат расчёта — открывается по прямой ссылке */}
-          {CALC_NAV.map((c) => (
+          {/* разбор матрицы судьбы — открывается по прямой ссылке */}
+          <Route path="/matrica/:date" element={<MatricaResult />} />
+
+          {/* остальные результаты пока заглушка — задача 3 */}
+          {CALC_NAV.filter((c) => c.id !== "matrica").map((c) => (
             <Route
               key={c.id + "-result"}
               path={c.pairs ? `${c.path}/:dateA/:dateB` : `${c.path}/:date`}

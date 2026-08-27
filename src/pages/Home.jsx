@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { C, R, FONT, SURFACE } from "../theme/tokens.js";
+import { C, SURFACE } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { Spark } from "../components/Icons.jsx";
 import { CALC_NAV, DEFAULT_CALC, calcById, activeNavId } from "../routes.js";
 import { partsToUrlDate } from "../lib/urlDate.js";
+import { calculateMatrix } from "../lib/matrixEngine.js";
+import { ARCANA_NAMES } from "../lib/prompts.js";
+import Octagram from "../components/Octagram.jsx";
+import ChakraTable from "../components/ChakraTable.jsx";
+import AgeTimeline from "../components/AgeTimeline.jsx";
 
 /* ============================================================
    MATRIX — главная страница
@@ -113,35 +118,21 @@ const TABS = {
   },
 };
 
+/**
+ * Пример на витрине — настоящий расчёт, а не выдуманные числа.
+ * Раньше здесь лежала копия чисел для 13.07.1998, и любая правка движка
+ * молча расходилась бы с главной страницей. Теперь витрина и разбор
+ * считаются одной функцией и разойтись не могут.
+ */
+const DEMO_DATE_URL = "13-07-1998";
+const DEMO_MATRIX = calculateMatrix("1998-07-13");
+
+const ARCANA = Object.values(ARCANA_NAMES);
+
 const MONTHS = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
 const YEARS = Array.from({ length: 106 }, (_, i) => 2026 - i);
 
-/* Пример расчёта — реальные числа для 13.07.1998 */
-const DEMO = {
-  date: "13.07.1998",
-  core: { W: 13, N: 7, E: 9, S: 11, C: 4, NW: 20, NE: 16, SE: 20, SW: 6 },
-  chakras: [
-    { n: "Сахасрара",   s: "Миссия",              c: "#8E44AD", p: 13, e: 7,  m: 20 },
-    { n: "Аджна",       s: "Судьба, эгрегоры",    c: "#3B5BC0", p: 3,  e: 18, m: 21 },
-    { n: "Вишудха",     s: "Творчество",          c: "#3BAFDA", p: 17, e: 11, m: 10 },
-    { n: "Анахата",     s: "Отношения",           c: "#4CAF50", p: 21, e: 15, m: 9 },
-    { n: "Манипура",    s: "Статус",              c: "#F7D02C", p: 4,  e: 4,  m: 8 },
-    { n: "Свадхистана", s: "Радость",             c: "#F0932B", p: 13, e: 15, m: 10 },
-    { n: "Муладхара",   s: "Тело, материя",       c: "#D63031", p: 9,  e: 11, m: 20 },
-  ],
-  total: { p: 8, e: 9, m: 17 },
-  timeline: [
-    { age: 0, a: 13 }, { age: 10, a: 20 }, { age: 20, a: 7 }, { age: 30, a: 16 },
-    { age: 40, a: 9 }, { age: 50, a: 20 }, { age: 60, a: 11 }, { age: 70, a: 6 }, { age: 80, a: 13 },
-  ],
-  now: 28,
-};
 
-const ARCANA = [
-  "Маг","Жрица","Императрица","Император","Иерофант","Влюблённые","Колесница",
-  "Справедливость","Отшельник","Колесо Фортуны","Сила","Повешенный","Смерть",
-  "Умеренность","Дьявол","Башня","Звезда","Луна","Солнце","Суд","Мир","Шут",
-];
 
 const FAQ = [
   {
@@ -310,9 +301,12 @@ export default function Home() {
           <div className="card" style={S.demoCard}>
             <div style={S.demoHead}>
               <span style={S.infoLabel}>Октаграмма</span>
-              <span style={S.demoDate}>пример</span>
+              <span style={S.demoDate}>пример · 13.07.1998</span>
             </div>
-            <OctaDemo />
+            <Octagram
+              matrix={DEMO_MATRIX}
+              onOpenSection={(id) => navigate(`/matrica/${DEMO_DATE_URL}?section=${id}`)}
+            />
           </div>
 
           <div className="card" style={S.demoCard}>
@@ -320,7 +314,7 @@ export default function Home() {
               <span style={S.infoLabel}>Карта здоровья</span>
               <span style={S.demoDate}>7 чакр · 3 колонки</span>
             </div>
-            <ChakraDemo />
+            <ChakraTable chakras={DEMO_MATRIX.chakras} />
           </div>
         </div>
       </section>
@@ -332,7 +326,7 @@ export default function Home() {
           Видно, какая энергия ведёт вас <em style={S.h1em}>сейчас</em>
         </h2>
         <div className="card" style={{ ...S.demoCard, padding: "30px 32px 26px" }}>
-          <Timeline />
+          <AgeTimeline timeline={DEMO_MATRIX.timeline} age={DEMO_MATRIX.today.age} />
           <p style={{ ...S.infoText, marginTop: 22, maxWidth: 760 }}>
             Восемь внешних точек матрицы становятся вехами по десять лет, между ними
             шкала дробится до отрезков в два с половиной года. Отсюда берётся аркан
@@ -480,330 +474,6 @@ export default function Home() {
         </div>
       </section>
     </>
-  );
-}
-
-/* ---------------- Демо-графика ---------------- */
-
-const LAYERS = [
-  { id: "age", label: "возрастная шкала" },
-  { id: "rod", label: "родовые линии" },
-  { id: "money", label: "зона денег" },
-  { id: "love", label: "зона отношений" },
-];
-
-/* Промежуточные числа для 13.07.1998 */
-const RAY = {
-  NW: { outer: 8, mid: 6 },
-  NE: { outer: 9, mid: 20 },
-  SE: { outer: 8, mid: 6 },
-  SW: { outer: 16, mid: 10 },
-};
-const AXIS = {
-  h: { startOuter: 3, startMid: 17, startInner: 21, endMid: 13, endOuter: 22 },
-  v: { startOuter: 18, startMid: 11, startInner: 15, endMid: 15, endOuter: 8 },
-};
-
-function OctaDemo() {
-  const [on, setOn] = useState({ age: true, rod: true, money: true, love: true });
-  const [sel, setSel] = useState("C");
-  const [hov, setHov] = useState(null);
-
-  const cx = 260, cy = 260, R0 = 170;
-  const ANG = { W: 180, NW: 135, N: 90, NE: 45, E: 0, SE: -45, S: -90, SW: -135 };
-  const AGE = { W: 0, NW: 10, N: 20, NE: 30, E: 40, SE: 50, S: 60, SW: 70 };
-
-  const at = (key, k = 1) => {
-    const a = (ANG[key] * Math.PI) / 180;
-    return [cx + R0 * k * Math.cos(a), cy - R0 * k * Math.sin(a)];
-  };
-
-  /* ---- все точки схемы ---- */
-  const P = [];
-  const push = (id, xy, v, r, kind, title, hint) =>
-    P.push({ id, x: xy[0], y: xy[1], v, r, kind, title, hint });
-
-  push("W", at("W"), DEMO.core.W, 27, "main", "Портрет личности", "День рождения. Каким вас видят другие.");
-  push("N", at("N"), DEMO.core.N, 27, "main", "Таланты", "Месяц рождения. Дары от природы.");
-  push("E", at("E"), DEMO.core.E, 27, "main", "Родовой дар", "Год рождения. Что передано родом.");
-  push("S", at("S"), DEMO.core.S, 27, "main", "Кармическая задача", "Что важно проработать в этой жизни.");
-  push("NW", at("NW"), DEMO.core.NW, 24, "corner", "Мужская линия рода", "Программа по линии отца.");
-  push("NE", at("NE"), DEMO.core.NE, 24, "corner", "Женская линия рода", "Программа по линии матери.");
-  push("SE", at("SE"), DEMO.core.SE, 24, "corner", "Денежный канал", "Через что приходят ресурсы.");
-  push("SW", at("SW"), DEMO.core.SW, 24, "corner", "Линия отношений", "Сценарии в любви и партнёрстве.");
-  push("C", [cx, cy], DEMO.core.C, 32, "center", "Зона комфорта", "Ядро личности. Точка «Я».");
-
-  const AX = [
-    ["h_o", "W", 0.74, AXIS.h.startOuter, "Аджна · физика", "Судьба и эгрегоры в материальном проявлении."],
-    ["h_m", "W", 0.52, AXIS.h.startMid, "Вишудха · физика", "Предназначение и творчество в делах."],
-    ["h_i", "W", 0.30, AXIS.h.startInner, "Анахата · физика", "Отношения и картина мира в поступках."],
-    ["h_em", "E", 0.33, AXIS.h.endMid, "Свадхистана · физика", "Детская радость, способность получать удовольствие."],
-    ["h_eo", "E", 0.66, AXIS.h.endOuter, "Точка оси · физика", "Промежуточное звено между центром и родовым даром."],
-    ["v_o", "N", 0.74, AXIS.v.startOuter, "Аджна · энергия", "Как вы чувствуете судьбу и своё место."],
-    ["v_m", "N", 0.52, AXIS.v.startMid, "Вишудха · энергия", "Творческий поток и самовыражение."],
-    ["v_i", "N", 0.30, AXIS.v.startInner, "Анахата · энергия", "Сердечный центр: чем вы наполняетесь."],
-    ["v_em", "S", 0.33, AXIS.v.endMid, "Свадхистана · энергия", "Источник радости и лёгкости."],
-    ["v_eo", "S", 0.66, AXIS.v.endOuter, "Точка оси · энергия", "Промежуточное звено к кармической задаче."],
-  ];
-  AX.forEach(([id, k, t, v, title, hint]) => push(id, at(k, t), v, 16, "axis", title, hint));
-
-  const RAYS = [
-    ["NW", "rod", "Мужская линия"],
-    ["NE", "rod", "Женская линия"],
-    ["SE", "money", "Денежный канал"],
-    ["SW", "love", "Линия отношений"],
-  ];
-  const HINT = {
-    NW: ["Что род передал по отцу и требует проработки.", "Итог мужской линии, ближе к центру."],
-    NE: ["Что род передал по матери и требует проработки.", "Итог женской линии, ближе к центру."],
-    SE: ["Финансовый блок: где канал перекрыт.", "Как раскрыть денежный канал."],
-    SW: ["Барьер близости: что мешает сближаться.", "Путь к гармонии в отношениях."],
-  };
-  RAYS.forEach(([k, layer, name]) => {
-    push(k + "_o", at(k, 0.72), RAY[k].outer, 16, "ray", `${name} · дальняя точка`, HINT[k][0]);
-    push(k + "_m", at(k, 0.44), RAY[k].mid, 16, "ray", `${name} · ближняя точка`, HINT[k][1]);
-    P[P.length - 1].layer = layer;
-    P[P.length - 2].layer = layer;
-  });
-
-  const rayOn = (k) => (k === "NW" || k === "NE" ? on.rod : k === "SE" ? on.money : on.love);
-  const rayColor = { NW: C.lilac, NE: C.lilac, SE: C.gold, SW: C.pink };
-  const order = ["W", "NW", "N", "NE", "E", "SE", "S", "SW"];
-  const outer = order.map((k) => at(k));
-
-  const active = P.find((p) => p.id === (hov || sel));
-  const colorOf = (p) =>
-    p.kind === "main" ? C.gold
-      : p.kind === "center" ? C.white
-      : p.kind === "corner" ? C.lilac
-      : p.kind === "ray" ? rayColor[p.id.split("_")[0]]
-      : C.text;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-      <div style={S.layerRow}>
-        {LAYERS.map((l) => {
-          const a = on[l.id];
-          return (
-            <button key={l.id} className="chip" style={{
-              ...S.layerChip,
-              background: a ? "rgba(183,156,232,0.16)" : "transparent",
-              borderColor: a ? C.lilac : C.border,
-              color: a ? C.white : C.muted,
-            }} onClick={() => setOn({ ...on, [l.id]: !a })}>
-              <span style={{
-                ...S.layerDot,
-                background: a ? C.lilac : "transparent",
-                borderColor: a ? C.lilac : C.borderHi,
-              }} />
-              {l.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <svg viewBox="-20 -20 560 560" style={{ width: "100%", height: "auto", display: "block" }}>
-        <defs>
-          <radialGradient id="ocore" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(183,156,232,0.16)" />
-            <stop offset="100%" stopColor="rgba(183,156,232,0.01)" />
-          </radialGradient>
-        </defs>
-
-        <circle cx={cx} cy={cy} r={R0} fill="url(#ocore)" />
-        {on.age && (
-          <circle cx={cx} cy={cy} r={R0 * 1.24} fill="none" stroke={C.border}
-            strokeWidth="0.8" strokeDasharray="2 6" opacity="0.5" />
-        )}
-        <polygon points={outer.map((p) => p.join(",")).join(" ")}
-          fill="none" stroke={C.border} strokeWidth="1" />
-
-        {outer.map((p, i) => (
-          <g key={"ln" + i}>
-            <line x1={p[0]} y1={p[1]} x2={cx} y2={cy} stroke={C.border} strokeWidth="0.8" />
-            <line x1={p[0]} y1={p[1]} x2={outer[(i + 3) % 8][0]} y2={outer[(i + 3) % 8][1]}
-              stroke={C.border} strokeWidth="0.6" opacity="0.5" />
-          </g>
-        ))}
-
-        {["NW", "NE", "SE", "SW"].map((k) => rayOn(k) && (
-          <line key={"rl" + k} x1={at(k)[0]} y1={at(k)[1]} x2={cx} y2={cy}
-            stroke={rayColor[k]} strokeWidth="1.6" opacity="0.5" />
-        ))}
-
-        {on.age && (() => {
-          const kR = 1.24;
-          const dots = Array.from({ length: 32 }, (_, i) => {
-            const deg = 180 - i * 11.25;              // по часовой от запада
-            const a = (deg * Math.PI) / 180;
-            return { i, x: cx + R0 * kR * Math.cos(a), y: cy - R0 * kR * Math.sin(a), deg };
-          });
-          return (
-            <g>
-              {dots.map((d) => d.i % 4 !== 0 && (
-                <circle key={"q" + d.i} cx={d.x} cy={d.y} r="3.4"
-                  fill="none" stroke={C.borderHi} strokeWidth="0.9" opacity="0.75" />
-              ))}
-              {order.map((k, i) => {
-                const [x, y] = at(k, kR);
-                const [lx, ly] = at(k, kR + 0.15);
-                return (
-                  <g key={"ag" + k}>
-                    <circle cx={x} cy={y} r="14" fill={C.bg} stroke={C.gold}
-                      strokeWidth="1" opacity="0.85" />
-                    <text x={x} y={y} textAnchor="middle" dominantBaseline="central"
-                      fill={C.gold} fontSize="12"
-                      fontFamily={FONT.serif}>{DEMO.core[k]}</text>
-                    <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central"
-                      fill={C.muted} fontSize="10.5">{AGE[k]}</text>
-                  </g>
-                );
-              })}
-            </g>
-          );
-        })()}
-
-        {P.map((p) => {
-          if (p.layer && !on[p.layer]) return null;
-          const isSel = sel === p.id;
-          const isHov = hov === p.id;
-          const col = colorOf(p);
-          const strong = isSel || isHov;
-          return (
-            <g key={p.id} className="octaPt" onClick={() => setSel(p.id)}
-              onMouseEnter={() => setHov(p.id)} onMouseLeave={() => setHov(null)}>
-              {strong && <circle cx={p.x} cy={p.y} r={p.r + 9} fill={col} opacity="0.14" />}
-              <circle cx={p.x} cy={p.y} r={p.r}
-                fill={p.kind === "center" ? C.cardHi : C.bg}
-                stroke={strong ? col : p.kind === "axis" ? C.border : col}
-                strokeWidth={strong ? 2.2 : p.kind === "axis" ? 1 : 1.4}
-                opacity={p.kind === "axis" && !strong ? 0.9 : 1} />
-              <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central"
-                fill={p.kind === "axis" && !strong ? C.muted : col}
-                fontSize={p.kind === "center" ? 25 : p.kind === "main" ? 21 : p.kind === "corner" ? 18 : 13}
-                fontFamily={FONT.serif}>{p.v}</text>
-            </g>
-          );
-        })}
-      </svg>
-
-      <div style={S.octaPanel}>
-        {active ? (
-          <>
-            <div style={S.octaPanelTop}>
-              <span style={S.octaVal}>{active.v}</span>
-              <div>
-                <div style={S.octaTitle}>{active.title}</div>
-                <div style={S.octaArc}>Аркан {active.v} — {ARCANA[active.v - 1]}</div>
-              </div>
-            </div>
-            <p style={S.octaHint}>{active.hint}</p>
-          </>
-        ) : (
-          <p style={S.octaHint}>Нажмите на любое число — покажем, что оно означает.</p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-
-const BAR = { p: C.gold, e: C.lilac, m: C.pink };
-
-function ChakraDemo() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-      <div style={{ ...S.chkRow, borderBottom: `1px solid ${C.border}`, paddingBottom: 10, flex: "0 0 auto" }}>
-        <span style={S.chkName} />
-        <span style={S.chkLegend}>
-          {[["p", "физика"], ["e", "энергия"], ["m", "эмоции"]].map(([k, l]) => (
-            <span key={k} style={S.chkLeg}>
-              <span style={{ ...S.chkLegDot, background: BAR[k] }} />{l}
-            </span>
-          ))}
-        </span>
-        <span style={S.chkHead}>Ф</span>
-        <span style={S.chkHead}>Э</span>
-        <span style={S.chkHead}>Эм</span>
-      </div>
-
-      {DEMO.chakras.map((c) => (
-        <div key={c.n} className="chk" style={{ ...S.chkRow, flex: "1 1 0", minHeight: 54 }}>
-          <span style={S.chkName}>
-            <span style={{ ...S.chkBar, background: c.c }} />
-            <span>
-              <span style={{ display: "block", color: C.white, fontSize: 14.5 }}>{c.n}</span>
-              <span style={{ display: "block", color: C.muted, fontSize: 11.5 }}>{c.s}</span>
-            </span>
-          </span>
-          <span style={S.chkGauge}>
-            {["p", "e", "m"].map((k) => (
-              <span key={k} style={S.chkTrack}>
-                <span style={{
-                  ...S.chkFill,
-                  width: (c[k] / 22) * 100 + "%",
-                  background: BAR[k],
-                }} />
-              </span>
-            ))}
-          </span>
-          <span style={S.chkVal}>{c.p}</span>
-          <span style={S.chkVal}>{c.e}</span>
-          <span style={S.chkVal}>{c.m}</span>
-        </div>
-      ))}
-
-      <div style={{
-        ...S.chkRow, borderTop: `2px solid ${C.borderHi}`, marginTop: 4,
-        paddingTop: 14, flex: "0 0 auto",
-        background: "rgba(228,190,114,0.05)", borderRadius: R.sm,
-      }}>
-        <span style={{ ...S.chkName, color: C.gold, fontSize: 15, paddingLeft: 14, fontWeight: 600 }}>
-          Итог · общее энергополе
-        </span>
-        <span />
-        <span style={{ ...S.chkVal, color: C.gold }}>{DEMO.total.p}</span>
-        <span style={{ ...S.chkVal, color: C.gold }}>{DEMO.total.e}</span>
-        <span style={{ ...S.chkVal, color: C.gold }}>{DEMO.total.m}</span>
-      </div>
-    </div>
-  );
-}
-
-function Timeline() {
-  const W = 900, H = 128, padX = 34;
-  const span = W - padX * 2;
-  const xOf = (age) => padX + (age / 80) * span;
-  const nowX = xOf(DEMO.now);
-
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-      <line x1={padX} y1={64} x2={W - padX} y2={64} stroke={C.border} strokeWidth="1.5" />
-      <line x1={padX} y1={64} x2={nowX} y2={64} stroke={C.gold} strokeWidth="1.5" opacity="0.75" />
-
-      {DEMO.timeline.map((p, i) => {
-        const x = xOf(p.age);
-        const passed = p.age <= DEMO.now;
-        return (
-          <g key={i}>
-            <circle cx={x} cy={64} r="17" fill={C.bg}
-              stroke={passed ? C.gold : C.borderHi} strokeWidth="1.3" />
-            <text x={x} y={64} textAnchor="middle" dominantBaseline="central"
-              fill={passed ? C.gold : C.text} fontSize="14"
-              fontFamily={FONT.serif}>{p.a}</text>
-            <text x={x} y={100} textAnchor="middle" fill={C.muted} fontSize="11">
-              {p.age}
-            </text>
-          </g>
-        );
-      })}
-
-      <g>
-        <line x1={nowX} y1={20} x2={nowX} y2={44} stroke={C.lilac} strokeWidth="1.4" strokeDasharray="3 3" />
-        <circle cx={nowX} cy={16} r="4" fill={C.lilac} />
-        <text x={nowX} y={8} textAnchor="middle" fill={C.lilac} fontSize="11.5">сейчас</text>
-      </g>
-    </svg>
   );
 }
 
