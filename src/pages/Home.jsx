@@ -5,6 +5,7 @@ import { S } from "../theme/styles.js";
 import { Spark } from "../components/Icons.jsx";
 import { CALC_NAV, DEFAULT_CALC, calcById, activeNavId } from "../routes.js";
 import { partsToUrlDate } from "../lib/urlDate.js";
+import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import Octagram from "../components/Octagram.jsx";
@@ -179,6 +180,7 @@ export default function Home() {
   const [a, setA] = useState({ name: "", d: "", m: "", y: "", g: "" });
   const [b, setB] = useState({ name: "", d: "", m: "", y: "", g: "" });
   const [faqOpen, setFaqOpen] = useState(0);
+  const isPhone = useIsPhone();
 
   const filled = (p) => p.name.trim() && p.d && p.m && p.y && p.g;
   const ready = filled(a) && (!calc.pairs || filled(b));
@@ -201,8 +203,12 @@ export default function Home() {
     <>
       {/* HERO */}
       <section style={{ ...S.section, paddingTop: 56, paddingBottom: 64 }}>
-        <div style={S.heroGrid}>
-          <div>
+        {/* minmax(0, 1fr), а не 1fr: колонка «1fr» не сжимается уже своего
+            содержимого, и лента вкладок внутри растягивала бы весь экран. */}
+        <div style={{ ...S.heroGrid, ...(isPhone ? { gridTemplateColumns: "minmax(0, 1fr)", gap: 30 } : null) }}>
+          {/* На телефоне форма идёт первой: человек пришёл считать,
+              а не читать. Меняем порядок, а не разметку. */}
+          <div style={isPhone ? { order: 2 } : null}>
             <div style={S.eyebrow}>Онлайн-калькулятор матрицы судьбы</div>
             <h1 style={S.h1}>
               Прочитайте свою жизнь по <em style={S.h1em}>дате рождения</em>
@@ -219,17 +225,19 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={S.form}>
+          <div style={{ ...S.form, ...(isPhone ? { order: 1, padding: "20px 16px 22px" } : null) }}>
             <div style={S.formTitle}>Рассчитать матрицу</div>
             <div style={S.formSub}>Выберите тип расчёта и заполните данные</div>
 
-            <div style={S.tabs}>
+            <div className={isPhone ? "hScroll" : undefined}
+              style={isPhone ? { ...hScrollRow, gap: 8, paddingBottom: 4 } : S.tabs}>
               {CALC_NAV.map((c) => {
                 const on = tab === c.id;
                 return (
                   <Link key={c.id} to={c.path} className="chip"
                     style={{
                       ...S.chip,
+                      ...(isPhone ? { minHeight: TAP, display: "flex", alignItems: "center", whiteSpace: "nowrap" } : null),
                       background: on ? C.gold : "transparent",
                       borderColor: on ? C.gold : C.border,
                       color: on ? C.ink : C.text,

@@ -4,6 +4,7 @@ import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import { dailyTextKey } from "../lib/contentPositions.js";
 import { useSlotText } from "./useSlotText.js";
+import { useIsPhone, useIsNarrow } from "../theme/responsive.js";
 
 /**
  * АРКАН ДНЯ
@@ -37,6 +38,8 @@ const humanDate = (iso) => {
 
 export default function DayArcana({ today }) {
   const weekday = WEEKDAYS[new Date(`${today.date}T12:00:00`).getDay()];
+  const isPhone = useIsPhone();
+  const isNarrow = useIsNarrow();
 
   const { loading, text } = useSlotText({
     key: dailyTextKey(today.dayArcana, today.arcana, today.date),
@@ -50,9 +53,13 @@ export default function DayArcana({ today }) {
   });
 
   return (
-    <div className="card" style={S.dayCard}>
+    <div className="card" style={{
+      ...S.dayCard,
+      ...(isNarrow ? { gridTemplateColumns: "minmax(0, 1fr)", gap: 18 } : null),
+      ...(isPhone ? { padding: "22px 18px" } : null),
+    }}>
       <div style={S.dayBigWrap}>
-        <span style={S.dayBig}>{today.dayArcana}</span>
+        <span style={{ ...S.dayBig, ...(isPhone ? { fontSize: 74 } : null) }}>{today.dayArcana}</span>
         <div style={S.dayArcName}>{ARCANA_NAMES[today.dayArcana]}</div>
         <div style={{ ...S.dayPeriod, marginTop: 6 }}>
           {weekday}, {humanDate(today.date)}

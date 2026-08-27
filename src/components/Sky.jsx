@@ -14,7 +14,11 @@ import { S } from "../theme/styles.js";
  * На тач-устройствах параллакс не запускается — там нет курсора,
  * а анимация просто ест батарею.
  */
-export default function Sky() {
+/**
+ * @param {boolean} [small] — телефон: воронку делаем меньше и бледнее,
+ * иначе на маленьком экране она забивает текст.
+ */
+export default function Sky({ small = false }) {
   const l0 = useRef(null), l1 = useRef(null), l2 = useRef(null);
   const tunnel = useRef(null);
 
@@ -82,7 +86,12 @@ export default function Sky() {
         </div>
       ))}
 
-      <div ref={tunnel} style={S.tunnelWrap}>
+      <div ref={tunnel} style={{
+        ...S.tunnelWrap,
+        width: small ? "min(56vh, 340px)" : "min(84vh, 720px)",
+        height: small ? "min(56vh, 340px)" : "min(84vh, 720px)",
+        opacity: small ? 0.45 : 1,
+      }}>
         <div style={S.glow} />
         <svg viewBox="0 0 600 600" style={S.tunnelSvg}>
           <defs>

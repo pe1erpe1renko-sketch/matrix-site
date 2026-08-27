@@ -11,6 +11,7 @@ import { buildMentorContext, mentorPlaceholder } from "../lib/mentorContext.js";
 import { calculateMatrix, toISODate } from "../lib/matrixEngine.js";
 import { Spark } from "../components/Icons.jsx";
 import LoginModal from "../components/LoginModal.jsx";
+import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 
 /**
  * ИИ-НАСТАВНИК — /chat
@@ -46,6 +47,7 @@ export default function Chat() {
   const [draft, setDraft] = useState("");
   const [aboutId, setAboutId] = useState(null);
   const [login, setLogin] = useState(false);
+  const isPhone = useIsPhone();
 
   const limits = PLAN_LIMITS[plan];
   const askedToday = messagesToday(list, toISODate(new Date()));
@@ -210,6 +212,7 @@ export default function Chat() {
               {messages.map((message, i) => (
                 <div key={i} style={{
                   ...S.msg,
+                  maxWidth: isPhone ? "88%" : S.msg.maxWidth,
                   alignSelf: message.role === "me" ? "flex-end" : "flex-start",
                   background: message.role === "me" ? C.lilacBtn : "rgba(23,18,46,0.72)",
                   color: message.role === "me" ? C.ink : C.text,
@@ -224,13 +227,15 @@ export default function Chat() {
       {view === "chat" && (
         <div style={S.composer}>
           <div style={S.composerInner}>
-            <div style={S.aboutRow}>
-              <span style={S.dimSm}>О ком говорим:</span>
+            <div className={isPhone ? "hScroll" : undefined}
+              style={isPhone ? { ...hScrollRow, gap: 8, alignItems: "center", marginBottom: 10 } : S.aboutRow}>
+              <span style={{ ...S.dimSm, whiteSpace: "nowrap" }}>О ком говорим:</span>
               {people.map((person) => {
                 const on = about && about.id === person.id;
                 return (
                   <button key={person.id} className="chip" style={{
                     ...S.chip,
+                    ...(isPhone ? { minHeight: TAP, whiteSpace: "nowrap" } : null),
                     background: on ? C.lilacBtn : "transparent",
                     borderColor: on ? C.lilacBtn : C.border,
                     color: on ? C.ink : C.text, fontWeight: on ? 600 : 400,
@@ -241,10 +246,14 @@ export default function Chat() {
 
             {/* Подсказки только на пустом экране: в разговоре они мешают. */}
             {empty && (
-              <div style={S.hints}>
+              <div style={{ ...S.hints, ...(isPhone ? { flexDirection: "column", alignItems: "stretch" } : null) }}>
                 {HINTS.map((hint) => (
                   <button key={hint} className="chip"
-                    style={{ ...S.chip, borderColor: C.border, color: C.text }}
+                    style={{
+                      ...S.chip, background: "transparent",
+                      borderColor: C.border, color: C.text,
+                      ...(isPhone ? { minHeight: TAP, textAlign: "left", justifyContent: "flex-start" } : null),
+                    }}
                     onClick={() => send(hint)}>{hint}</button>
                 ))}
               </div>

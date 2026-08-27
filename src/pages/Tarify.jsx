@@ -7,6 +7,7 @@ import { usePeople, telegramUsed } from "../lib/people.js";
 import { useConversations, messagesToday } from "../lib/conversations.js";
 import { toISODate } from "../lib/matrixEngine.js";
 import { Meter } from "../components/Controls.jsx";
+import { useIsPhone, TAP } from "../theme/responsive.js";
 
 /**
  * ТАРИФЫ И ОПЛАТА — /tarify
@@ -46,6 +47,7 @@ export default function Tarify() {
   const people = usePeople();
   const { list } = useConversations();
   const limits = PLAN_LIMITS[plan];
+  const isPhone = useIsPhone();
 
   const askedToday = messagesToday(list, toISODate(new Date()));
   const nextPlan = PLAN_ORDER[Math.min(PLAN_ORDER.indexOf(plan) + 1, PLAN_ORDER.length - 1)];
@@ -78,7 +80,7 @@ export default function Tarify() {
           <Meter label="Сообщений наставнику сегодня" now={askedToday} max={limits.messages} wide />
         </div>
 
-        <div style={S.planBtns}>
+        <div style={{ ...S.planBtns, ...(isPhone ? { marginLeft: 0, width: "100%" } : null) }}>
           {canUpgrade && (
             <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}
               onClick={() => setPlan(nextPlan)}>
@@ -152,7 +154,19 @@ export default function Tarify() {
 
       <div className="card" style={{ ...S.block, marginTop: 16 }}>
         <div style={S.blockTitle}>История платежей</div>
-        {HISTORY.map((row) => (
+        {/* На телефоне строка таблицы не помещается и рвётся на четыре
+            уровня — вместо неё карточка на каждый платёж. */}
+        {HISTORY.map((row) => (isPhone ? (
+          <div key={row.date} style={S.histCard}>
+            <div style={{ color: C.white }}>{row.subject}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <span style={{ color: C.gold, fontWeight: 600, fontSize: 16 }}>{row.sum}</span>
+              <span style={{ color: C.ok, fontSize: 12.5 }}>оплачено</span>
+              <span style={{ ...S.dimSm, marginLeft: "auto" }}>{row.date}</span>
+            </div>
+            <button className="link" style={{ ...S.linkBtn, alignSelf: "flex-start", minHeight: TAP }}>чек</button>
+          </div>
+        ) : (
           <div key={row.date} style={S.histRow}>
             <span style={{ color: C.muted, minWidth: 150 }}>{row.date}</span>
             <span style={{ flex: 1, color: C.white, minWidth: 180 }}>{row.subject}</span>
@@ -160,7 +174,7 @@ export default function Tarify() {
             <span style={{ color: C.gold, fontWeight: 600 }}>{row.sum}</span>
             <button className="link" style={S.linkBtn}>чек</button>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );

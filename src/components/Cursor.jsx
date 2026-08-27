@@ -10,6 +10,10 @@ import { S } from "../theme/styles.js";
  */
 export default function Cursor() {
   const dot = useRef(null), ring = useRef(null);
+  /* Макет не монтирует курсор на тач-устройствах, но проверка остаётся
+     здесь же: компонент не должен зависеть от того, кто его вызвал. */
+  const coarse = typeof window !== "undefined" && window.matchMedia
+    && window.matchMedia("(pointer: coarse)").matches;
 
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) return;
@@ -35,6 +39,8 @@ export default function Cursor() {
       window.removeEventListener("mouseup", up);
     };
   }, []);
+
+  if (coarse) return null;
 
   return (
     <>

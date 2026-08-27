@@ -72,4 +72,66 @@ a { color: inherit; text-decoration: none; }
 .btnGhost { background: transparent; color: ${C.muted}; }
 .btnGhost:hover { color: ${C.white}; }
 .socialBtn:hover { border-color: ${C.lilac}; }
+
+/* ---- мобильный режим ---- */
+
+/*
+ * ОТСТУПЫ ЧЕРЕЗ ПЕРЕМЕННЫЕ.
+ * Вёрстка на встроенных стилях, а их медиазапросом не перекрыть. Зато
+ * встроенный стиль может СОСЛАТЬСЯ на переменную — и вот её значение
+ * медиазапрос уже меняет. Так все секции сужаются на телефоне разом,
+ * без правки каждой страницы.
+ */
+:root {
+  --secX: 52px;   /* боковой отступ секции */
+  --secY: 62px;   /* верх и низ секции */
+  --cabY: 40px;   /* кабинет сверху */
+  --cabB: 64px;   /* кабинет снизу */
+  --chatX: 24px;  /* поля чата */
+  --appTop: 0px;  /* высота мобильной шапки: на десктопе её нет */
+}
+@media (max-width: 1024px) {
+  :root { --secX: 30px; --secY: 48px; --cabY: 30px; --cabB: 48px; --chatX: 18px; }
+}
+@media (max-width: 640px) {
+  :root { --secX: 16px; --secY: 34px; --cabY: 20px; --cabB: 36px; --chatX: 12px; --appTop: 56px; }
+}
+
+/* Полоса прокрутки у боковых лент только мешает: лента и так очевидна. */
+.hScroll::-webkit-scrollbar { display: none; }
+.hScroll > * { flex-shrink: 0; }
+
+/* Страница целиком вбок не ездит. Прокручиваются только те блоки,
+   которым это осмысленно — им проставлен overflow-x на самом блоке. */
+html, body { max-width: 100%; overflow-x: hidden; }
+
+/* Схема матрицы: жесты забирает компонент, браузер не должен
+   одновременно скроллить страницу под пальцем. */
+.octaStage { touch-action: none; }
+
+/* На тач-устройствах курсор системный, свой не рисуем. */
+@media (pointer: coarse) {
+  html, body, button, input, select, a, label, textarea { cursor: auto; }
+}
+
+@media (max-width: 640px) {
+  /* Полосы-индикаторы в чакральной таблице на телефоне скрыты:
+     места мало, числа важнее. */
+  .chkGauge { display: none !important; }
+
+  /*
+   * Палец — не курсор: цель меньше 44 пикселей по высоте нажимается
+   * с промахом. Высоту задаём классом, а не встроенным стилем: min-height
+   * во встроенных стилях кнопок не выставлен, поэтому перебивать нечего
+   * и правило срабатывает.
+   */
+  .chip, .btnGold, .btnOutline, .btnGhost, .socialBtn, .inAct, .delBtn, .link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Ссылка внутри строки состояния остаётся по левому краю. */
+  .link { justify-content: flex-start; }
+}
 `;

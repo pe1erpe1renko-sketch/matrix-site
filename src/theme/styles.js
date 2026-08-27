@@ -51,7 +51,7 @@ export const S = {
     display: "flex", alignItems: "center", padding: "0 16px",
     borderBottom: `1px solid ${C.border}`, height: 74,
   },
-  logo: { display: "flex", alignItems: "center", gap: 11 },
+  logo: { display: "flex", alignItems: "center", gap: 11, minHeight: 44 },
   logoText: { fontSize: 19, fontWeight: 600, color: C.white, letterSpacing: "0.24em", lineHeight: 1 },
   collapse: {
     background: "transparent", border: `1px solid ${C.border}`, color: C.muted,
@@ -75,11 +75,11 @@ export const S = {
   },
 
   main: { flex: 1, minWidth: 0, position: "relative", zIndex: 2 },
-  section: { padding: "62px 52px", position: "relative" },
+  section: { padding: "var(--secY) var(--secX)", position: "relative" },
 
   heroGrid: {
     display: "grid", width: "100%",
-    gridTemplateColumns: "minmax(300px, 1fr) minmax(330px, 440px)",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(330px, 440px)",
     gap: 56, alignItems: "center",
   },
 
@@ -115,10 +115,13 @@ export const S = {
   },
   formTitle: { fontFamily: FONT.serif, fontSize: 21, color: C.white, marginBottom: 4 },
   formSub: { fontSize: 13, color: C.muted, marginBottom: 16 },
-  tabs: { display: "flex", flexWrap: "wrap", gap: 7 },
+  tabs: { display: "flex", flexWrap: "wrap", gap: 8 },
   chip: {
     padding: "7px 13px", borderRadius: R.pill, fontSize: 12.5,
     border: "1px solid", fontFamily: "inherit", transition: "all .16s ease",
+    /* Фон обязателен: без него браузер рисует кнопке системный светло-серый,
+       и на тёмном фоне вылезает белая плашка. */
+    background: "transparent",
   },
   personLabel: {
     fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase",
@@ -130,19 +133,19 @@ export const S = {
     textTransform: "uppercase", color: C.muted, margin: "11px 0 6px",
   },
   input: {
-    width: "100%", padding: "10px 13px", borderRadius: R.md,
+    width: "100%", padding: "11px 13px", borderRadius: R.md, minHeight: 44,
     background: "rgba(10,8,23,0.72)", border: `1px solid ${C.border}`,
     color: C.white, fontSize: 14, fontFamily: "inherit", boxSizing: "border-box",
   },
   dateRow: { display: "grid", gridTemplateColumns: "1fr 1.1fr 1fr", gap: 8 },
   select: {
-    width: "100%", padding: "10px 9px", borderRadius: R.md,
+    width: "100%", padding: "11px 9px", borderRadius: R.md, minHeight: 44,
     background: "rgba(10,8,23,0.72)", border: `1px solid ${C.border}`,
     color: C.white, fontSize: 14, fontFamily: "inherit", boxSizing: "border-box",
   },
-  genderRow: { display: "flex", gap: 6 },
+  genderRow: { display: "flex", gap: 8 },
   gender: {
-    width: 42, padding: "10px 0", borderRadius: R.md, fontSize: 13.5,
+    width: 44, minHeight: 44, padding: "10px 0", borderRadius: R.md, fontSize: 13.5,
     border: "1px solid", fontFamily: "inherit", transition: "all .16s ease",
   },
   cta: {
@@ -160,7 +163,7 @@ export const S = {
   },
 
   undGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))",
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))",
     gap: 52, alignItems: "start",
   },
   undAside: {
@@ -179,7 +182,7 @@ export const S = {
   undTxt: { fontSize: 15.5, color: C.text, lineHeight: 1.55 },
   uMark: { color: C.gold, flexShrink: 0 },
 
-  layerRow: { display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 6 },
+  layerRow: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 6 },
   layerChip: {
     display: "flex", alignItems: "center", gap: 7,
     padding: "6px 12px", borderRadius: R.pill, fontSize: 11.5,
@@ -188,6 +191,19 @@ export const S = {
   layerDot: {
     width: 7, height: 7, borderRadius: 4, border: "1px solid",
     flexShrink: 0, transition: "all .16s ease",
+  },
+  /* Сцена схемы строго квадратная: иначе при зуме она то вытягивается,
+     то сплющивается, и точки уезжают из-под пальца. */
+  octaStage: {
+    width: "100%", aspectRatio: "1 / 1", overflow: "hidden",
+    borderRadius: R.md, position: "relative",
+  },
+  zoomRow: { display: "flex", alignItems: "center", gap: 8, marginTop: 10 },
+  zoomBtn: {
+    width: 44, height: 44, borderRadius: R.md, flexShrink: 0,
+    background: "rgba(10,8,23,0.6)", border: `1px solid ${C.border}`,
+    color: C.white, fontSize: 20, lineHeight: 1, fontFamily: "inherit",
+    display: "flex", alignItems: "center", justifyContent: "center",
   },
   octaPanel: {
     marginTop: 14, padding: "16px 18px", borderRadius: R.lg,
@@ -210,7 +226,7 @@ export const S = {
   infoText: { margin: 0, color: C.text, fontSize: 14.5 },
 
   demoGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 16,
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))", gap: 16,
   },
   demoCard: {
     background: "rgba(23,18,46,0.78)", border: `1px solid ${C.border}`,
@@ -254,7 +270,7 @@ export const S = {
   },
 
   arcGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: 12,
+    display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 158px), 1fr))", gap: 12,
   },
   arcTile: {
     position: "relative", overflow: "hidden",
@@ -282,7 +298,7 @@ export const S = {
     opacity: 0.5,
   },
   flow: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))",
     gap: 16, position: "relative",
   },
   flowCard: {
@@ -332,7 +348,7 @@ export const S = {
   },
 
   plans: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
     gap: 17, alignItems: "stretch",
   },
   plan: {
@@ -374,10 +390,10 @@ export const S = {
   },
 
   footer: {
-    borderTop: `1px solid ${C.border}`, padding: "50px 52px 36px",
+    borderTop: `1px solid ${C.border}`, padding: "44px var(--secX) 32px",
     background: "rgba(15,11,32,0.92)",
   },
-  footGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 36 },
+  footGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 36 },
   footTitle: {
     fontSize: 11.5, letterSpacing: "0.15em", textTransform: "uppercase",
     color: C.gold, marginBottom: 15,
@@ -451,7 +467,7 @@ export const S = {
 
   /* предназначения */
   purposeGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14,
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 14,
   },
   purposeCard: {
     padding: "20px 22px 22px", borderRadius: R.lg,
@@ -470,7 +486,7 @@ export const S = {
 
   /* родовые программы */
   lineGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14,
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 14,
   },
   lineCard: {
     padding: "22px 24px", borderRadius: R.lg,
@@ -568,7 +584,7 @@ export const S = {
 
   /* ядра партнёров */
   coreGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))",
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 70px), 1fr))",
     gap: 8, marginTop: 14,
   },
   coreCell: {
@@ -580,7 +596,7 @@ export const S = {
 
   /* ═══════════ ЛИЧНЫЙ КАБИНЕТ ═══════════ */
 
-  cabinet: { padding: "40px 46px 64px" },
+  cabinet: { padding: "var(--cabY) var(--secX) var(--cabB)" },
   head: {
     display: "flex", justifyContent: "space-between", alignItems: "flex-start",
     gap: 20, flexWrap: "wrap", marginBottom: 26,
@@ -609,7 +625,7 @@ export const S = {
   fill: { height: "100%", borderRadius: 3, transition: "width .3s ease" },
 
   /* карточки матриц */
-  pGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(330px, 1fr))", gap: 16 },
+  pGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 330px), 1fr))", gap: 16 },
   pCard: {
     background: SURFACE.card, border: "1px solid", borderRadius: R.xl,
     padding: 20, display: "flex", flexDirection: "column", gap: 16, transition: "all .18s ease",
@@ -669,7 +685,7 @@ export const S = {
 
   /* лента прогнозов */
   feedDay: { fontSize: 11.5, letterSpacing: ".14em", textTransform: "uppercase", color: C.gold, marginBottom: 12 },
-  feedGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 },
+  feedGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: 14 },
   feedCard: { background: SURFACE.card, border: "1px solid", borderRadius: R.lg, padding: 18, transition: "all .18s ease" },
   feedTop: { display: "flex", alignItems: "center", gap: 12, marginBottom: 10 },
   feedArc: {
@@ -686,16 +702,16 @@ export const S = {
   },
 
   /* вкладка «Данные» */
-  two: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 16, alignItems: "start" },
+  two: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))", gap: 16, alignItems: "start" },
   /* 280px — минимум, при котором подпись в поле не заезжает под кнопку
      «Активировать»: она внутри поля, а не рядом с ним. */
-  half: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 },
+  half: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 16 },
   block: { background: SURFACE.card, border: `1px solid ${C.border}`, borderRadius: R.xl, padding: "22px 24px", transition: "all .18s ease" },
   blockHead: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18 },
   blockTitle: { fontSize: 11.5, letterSpacing: ".15em", textTransform: "uppercase", color: C.gold, marginBottom: 16 },
   blockTitle2: { fontSize: 11.5, letterSpacing: ".15em", textTransform: "uppercase", color: C.gold, margin: "24px 0 14px" },
   field: { display: "flex", alignItems: "center", gap: 14, padding: "11px 0", borderBottom: `1px solid ${C.border}`, flexWrap: "wrap" },
-  socials: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 9 },
+  socials: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: 9 },
   social: {
     border: "1px solid", borderRadius: R.md, padding: "11px 13px", display: "flex",
     justifyContent: "space-between", alignItems: "center", gap: 8, fontSize: 13.5,
@@ -728,7 +744,7 @@ export const S = {
     color: C.gold, fontFamily: "monospace", fontSize: 13, boxSizing: "border-box",
     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", userSelect: "text",
   },
-  refGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 26, alignItems: "start" },
+  refGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 26, alignItems: "start" },
   refStats: { display: "flex", gap: 26, flexWrap: "wrap" },
   refNum: { display: "block", fontFamily: FONT.serif, fontSize: 24, color: C.gold, lineHeight: 1, marginBottom: 4 },
   delWrap: { display: "flex", justifyContent: "center", marginTop: 22 },
@@ -760,10 +776,21 @@ export const S = {
   },
 
   /* наставник */
-  chatPage: { display: "flex", flexDirection: "column", height: "100vh", position: "relative" },
+  /* dvh, а не vh: на iOS адресная строка съедает часть vh, и поле ввода
+     уезжает под клавиатуру. dvh считает живую высоту окна.
+     height задан дважды намеренно — первая строка запасная для браузеров
+     без dvh, вторая перекрывает её там, где dvh поддерживается. */
+  chatPage: {
+    display: "flex", flexDirection: "column", position: "relative",
+    /* Из высоты окна вычитается мобильная шапка: на телефоне чат живёт
+       под ней, и без вычитания поле ввода уезжает за нижний край. */
+    height: "calc(100vh - var(--appTop))",
+    minHeight: "calc(100dvh - var(--appTop))",
+    maxHeight: "calc(100dvh - var(--appTop))",
+  },
   chatTop: {
     display: "flex", alignItems: "center", justifyContent: "space-between",
-    gap: 16, padding: "18px 32px", flexShrink: 0,
+    gap: 16, padding: "16px var(--chatX)", flexShrink: 0,
   },
   chatTabs: { display: "flex", gap: 4 },
   chatTab: {
@@ -771,7 +798,7 @@ export const S = {
     fontSize: 13.5, fontFamily: "inherit", transition: "all .16s ease",
   },
   counter: { marginLeft: "auto", fontSize: 12.5 },
-  chatCenter: { flex: 1, overflowY: "auto", padding: "34px 24px 20px", width: "100%", maxWidth: 820, margin: "0 auto" },
+  chatCenter: { flex: 1, overflowY: "auto", padding: "28px var(--chatX) 20px", width: "100%", maxWidth: 820, margin: "0 auto" },
   chatH2: { fontFamily: FONT.serif, fontSize: 22, color: C.white, margin: "0 0 18px", fontWeight: 600 },
   intro: { textAlign: "center", padding: "26px 0 10px" },
   introIcon: {
@@ -794,10 +821,10 @@ export const S = {
   histLast: { color: C.muted, fontSize: 12.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
   histMeta: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 5, flexShrink: 0 },
   histAbout: { fontSize: 11, color: C.lilac, border: `1px solid ${C.borderHi}`, borderRadius: R.pill, padding: "2px 9px" },
-  composer: { flexShrink: 0, padding: "0 24px 22px" },
+  composer: { flexShrink: 0, padding: "0 var(--chatX) 18px" },
   composerInner: { width: "100%", maxWidth: 820, margin: "0 auto" },
   aboutRow: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 },
-  hints: { display: "flex", gap: 7, flexWrap: "wrap", margin: "14px 0" },
+  hints: { display: "flex", gap: 8, flexWrap: "wrap", margin: "14px 0" },
   inputBox: {
     display: "flex", alignItems: "flex-end", gap: 10, padding: 8,
     borderRadius: 20, background: "rgba(23,18,46,0.9)", border: `1px solid ${C.border}`,
@@ -847,7 +874,7 @@ export const S = {
     flexShrink: 0, transition: "all .18s ease",
   },
   tip: {
-    position: "absolute", bottom: "calc(100% + 8px)", right: 0,
+    position: "absolute", bottom: "calc(100% + 8px)", right: 0, maxWidth: "60vw",
     background: C.cardHi, border: `1px solid ${C.borderHi}`, color: C.white,
     fontSize: 11.5, padding: "5px 10px", borderRadius: R.sm,
     whiteSpace: "nowrap", pointerEvents: "none", opacity: 0, transition: "opacity .16s ease",
@@ -867,4 +894,47 @@ export const S = {
   userPlan: { color: C.gold, fontSize: 12 },
   checkRow: { display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13, color: C.text, marginTop: 12, textAlign: "left", background: "none", border: "none", fontFamily: "inherit", padding: 0, width: "100%" },
   checkBox: { width: 18, height: 18, borderRadius: 5, border: "1px solid", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 },
+
+  /* ═══════════ ТЕЛЕФОН ═══════════ */
+
+  /* На телефоне макет колонкой: шапка сверху, содержимое под ней.
+     Меню выезжает поверх и в поток не попадает. */
+  rootPhone: {
+    display: "flex", flexDirection: "column", minHeight: "100vh",
+    background: C.bg, color: C.text, fontFamily: FONT.sans,
+    fontSize: 15, lineHeight: 1.6, position: "relative",
+    width: "100%", overflowX: "hidden",
+  },
+  topBar: {
+    display: "grid", gridTemplateColumns: "44px 1fr 44px", alignItems: "center",
+    gap: 8, height: 56, padding: "0 10px", position: "sticky", top: 0, zIndex: 20,
+    background: "rgba(13,10,30,0.94)", backdropFilter: "blur(12px)",
+    borderBottom: `1px solid ${C.border}`,
+  },
+  topBtn: {
+    width: 44, height: 44, borderRadius: R.md, border: "none",
+    background: "transparent", color: C.text,
+    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  backdrop: {
+    position: "fixed", inset: 0, zIndex: 40,
+    background: "rgba(6,4,14,0.7)", backdropFilter: "blur(3px)",
+    transition: "opacity .22s ease",
+  },
+  drawer: {
+    position: "fixed", left: 0, top: 0, bottom: 0, zIndex: 41,
+    width: "min(288px, 86vw)", display: "flex", flexDirection: "column",
+    background: "rgba(13,10,30,0.98)", borderRight: `1px solid ${C.border}`,
+    transition: "transform .24s cubic-bezier(.4,0,.2,1)", willChange: "transform",
+  },
+  drawerTop: {
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+    padding: "0 10px 0 16px", height: 56, borderBottom: `1px solid ${C.border}`, flexShrink: 0,
+  },
+
+  /* Карточка платежа вместо строки таблицы. */
+  histCard: {
+    border: `1px solid ${C.border}`, borderRadius: R.md, padding: "14px 16px",
+    marginBottom: 10, display: "flex", flexDirection: "column", gap: 6,
+  },
 };

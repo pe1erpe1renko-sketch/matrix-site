@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { C, FONT } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { POINT_SLOTS, findSectionForPoint, resolvePath, textKey } from "../lib/contentPositions.js";
 import { POINT_CODES } from "../lib/matrixEngine.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import { useSlotText } from "./useSlotText.js";
+import { useIsPhone, useIsTouch, hScrollRow, TAP } from "../theme/responsive.js";
 
 /**
  * ОКТАГРАММА
@@ -114,6 +115,13 @@ export default function Octagram({
   const [selected, setSelected] = useState(emphasis ? `point_${emphasis}` : "point_C");
   const [hovered, setHovered] = useState(null);
 
+  const isPhone = useIsPhone();
+  const isTouch = useIsTouch();
+  /* Жесты и кнопки масштаба нужны там, где схема мелкая: на телефоне
+     и на любом тач-экране. На широком десктопе схема и так читается. */
+  const zoomable = isPhone || isTouch;
+  const view = useZoomPan(zoomable);
+
   const points = useMemo(() => buildPoints(matrix), [matrix]);
   const active = points.find((p) => p.id === (hovered || selected)) || points[0];
 
@@ -130,12 +138,14 @@ export default function Octagram({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-      <div style={S.layerRow}>
+      <div className={isPhone ? "hScroll" : undefined}
+        style={isPhone ? { ...hScrollRow, gap: 8, marginBottom: 8, paddingBottom: 4 } : S.layerRow}>
         {visibleLayers.map((l) => {
           const on = layers[l.id];
           return (
             <button key={l.id} className="chip" style={{
               ...S.layerChip,
+              ...(isPhone ? { minHeight: TAP, whiteSpace: "nowrap" } : null),
               background: on ? "rgba(183,156,232,0.16)" : "transparent",
               borderColor: on ? C.lilac : C.border,
               color: on ? C.white : C.muted,
@@ -151,7 +161,16 @@ export default function Octagram({
         })}
       </div>
 
-      <svg viewBox="-20 -20 560 560" style={{ width: "100%", height: "auto", display: "block" }}>
+      <div
+        className="octaStage"
+        style={S.octaStage}
+        onPointerDown={view.onPointerDown}
+        onPointerMove={view.onPointerMove}
+        onPointerUp={view.onPointerUp}
+        onPointerCancel={view.onPointerUp}
+      >
+      <svg viewBox="-20 -20 560 560" style={{ width: "100%", height: "100%", display: "block" }}>
+        <g transform={view.transform}>
         <defs>
           <radialGradient id="octaCore" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="rgba(183,156,232,0.16)" />
@@ -204,11 +223,121 @@ export default function Octagram({
             </g>
           );
         })}
+        </g>
       </svg>
+      </div>
+
+      {zoomable && (
+        <div style={S.zoomRow}>
+          <button style={S.zoomBtn} onClick={view.zoomOut} aria-label="Уменьшить">−</button>
+          <button style={S.zoomBtn} onClick={view.zoomIn} aria-label="Увеличить">+</button>
+          <button style={{ ...S.zoomBtn, width: "auto", padding: "0 16px", fontSize: 13 }}
+            onClick={view.reset} aria-label="Сбросить масштаб">сброс</button>
+          <span style={{ ...S.dimSm, marginLeft: "auto" }}>
+            {view.k.toFixed(1)}× · щипок и перетаскивание
+          </span>
+        </div>
+      )}
 
       <PointPanel point={active} onOpenSection={onOpenSection} sectionsUnlocked={sectionsUnlocked} />
     </div>
   );
+}
+
+const MIN_SCALE = 1;
+const MAX_SCALE = 3;
+const DRAG_THRESHOLD = 6;      // меньше — это клик по точке, а не перетаскивание
+
+/**
+ * МАСШТАБ И ПЕРЕТАСКИВАНИЕ СХЕМЫ
+ * ==============================
+ * Щипок двумя пальцами меняет масштаб, одно касание таскает.
+ * Масштаб ограничен 1..3: меньше единицы схема уже влезает целиком,
+ * больше тройки числа уезжают из поля зрения.
+ *
+ * Числа при этом не наезжают друг на друга ни при каком масштабе:
+ * увеличивается ВСЯ схема целиком, взаимное расположение точек и
+ * размеры подписей меняются одинаково.
+ *
+ * Порог в шесть пикселей отделяет перетаскивание от клика: без него
+ * дрогнувший палец отменял бы выбор точки.
+ */
+function useZoomPan(enabled) {
+  const [state, setState] = useState({ k: 1, x: 0, y: 0 });
+  const pointers = useRef(new Map());
+  const gesture = useRef(null);
+
+  const clamp = (next) => {
+    const k = Math.min(MAX_SCALE, Math.max(MIN_SCALE, next.k));
+    /* Не даём утащить схему за край: предел сдвига растёт вместе с масштабом. */
+    const limit = (k - 1) * 280;
+    return {
+      k,
+      x: Math.min(limit, Math.max(-limit, next.x)),
+      y: Math.min(limit, Math.max(-limit, next.y)),
+    };
+  };
+
+  const zoomBy = (delta) => setState((prev) => clamp({ ...prev, k: prev.k + delta }));
+
+  const onPointerDown = (e) => {
+    if (!enabled) return;
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.current.size === 1) {
+      gesture.current = { kind: "pan", start: { x: e.clientX, y: e.clientY }, base: state, moved: 0 };
+    } else if (pointers.current.size === 2) {
+      const [a, b] = [...pointers.current.values()];
+      gesture.current = { kind: "pinch", distance: Math.hypot(a.x - b.x, a.y - b.y), base: state };
+    }
+  };
+
+  const onPointerMove = (e) => {
+    if (!enabled || !gesture.current) return;
+    if (!pointers.current.has(e.pointerId)) return;
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    const box = e.currentTarget.getBoundingClientRect();
+    const unitsPerPixel = 560 / (box.width || 1);   // viewBox 560 единиц на всю ширину
+
+    if (gesture.current.kind === "pinch" && pointers.current.size >= 2) {
+      const [a, b] = [...pointers.current.values()];
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      const ratio = distance / (gesture.current.distance || distance);
+      setState(clamp({ ...gesture.current.base, k: gesture.current.base.k * ratio }));
+      return;
+    }
+
+    if (gesture.current.kind === "pan") {
+      const dx = e.clientX - gesture.current.start.x;
+      const dy = e.clientY - gesture.current.start.y;
+      gesture.current.moved = Math.max(gesture.current.moved, Math.hypot(dx, dy));
+      if (gesture.current.moved < DRAG_THRESHOLD) return;
+      setState(clamp({
+        ...gesture.current.base,
+        x: gesture.current.base.x + dx * unitsPerPixel,
+        y: gesture.current.base.y + dy * unitsPerPixel,
+      }));
+    }
+  };
+
+  const onPointerUp = (e) => {
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size === 0) gesture.current = null;
+  };
+
+  /* Масштабируем вокруг центра схемы, а не вокруг угла системы координат. */
+  const transform = `translate(${CX - state.k * CX + state.x} ${CY - state.k * CY + state.y}) scale(${state.k})`;
+
+  return {
+    ...state,
+    transform,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    zoomIn: () => zoomBy(0.5),
+    zoomOut: () => zoomBy(-0.5),
+    reset: () => setState({ k: 1, x: 0, y: 0 }),
+  };
 }
 
 /** Внешнее кольцо возрастной шкалы: вехи по десять лет и дробление до 2,5. */

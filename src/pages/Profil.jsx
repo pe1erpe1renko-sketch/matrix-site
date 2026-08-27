@@ -10,6 +10,7 @@ import { clearConversations } from "../lib/conversations.js";
 import { calculateMatrix, dayArcana } from "../lib/matrixEngine.js";
 import { isoToUrlDate, urlDateToHuman } from "../lib/urlDate.js";
 import { Ic } from "../components/Icons.jsx";
+import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { Meter, Switch, CopyButton, MiniOcta, Field, Modal } from "../components/Controls.jsx";
 import SupportModal from "../components/SupportModal.jsx";
 import LoginModal from "../components/LoginModal.jsx";
@@ -33,6 +34,7 @@ export default function Profil() {
   const [tab, setTab] = useState("matrices");
   const [support, setSupport] = useState(false);
   const [login, setLogin] = useState(false);
+  const isPhone = useIsPhone();
 
   const limits = PLAN_LIMITS[plan];
 
@@ -48,6 +50,7 @@ export default function Profil() {
               : "Расчёты сохраняются в браузере. Войдите — и они переедут в кабинет."}
           </div>
         </div>
+        {!isPhone && (
         <button className="iconBtn" style={S.iconBtn} onClick={() => setSupport(true)} aria-label="Поддержка">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.5" />
@@ -57,16 +60,19 @@ export default function Profil() {
           </svg>
           <span className="tip" style={S.tip}>Поддержка</span>
         </button>
+        )}
       </div>
 
       {account.signedIn ? (
         <>
-          <div style={S.cabTabs}>
+          <div className={isPhone ? "hScroll" : undefined}
+            style={isPhone ? { ...hScrollRow, ...S.cabTabs, flexWrap: "nowrap" } : S.cabTabs}>
             {[["matrices", "Мои матрицы"], ["feed", "Прогнозы"], ["data", "Данные"]].map(([id, label]) => {
               const on = tab === id;
               return (
                 <button key={id} style={{
                   ...S.cabTab,
+                  minHeight: TAP, whiteSpace: "nowrap",
                   color: on ? C.white : C.muted,
                   borderBottomColor: on ? C.gold : "transparent",
                 }} onClick={() => setTab(id)}>{label}</button>
@@ -193,6 +199,9 @@ function MatricesTab({ people, plan }) {
  */
 function PersonCard({ person, plan, tgOn = 0, onEdit, guest = false }) {
   const { unlocked, canUnlockMore } = useAccess(personKey(person));
+  const isPhone = useIsPhone();
+  /* На телефоне кнопки во всю ширину карточки: так по ним не промахиваются. */
+  const btn = isPhone ? { flex: "1 1 100%", minHeight: TAP } : null;
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   const matrix = safeMatrix(person.birthDate);
   const urlDate = isoToUrlDate(person.birthDate);
@@ -230,20 +239,20 @@ function PersonCard({ person, plan, tgOn = 0, onEdit, guest = false }) {
 
       <div style={S.pBtns}>
         <Link to={`/matrica/${urlDate}`} className="btnGold"
-          style={{ ...S.btnSm, background: C.gold, color: C.ink }}>Открыть</Link>
+          style={{ ...S.btnSm, ...btn, background: C.gold, color: C.ink }}>Открыть</Link>
         {onEdit && (
-          <button className="btnOutline" style={{ ...S.btnSm, border: `1px solid ${C.border}`, color: C.white }}
+          <button className="btnOutline" style={{ ...S.btnSm, ...btn, border: `1px solid ${C.border}`, color: C.white }}
             onClick={onEdit}>Изменить</button>
         )}
         {!guest && (unlocked
-          ? <button className="btnGhost" style={S.btnSm} onClick={() => lockReport(personKey(person))}>Закрыть разбор</button>
+          ? <button className="btnGhost" style={{ ...S.btnSm, ...btn }} onClick={() => lockReport(personKey(person))}>Закрыть разбор</button>
           : <button className="btnOutline" disabled={!canUnlockMore}
-              style={{ ...S.btnSm, border: `1px solid ${canUnlockMore ? C.border : "transparent"}`, color: canUnlockMore ? C.white : C.muted }}
+              style={{ ...S.btnSm, ...btn, border: `1px solid ${canUnlockMore ? C.border : "transparent"}`, color: canUnlockMore ? C.white : C.muted }}
               onClick={() => unlockReport(personKey(person))}>
               {canUnlockMore ? "Открыть разбор" : "Лимит тарифа"}
             </button>)}
         {!person.self && (
-          <button className="btnGhost" style={S.btnSm} onClick={() => removePerson(person.id)}>Удалить</button>
+          <button className="btnGhost" style={{ ...S.btnSm, ...btn }} onClick={() => removePerson(person.id)}>Удалить</button>
         )}
       </div>
     </div>
