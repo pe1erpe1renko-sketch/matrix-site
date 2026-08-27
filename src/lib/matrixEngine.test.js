@@ -2,7 +2,7 @@
  * Эталонные значения взяты со скриншотов конкурентов.
  * Если тест падает — движок сломан, дальше идти нельзя.
  */
-import { calculateMatrix, dayArcana } from './matrixEngine.js';
+import { calculateMatrix, calculatePair, dayArcana } from './matrixEngine.js';
 
 const CASES = [
   {
@@ -132,5 +132,60 @@ else console.log('   ✓ завтрашний аркан отличается о
 const a1 = calculateMatrix('1998-07-13', new Date(2026, 0, 1));
 const a2 = calculateMatrix('1998-07-13', new Date(2026, 7, 25));
 check('расчёт не зависит от текущей даты', a1.core, a2.core);
+
+// ═══ ДИАГОНАЛИ (родовые лучи) ═══
+// Эталон снят со схем tvoyamatritsa.ru. Формула: mid = угол + итог родовых
+// линий, outer = угол + mid. Вариант «от центра матрицы» даёт 0 из 8.
+console.log('\n▸ Диагонали');
+const DIAG = [
+  { date: '1998-07-13', want: { NW: [10, 3], NE: [6, 22], SE: [10, 3], SW: [14, 20] } },
+  { date: '1998-06-07', want: { NW: [20, 6], NE: [22, 10], SE: [11, 15], SW: [18, 11] } },
+];
+for (const { date, want } of DIAG) {
+  const d = calculateMatrix(date).diagonals;
+  const got = {};
+  for (const k of ['NW', 'NE', 'SE', 'SW']) got[k] = [d[k].mid, d[k].outer];
+  if (check(`   ${date.split('-').reverse().join('.')}`, got, want)) {
+    console.log(`   ✓ ${date.split('-').reverse().join('.')} — все четыре луча сошлись`);
+  }
+}
+
+// ═══ СОВМЕСТИМОСТЬ ═══
+// Эталон: tvoyamatritsa.ru, пара 13.07.1998 + 09.05.1998
+console.log('\n▸ Совместимость');
+const p = calculatePair('1998-07-13', '1998-05-09');
+const beforePair = failed;
+
+check('ядро пары', p.core,
+  { W: 22, N: 12, E: 18, S: 16, C: 14, NW: 7, NE: 3, SE: 7, SW: 20 });
+
+check('ось «физика»',
+  [p.axes.horizontal.startOuter, p.axes.horizontal.startMid,
+   p.axes.horizontal.endMid, p.axes.horizontal.endOuter],
+  [4, 9, 5, 5]);
+
+check('ось «энергия»',
+  [p.axes.vertical.startOuter, p.axes.vertical.startMid,
+   p.axes.vertical.endMid, p.axes.vertical.endOuter],
+  [20, 8, 3, 19]);
+
+check('предназначения пары', {
+  sky: p.purpose.personal.sky,           // «Небо»
+  earth: p.purpose.personal.earth,       // «Земля»
+  relations: p.purpose.personal.result,  // «Отношения»
+  male: p.ancestral.male.result,         // «М»
+  female: p.ancestral.female.result,     // «Ж»
+  merge: p.purpose.social.result,        // «Слияние»
+  harmony: p.purpose.spiritual.result,   // «Гармония»
+}, { sky: 10, earth: 4, relations: 14, male: 14, female: 5, merge: 19, harmony: 6 });
+
+// Порядок партнёров не должен влиять на результат
+const swapped = calculatePair('1998-05-09', '1998-07-13');
+check('перестановка партнёров', swapped.core, p.core);
+
+// Личные матрицы партнёров внутри пары остаются нетронутыми
+check('матрица партнёра А', p.partners.a.core, calculateMatrix('1998-07-13').core);
+
+if (failed === beforePair) console.log('   ✓ всё сошлось');
 
 console.log(failed === 0 ? '\n✅ ВСЕ ТЕСТЫ ПРОЙДЕНЫ\n' : `\n❌ ОШИБОК: ${failed}\n`);

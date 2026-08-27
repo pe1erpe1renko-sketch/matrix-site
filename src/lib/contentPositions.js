@@ -371,6 +371,280 @@ export function findSectionForPoint(path) {
   return null; // точка используется только в чакральной таблице — кнопку не показываем
 }
 
+// ═══════════════════════════════════════════════════════════
+// РАЗДЕЛЫ ДЛЯ ПАРНЫХ РАСЧЁТОВ
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Совместимость и бизнес-совместимость считаются по одной матрице пары
+ * (calculatePair), но читаются по-разному: одна про близость, вторая про
+ * деньги и роли. Поэтому наборы слотов разные, а пути к числам — общие.
+ */
+export const PAIR_SECTIONS = {
+  love: [
+    {
+      id: 'pair_meeting',
+      title: 'Зачем вы встретились',
+      lead: 'Общая задача пары и то, ради чего вас свело.',
+      access: 'free',
+      slots: [
+        { id: 'pair_purpose', label: 'Задача пары',   path: 'purpose.personal.result' },
+        { id: 'pair_core',    label: 'Ядро союза',    path: 'core.C' },
+      ],
+    },
+    {
+      id: 'pair_daily',
+      title: 'Как пара проявляется',
+      lead: 'Что видят окружающие и как вы ведёте себя вдвоём.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_face',    label: 'Лицо пары',     path: 'core.W' },
+        { id: 'pair_comfort', label: 'Зона комфорта', path: 'core.C' },
+      ],
+    },
+    {
+      id: 'pair_money',
+      title: 'Деньги в паре',
+      lead: 'Общий финансовый поток и где он перекрывается.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_money_channel', label: 'Денежный канал пары', path: 'core.SE' },
+        { id: 'pair_money_block',   label: 'Финансовый блок',     path: 'diagonals.SE.outer' },
+      ],
+    },
+    {
+      id: 'pair_friction',
+      title: 'Где вы упираетесь',
+      lead: 'Сценарий, который повторяется, и что его запускает.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_barrier', label: 'Барьер близости', path: 'diagonals.SW.outer' },
+        { id: 'pair_way',     label: 'Путь к гармонии', path: 'diagonals.SW.mid' },
+      ],
+    },
+    {
+      id: 'pair_merge',
+      title: 'Слияние и гармония',
+      lead: 'Объединение родов и зрелая стадия отношений.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_merge_result',   label: 'Слияние',  path: 'purpose.social.result' },
+        { id: 'pair_harmony_result', label: 'Гармония', path: 'purpose.spiritual.result' },
+      ],
+    },
+  ],
+
+  business: [
+    {
+      id: 'biz_why',
+      title: 'Зачем вам общее дело',
+      lead: 'Задача связки и её сильная сторона.',
+      access: 'free',
+      slots: [
+        { id: 'biz_purpose', label: 'Задача связки', path: 'purpose.personal.result' },
+        { id: 'biz_core',    label: 'Ядро связки',   path: 'core.C' },
+      ],
+    },
+    {
+      id: 'biz_roles',
+      title: 'Кто за что отвечает',
+      lead: 'Распределение ролей и где они пересекутся.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_driver',  label: 'Кто двигает дело', path: 'core.N' },
+        { id: 'biz_anchor',  label: 'Кто удерживает',   path: 'core.E' },
+      ],
+    },
+    {
+      id: 'biz_money',
+      title: 'Деньги и дележ',
+      lead: 'Общая денежная зона и риски вокруг неё.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_money_channel', label: 'Денежный канал', path: 'core.SE' },
+        { id: 'biz_money_risk',    label: 'Где теряете',    path: 'diagonals.SE.outer' },
+      ],
+    },
+    {
+      id: 'biz_conflict',
+      title: 'Как поведёте себя в конфликте',
+      lead: 'Точка трения и способ её пройти.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_friction', label: 'Точка трения', path: 'diagonals.SW.outer' },
+        { id: 'biz_solution', label: 'Как проходить', path: 'diagonals.SW.mid' },
+      ],
+    },
+    {
+      id: 'biz_result',
+      title: 'Результат в социуме',
+      lead: 'Чего связка добьётся вместе.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_social', label: 'Реализация', path: 'purpose.social.result' },
+      ],
+    },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════
+// ТЕМАТИЧЕСКИЕ СТРАНИЦЫ
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * ПРАВИЛО ОПЛАТЫ: платят за дату, а не за калькулятор.
+ * Один купленный разбор открывает всё, что считается по этой дате —
+ * общую матрицу, финансовый вход и прогноз. Детская считается по дате
+ * ребёнка, совместимость — по двум датам, поэтому это отдельные разборы
+ * и они списывают отдельную единицу из лимита тарифа.
+ */
+
+/** Собственные разделы финансовой страницы — сверх общих денежных. */
+export const FINANCE_EXTRA = [
+  {
+    id: 'fin_scenario',
+    title: 'Ваш сценарий заработка',
+    lead: 'Как именно к вам приходит доход и почему другие способы не работают.',
+    access: 'paid',
+    slots: [
+      { id: 'fin_way',    label: 'Способ заработка',   path: 'core.SE' },
+      { id: 'fin_effort', label: 'Чего это стоит',     path: 'diagonals.SE.mid' },
+    ],
+  },
+  {
+    id: 'fin_spending',
+    title: 'Отношение к тратам',
+    lead: 'Что происходит с деньгами, когда они уже у вас.',
+    access: 'paid',
+    slots: [
+      { id: 'fin_status', label: 'Статус и владение', path: 'chakras.rows.4.physics' },
+      { id: 'fin_hold',   label: 'Умение удерживать', path: 'chakras.total.physics' },
+    ],
+  },
+  {
+    id: 'fin_family',
+    title: 'Финансовая программа рода',
+    lead: 'Что вы унаследовали в отношении к деньгам.',
+    access: 'paid',
+    slots: [
+      { id: 'fin_rod_male',   label: 'По линии отца',  path: 'ancestral.male.result' },
+      { id: 'fin_rod_female', label: 'По линии матери', path: 'ancestral.female.result' },
+    ],
+  },
+];
+
+/**
+ * Детская матрица. Разделы свои: общие написаны для взрослого о себе,
+ * здесь тон другой — родитель читает про ребёнка.
+ * Считается по дате ребёнка, поэтому это отдельный разбор.
+ */
+export const CHILD_SECTIONS = [
+  {
+    id: 'child_nature',
+    title: 'С чем ребёнок родился',
+    lead: 'Природные данные, которые есть до всякого воспитания.',
+    access: 'free',
+    slots: [
+      { id: 'child_talent',  label: 'Главный талант',    path: 'core.N' },
+      { id: 'child_face',    label: 'Как он проявляется', path: 'core.W' },
+    ],
+  },
+  {
+    id: 'child_approach',
+    title: 'Какой подход работает',
+    lead: 'Что его успокаивает и что вызывает сопротивление.',
+    access: 'paid',
+    slots: [
+      { id: 'child_comfort', label: 'Что даёт опору',   path: 'core.C' },
+      { id: 'child_resist',  label: 'Что вызывает бунт', path: 'diagonals.SW.mid' },
+    ],
+  },
+  {
+    id: 'child_task',
+    title: 'Чему он пришёл научиться',
+    lead: 'Задача, которая стоит перед ребёнком в этой жизни.',
+    access: 'paid',
+    slots: [
+      { id: 'child_lesson', label: 'Главный урок', path: 'core.S' },
+      { id: 'child_gift',   label: 'Дар рода',     path: 'core.E' },
+    ],
+  },
+  {
+    id: 'child_parents',
+    title: 'Ваша связь с ним',
+    lead: 'Что происходит между вами и где легко навредить из лучших побуждений.',
+    access: 'paid',
+    slots: [
+      { id: 'child_link',    label: 'Тип связи',       path: 'chakras.rows.5.physics' },
+      { id: 'child_mistake', label: 'Частая ошибка',   path: 'diagonals.SW.outer' },
+    ],
+  },
+  {
+    id: 'child_rod',
+    title: 'Что передаётся по роду',
+    lead: 'Программы, которые ребёнок принял от обеих линий.',
+    access: 'paid',
+    slots: [
+      { id: 'child_male',   label: 'Линия отца',  path: 'ancestral.male.result' },
+      { id: 'child_female', label: 'Линия матери', path: 'ancestral.female.result' },
+    ],
+  },
+];
+
+/**
+ * Прогноз. Три уровня на одном экране: день, месяц, период жизни.
+ * Считается по той же дате, что и общая матрица, — отдельной оплаты нет.
+ * Календарь месяца строится в компоненте вызовом dayArcana() на каждый
+ * день, отдельного слота под него не нужно.
+ */
+export const FORECAST_SECTIONS = [
+  {
+    id: 'forecast_day',
+    title: 'Аркан дня',
+    lead: 'Ваша энергия на сегодня и на завтра.',
+    access: 'free',
+    daily: true,
+    slots: [
+      { id: 'day_energy', label: 'Сегодня', path: 'today.dayArcana' },
+    ],
+  },
+  {
+    id: 'forecast_period',
+    title: 'Период жизни',
+    lead: 'Какая энергия ведёт вас сейчас и когда сменится.',
+    access: 'free',
+    slots: [
+      { id: 'year_energy', label: 'Энергия периода', path: 'today.arcana' },
+    ],
+  },
+  {
+    id: 'forecast_ahead',
+    title: 'Что дальше',
+    lead: 'Энергия следующего отрезка и как к нему подойти.',
+    access: 'paid',
+    slots: [
+      { id: 'forecast_next',  label: 'Следующий период', path: 'today.nextArcana' },
+      { id: 'forecast_bridge', label: 'Переход',         path: 'core.S' },
+    ],
+  },
+];
+
+/** Какие разделы показывает каждая страница. Единая точка правды для UI. */
+export const PAGE_VIEWS = {
+  matrica: { title: 'Матрица судьбы', pair: false, sections: SECTIONS },
+  finansy: {
+    title: 'Финансы', pair: false,
+    sections: [
+      ...SECTIONS.filter((s) => ['money_flow', 'money_leak', 'profession'].includes(s.id)),
+      ...FINANCE_EXTRA,
+    ],
+  },
+  detskaya:     { title: 'Детская матрица',      pair: false, sections: CHILD_SECTIONS },
+  prognoz:      { title: 'Прогноз',              pair: false, sections: FORECAST_SECTIONS },
+  sovmestimost: { title: 'Совместимость',        pair: true,  sections: PAIR_SECTIONS.love },
+  biznes:       { title: 'Бизнес-совместимость', pair: true,  sections: PAIR_SECTIONS.business },
+};
+
 /** Плоский список всех слотов — для подсчёта объёма базы и для админки. */
 export const ALL_SLOTS = SECTIONS.flatMap((s) =>
   s.slots.map((slot) => ({ ...slot, sectionId: s.id, sectionTitle: s.title, access: s.access }))
