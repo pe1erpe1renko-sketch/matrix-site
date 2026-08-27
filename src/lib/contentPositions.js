@@ -371,6 +371,122 @@ export function findSectionForPoint(path) {
   return null; // точка используется только в чакральной таблице — кнопку не показываем
 }
 
+// ═══════════════════════════════════════════════════════════
+// РАЗДЕЛЫ ДЛЯ ПАРНЫХ РАСЧЁТОВ
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Совместимость и бизнес-совместимость считаются по одной матрице пары
+ * (calculatePair), но читаются по-разному: одна про близость, вторая про
+ * деньги и роли. Поэтому наборы слотов разные, а пути к числам — общие.
+ */
+export const PAIR_SECTIONS = {
+  love: [
+    {
+      id: 'pair_meeting',
+      title: 'Зачем вы встретились',
+      lead: 'Общая задача пары и то, ради чего вас свело.',
+      access: 'free',
+      slots: [
+        { id: 'pair_purpose', label: 'Задача пары',   path: 'purpose.personal.result' },
+        { id: 'pair_core',    label: 'Ядро союза',    path: 'core.C' },
+      ],
+    },
+    {
+      id: 'pair_daily',
+      title: 'Как пара проявляется',
+      lead: 'Что видят окружающие и как вы ведёте себя вдвоём.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_face',    label: 'Лицо пары',     path: 'core.W' },
+        { id: 'pair_comfort', label: 'Зона комфорта', path: 'core.C' },
+      ],
+    },
+    {
+      id: 'pair_money',
+      title: 'Деньги в паре',
+      lead: 'Общий финансовый поток и где он перекрывается.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_money_channel', label: 'Денежный канал пары', path: 'core.SE' },
+        { id: 'pair_money_block',   label: 'Финансовый блок',     path: 'diagonals.SE.outer' },
+      ],
+    },
+    {
+      id: 'pair_friction',
+      title: 'Где вы упираетесь',
+      lead: 'Сценарий, который повторяется, и что его запускает.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_barrier', label: 'Барьер близости', path: 'diagonals.SW.outer' },
+        { id: 'pair_way',     label: 'Путь к гармонии', path: 'diagonals.SW.mid' },
+      ],
+    },
+    {
+      id: 'pair_merge',
+      title: 'Слияние и гармония',
+      lead: 'Объединение родов и зрелая стадия отношений.',
+      access: 'paid',
+      slots: [
+        { id: 'pair_merge_result',   label: 'Слияние',  path: 'purpose.social.result' },
+        { id: 'pair_harmony_result', label: 'Гармония', path: 'purpose.spiritual.result' },
+      ],
+    },
+  ],
+
+  business: [
+    {
+      id: 'biz_why',
+      title: 'Зачем вам общее дело',
+      lead: 'Задача связки и её сильная сторона.',
+      access: 'free',
+      slots: [
+        { id: 'biz_purpose', label: 'Задача связки', path: 'purpose.personal.result' },
+        { id: 'biz_core',    label: 'Ядро связки',   path: 'core.C' },
+      ],
+    },
+    {
+      id: 'biz_roles',
+      title: 'Кто за что отвечает',
+      lead: 'Распределение ролей и где они пересекутся.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_driver',  label: 'Кто двигает дело', path: 'core.N' },
+        { id: 'biz_anchor',  label: 'Кто удерживает',   path: 'core.E' },
+      ],
+    },
+    {
+      id: 'biz_money',
+      title: 'Деньги и дележ',
+      lead: 'Общая денежная зона и риски вокруг неё.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_money_channel', label: 'Денежный канал', path: 'core.SE' },
+        { id: 'biz_money_risk',    label: 'Где теряете',    path: 'diagonals.SE.outer' },
+      ],
+    },
+    {
+      id: 'biz_conflict',
+      title: 'Как поведёте себя в конфликте',
+      lead: 'Точка трения и способ её пройти.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_friction', label: 'Точка трения', path: 'diagonals.SW.outer' },
+        { id: 'biz_solution', label: 'Как проходить', path: 'diagonals.SW.mid' },
+      ],
+    },
+    {
+      id: 'biz_result',
+      title: 'Результат в социуме',
+      lead: 'Чего связка добьётся вместе.',
+      access: 'paid',
+      slots: [
+        { id: 'biz_social', label: 'Реализация', path: 'purpose.social.result' },
+      ],
+    },
+  ],
+};
+
 /** Плоский список всех слотов — для подсчёта объёма базы и для админки. */
 export const ALL_SLOTS = SECTIONS.flatMap((s) =>
   s.slots.map((slot) => ({ ...slot, sectionId: s.id, sectionTitle: s.title, access: s.access }))

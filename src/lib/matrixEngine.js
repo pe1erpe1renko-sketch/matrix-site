@@ -104,18 +104,29 @@ export function buildAxes(core) {
 // 3. ДИАГОНАЛИ (родовые лучи)
 // ═══════════════════════════════════════════════════════════
 
-/** Между углом и центром — две точки: ближняя к углу и середина. */
-function buildRay(corner, center) {
-  const mid = sum(corner, center);
+/**
+ * Между углом и центром — две точки: середина луча и ближняя к углу.
+ *
+ * ВНИМАНИЕ: точка mid считается НЕ от центра матрицы, а от итога родовых
+ * линий (социализации). Это восстановлено по tvoyamatritsa.ru и сверено
+ * на двух датах — 13.07.1998 и 07.06.1998, по 4 луча в каждой.
+ * Вариант «от центра» даёт 0 совпадений из 8.
+ *
+ * Логика в том, что диагонали — родовые лучи, поэтому и опорное число
+ * у них родовое, а не личное.
+ */
+function buildRay(corner, anchor) {
+  const mid = sum(corner, anchor);
   return { corner, outer: sum(corner, mid), mid };
 }
 
-export function buildDiagonals(core) {
+/** @param {number} anchor — итог родовых линий (purpose.social.result) */
+export function buildDiagonals(core, anchor) {
   return {
-    NW: buildRay(core.NW, core.C),
-    NE: buildRay(core.NE, core.C),
-    SE: buildRay(core.SE, core.C),
-    SW: buildRay(core.SW, core.C),
+    NW: buildRay(core.NW, anchor),
+    NE: buildRay(core.NE, anchor),
+    SE: buildRay(core.SE, anchor),
+    SW: buildRay(core.SW, anchor),
   };
 }
 
@@ -315,37 +326,82 @@ export function buildToday(timeline, birthDate, now = new Date()) {
 // ═══════════════════════════════════════════════════════════
 
 /**
- * @param {string} birthDate — 'YYYY-MM-DD'
- * @param {Date} [now] — «сегодня». Параметр нужен только для тестов.
- * @returns полный расчёт матрицы
+ * Достраивает полную матрицу из готового ядра.
+ * Используется и для личной матрицы, и для парной — методика одна.
+ *
+ * ПОРЯДОК ВАЖЕН: диагонали зависят от родовых линий, поэтому ancestral
+ * и purpose считаются раньше них.
  */
-export function calculateMatrix(birthDate, now = new Date()) {
+function buildFromCore(core) {
+  const ancestral = buildAncestral(core);
+  const purpose = buildPurpose(core, ancestral);
+  const diagonals = buildDiagonals(core, purpose.social.result);
+  const axes = buildAxes(core);
+  const chakras = buildChakras(axes);
+  const timeline = buildTimeline(core);
+  return { core, axes, diagonals, chakras, ancestral, purpose, timeline };
+}
+
+/** Разбор строки 'YYYY-MM-DD' с проверкой существования даты. */
+function parseDate(birthDate) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate);
   if (!match) throw new Error('Дата должна быть в формате YYYY-MM-DD');
-
   const [, y, m, d] = match.map(Number);
   const parsed = new Date(Date.UTC(y, m - 1, d));
   if (parsed.getUTCMonth() !== m - 1 || parsed.getUTCDate() !== d) {
     throw new Error('Такой даты не существует');
   }
+  return { y, m, d };
+}
 
-  const core = buildCore(d, m, y);
-  const axes = buildAxes(core);
-  const diagonals = buildDiagonals(core);
-  const chakras = buildChakras(axes);
-  const ancestral = buildAncestral(core);
-  const purpose = buildPurpose(core, ancestral);
-  const timeline = buildTimeline(core);
-
+/**
+ * @param {string} birthDate — 'YYYY-MM-DD'
+ * @param {Date} [now] — «сегодня». Параметр нужен только для тестов.
+ * @returns полный расчёт матрицы
+ */
+export function calculateMatrix(birthDate, now = new Date()) {
+  const { y, m, d } = parseDate(birthDate);
+  const built = buildFromCore(buildCore(d, m, y));
   return {
     birthDate,
-    core,
-    axes,
-    diagonals,
-    chakras,
-    ancestral,
-    purpose,
-    timeline,
-    today: buildToday(timeline, birthDate, now),
+    ...built,
+    today: buildToday(built.timeline, birthDate, now),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// 9. СОВМЕСТИМОСТЬ
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Ядро пары: одноимённые точки двух личных матриц складываются
+ * и приводятся к Аркану тем же правилом — суммой цифр.
+ *
+ * Восстановлено по tvoyamatritsa.ru на паре 13.07.1998 + 09.05.1998:
+ * сошлись все девять точек ядра, все точки осей и все предназначения.
+ * Вариант с вычитанием 22 даёт 6 совпадений из 9.
+ */
+export function buildPairCore(coreA, coreB) {
+  const out = {};
+  for (const k of ['W', 'N', 'E', 'S', 'C', 'NW', 'NE', 'SE', 'SW']) {
+    out[k] = toArcana(coreA[k] + coreB[k]);
+  }
+  return out;
+}
+
+/**
+ * Матрица пары. Одна и та же для романтической совместимости и для
+ * деловой — числа те же, различаются только тексты трактовок.
+ *
+ * У пары нет своей даты рождения, поэтому блока `today` здесь нет:
+ * аркан дня остаётся личным и берётся из partners.a.today / partners.b.today.
+ */
+export function calculatePair(dateA, dateB, now = new Date()) {
+  const a = calculateMatrix(dateA, now);
+  const b = calculateMatrix(dateB, now);
+  return {
+    dates: [dateA, dateB],
+    partners: { a, b },
+    ...buildFromCore(buildPairCore(a.core, b.core)),
   };
 }
