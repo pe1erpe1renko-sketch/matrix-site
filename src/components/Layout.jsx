@@ -7,6 +7,10 @@ import { CALC_NAV, ACCOUNT_NAV, activeNavId, calcById } from "../routes.js";
 import { Ic, Spark } from "./Icons.jsx";
 import Cursor from "./Cursor.jsx";
 import Sky from "./Sky.jsx";
+import LoginModal from "./LoginModal.jsx";
+import { useAccount, signOut } from "../lib/account.js";
+import { useAccess } from "../lib/access.js";
+import { PLAN_LIMITS } from "../lib/plans.js";
 
 /**
  * ОБЩИЙ МАКЕТ
@@ -25,8 +29,15 @@ import Sky from "./Sky.jsx";
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [hover, setHover] = useState(null);
+  const [login, setLogin] = useState(false);
   const { pathname } = useLocation();
   const active = activeNavId(pathname);
+
+  const account = useAccount();
+  const { plan } = useAccess();
+
+  /* У наставника свой полноэкранный макет — подвал под ним лишний. */
+  const fullHeight = active === "chat";
 
   /**
    * При переходе на другую страницу возвращаемся наверх.
@@ -102,17 +113,44 @@ export default function Layout() {
         </nav>
 
         <div style={S.sideBottom}>
-          <button className="btnLilac" style={S.loginBtn}>
-            {collapsed ? "→" : "Войти"}
-          </button>
+          {account.signedIn ? (
+            <div style={S.userCard}>
+              <div style={S.avatar}>{(account.name || "?").charAt(0).toUpperCase()}</div>
+              {!collapsed && (
+                <>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={S.userName}>{account.name}</div>
+                    <div style={S.userPlan}>{PLAN_LIMITS[plan].label}</div>
+                  </div>
+                  <button className="exitBtn" style={S.exitBtn} onClick={signOut} aria-label="Выйти">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                      <path d="M15 8.5V6.2a2 2 0 0 0-2-2H6.2a2 2 0 0 0-2 2v11.6a2 2 0 0 0 2 2H13a2 2 0 0 0 2-2v-2.3"
+                        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M10.5 12h9.3M17 9.2l2.8 2.8-2.8 2.8"
+                        stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="tip" style={{ ...S.tip, left: "50%", right: "auto", transform: "translateX(-50%)" }}>
+                      Выйти
+                    </span>
+                  </button>
+                </>
+              )}
+            </div>
+          ) : (
+            <button className="btnLilac" style={S.loginBtn} onClick={() => setLogin(true)}>
+              {collapsed ? "→" : "Войти"}
+            </button>
+          )}
         </div>
       </aside>
 
       {/* ---------------- КОНТЕНТ ---------------- */}
       <main style={S.main}>
         <Outlet />
-        <Footer />
+        {!fullHeight && <Footer />}
       </main>
+
+      {login && <LoginModal onClose={() => setLogin(false)} />}
     </div>
   );
 }

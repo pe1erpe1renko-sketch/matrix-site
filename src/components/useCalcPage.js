@@ -1,8 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { calculateMatrix, calculatePair } from "../lib/matrixEngine.js";
 import { buildViewSections, pageView, openCount } from "../lib/pageSections.js";
 import { reportKey, useAccess } from "../lib/access.js";
+import { useAccount } from "../lib/account.js";
+import { rememberGuestCalculation } from "../lib/people.js";
 import { urlDateToISO, urlDateToHuman } from "../lib/urlDate.js";
 
 /**
@@ -40,6 +42,18 @@ export function useCalcPage(pageId) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valid, view.pair, isoDates.join("|")]);
+
+  /**
+   * Гость считает без регистрации — запоминаем его расчёт, чтобы при входе
+   * было что перенести в кабинет. У вошедшего матрицы заводятся вручную
+   * в кабинете, поэтому здесь мы их не плодим.
+   */
+  const { signedIn } = useAccount();
+  const rememberDate = !signedIn && !view.pair && valid ? isoDates[0] : null;
+  useEffect(() => {
+    if (!rememberDate) return;
+    rememberGuestCalculation({ birthDate: rememberDate, kind: pageId === "detskaya" ? "child" : "personal" });
+  }, [rememberDate, pageId]);
 
   const sections = useMemo(
     () => (matrix ? buildViewSections(matrix, view.sections, { unlocked: access.unlocked }) : []),

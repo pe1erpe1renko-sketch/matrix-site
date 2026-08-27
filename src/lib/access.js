@@ -21,10 +21,8 @@
  * пощёлкать доступы между страницами и увидеть правило в действии.
  */
 
-import { useSyncExternalStore } from 'react';
 import { PLAN_LIMITS, DEFAULT_PLAN } from './plans.js';
-
-const STORAGE_KEY = 'matrix.dev.access';
+import { createStore } from './devStore.js';
 
 /**
  * Ключ разбора — набор дат, отсортированный.
@@ -35,37 +33,16 @@ export function reportKey(isoDates) {
   return [...isoDates].filter(Boolean).sort().join('+');
 }
 
-const emptyState = { plan: DEFAULT_PLAN, reports: [] };
+const store = createStore(
+  'matrix.dev.access',
+  { plan: DEFAULT_PLAN, reports: [] },
+  (saved, initial) => ({
+    plan: PLAN_LIMITS[saved.plan] ? saved.plan : initial.plan,
+    reports: Array.isArray(saved.reports) ? saved.reports.filter((r) => typeof r === 'string') : [],
+  })
+);
 
-function readStorage() {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return emptyState;
-    const parsed = JSON.parse(raw);
-    return {
-      plan: PLAN_LIMITS[parsed.plan] ? parsed.plan : DEFAULT_PLAN,
-      reports: Array.isArray(parsed.reports) ? parsed.reports.filter((r) => typeof r === 'string') : [],
-    };
-  } catch {
-    return emptyState;                 // приватное окно, запрет на хранилище — не повод падать
-  }
-}
-
-let state = readStorage();
-const listeners = new Set();
-
-function commit(next) {
-  state = next;
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    /* не сохранилось — работаем в памяти до перезагрузки */
-  }
-  listeners.forEach((fn) => fn());
-}
-
-const subscribe = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
-const snapshot = () => state;
+const commit = store.set;
 
 /** Сколько разборов разрешено тарифом. Infinity на «Без границ». */
 export const reportLimit = (plan) => PLAN_LIMITS[plan]?.matrices ?? 0;
@@ -77,6 +54,7 @@ export const reportLimit = (plan) => PLAN_LIMITS[plan]?.matrices ?? 0;
  */
 export function setPlan(plan) {
   if (!PLAN_LIMITS[plan]) return;
+  const state = store.get();
   const limit = reportLimit(plan);
   const reports = Number.isFinite(limit) ? state.reports.slice(0, limit) : state.reports;
   commit({ plan, reports });
@@ -84,6 +62,7 @@ export function setPlan(plan) {
 
 /** Открыть разбор. Вернёт false, если лимит тарифа исчерпан. */
 export function unlockReport(key) {
+  const state = store.get();
   if (!key || state.reports.includes(key)) return true;
   if (state.reports.length >= reportLimit(state.plan)) return false;
   commit({ ...state, reports: [...state.reports, key] });
@@ -92,6 +71,7 @@ export function unlockReport(key) {
 
 /** Закрыть разбор — освободить единицу лимита. */
 export function lockReport(key) {
+  const state = store.get();
   commit({ ...state, reports: state.reports.filter((r) => r !== key) });
 }
 
@@ -100,12 +80,12 @@ export function lockReport(key) {
  * На бесплатном тарифе лимит нулевой, поэтому открытых разборов не бывает.
  */
 export function isReportUnlocked(key) {
-  return Boolean(key) && state.reports.includes(key);
+  return Boolean(key) && store.get().reports.includes(key);
 }
 
 /** Состояние доступов для компонентов. */
 export function useAccess(key) {
-  const current = useSyncExternalStore(subscribe, snapshot, snapshot);
+  const current = store.useStore();
   const limit = reportLimit(current.plan);
   return {
     plan: current.plan,

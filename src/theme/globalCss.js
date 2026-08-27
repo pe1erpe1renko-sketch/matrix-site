@@ -59,4 +59,17 @@ button:focus-visible, .fld:focus-visible { outline: 2px solid ${C.lilac}; outlin
 @media (pointer: coarse) { html, body, button, input, select, a, label { cursor: auto; } }
 
 a { color: inherit; text-decoration: none; }
+
+/* ---- кабинет ---- */
+.iconBtn:hover, .iconCopy:hover { border-color: ${C.lilac}; color: ${C.lilac}; }
+.iconBtn:hover .tip, .iconCopy:hover .tip, .exitBtn:hover .tip { opacity: 1; }
+.exitBtn:hover { color: ${C.white}; }
+.supRow:hover { border-color: ${C.lilac}; background: rgba(31,24,65,0.9); }
+.histItem:hover { border-color: ${C.lilac}; background: rgba(31,24,65,0.9); }
+.inAct:hover { background: rgba(228,190,114,0.26); color: ${C.goldHi}; }
+.addCard:hover { border-color: ${C.gold}; color: ${C.gold}; background: rgba(228,190,114,.04); }
+.delBtn:hover { background: rgba(230,138,176,0.18); border-color: ${C.pink}; color: #F5A8C4; box-shadow: 0 0 26px -4px rgba(230,138,176,0.6); }
+.btnGhost { background: transparent; color: ${C.muted}; }
+.btnGhost:hover { color: ${C.white}; }
+.socialBtn:hover { border-color: ${C.lilac}; }
 `;
