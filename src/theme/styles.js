@@ -536,4 +536,45 @@ export const S = {
     color: C.lilac, marginRight: 4,
   },
   devHint: { fontSize: 12, color: C.muted, width: "100%", margin: 0 },
+  devDivider: { width: 1, height: 22, background: C.border, margin: "0 4px" },
+
+  /* ---------- тематические страницы ---------- */
+
+  notice: {
+    display: "flex", gap: 14, alignItems: "flex-start",
+    padding: "16px 20px", borderRadius: R.lg, marginBottom: 24,
+    background: "rgba(183,156,232,0.08)", border: `1px solid ${C.lilac}`,
+  },
+  noticeText: { margin: 0, color: C.text, fontSize: 13.5, lineHeight: 1.55 },
+
+  /* переключатель уровней прогноза */
+  switchRow: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 22 },
+
+  /* календарь месяца */
+  calGrid: {
+    display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: 6,
+  },
+  calHead: {
+    fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase",
+    color: C.muted, textAlign: "center", paddingBottom: 6,
+  },
+  calCell: {
+    border: "1px solid", borderRadius: R.sm, padding: "8px 4px 9px",
+    textAlign: "center", minHeight: 58,
+    display: "flex", flexDirection: "column", justifyContent: "center", gap: 3,
+  },
+  calDay: { fontSize: 11, color: C.muted, lineHeight: 1 },
+  calArc: { fontFamily: FONT.serif, fontSize: 19, lineHeight: 1 },
+
+  /* ядра партнёров */
+  coreGrid: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))",
+    gap: 8, marginTop: 14,
+  },
+  coreCell: {
+    borderRadius: R.sm, border: `1px solid ${C.border}`, padding: "9px 4px",
+    textAlign: "center", background: "rgba(10,8,23,0.45)",
+  },
+  coreCode: { display: "block", fontSize: 10, color: C.muted, letterSpacing: "0.08em" },
+  coreVal: { display: "block", fontFamily: FONT.serif, fontSize: 20, color: C.white, marginTop: 3 },
 };

@@ -13,8 +13,6 @@
  * дешевле, чем потерять человека.
  */
 
-import { SECTIONS, FREE_SECTIONS } from './contentPositions.js';
-
 export const PLAN_LIMITS = {
   free:      { matrices: 0, messages: 0,  telegram: 0, archive: false, pdf: false, label: 'Бесплатно' },
   once:      { matrices: 1, messages: 0,  telegram: 0, archive: false, pdf: true,  label: 'Разовый разбор' },
@@ -30,20 +28,8 @@ export const PLAN_ORDER = ['free', 'once', 'path', 'circle', 'unlimited'];
 export const DEFAULT_PLAN = 'free';
 
 /**
- * Открыты ли все 25 разделов.
- *
- * По таблице тарифов разделы открывает любая оплата, включая разовую:
- * бесплатно — 4 из 25, на всех остальных — все 25. Признак взят
- * из наличия матриц в тарифе, а не из списка названий: добавится
- * новый платный тариф — правило сработает само.
+ * Сколько разборов разрешает тариф — то же поле matrices.
+ * Что считается одним разбором и как он открывает несколько страниц,
+ * описано в src/lib/access.js: платят за дату, а не за калькулятор.
  */
-export const sectionsUnlocked = (plan) => (PLAN_LIMITS[plan]?.matrices ?? 0) > 0;
-
-/** Сколько разделов видно на тарифе: 4 из 25 или 25 из 25. */
-export const sectionsOpen = (plan) =>
-  sectionsUnlocked(plan) ? SECTIONS.length : FREE_SECTIONS.length;
-
-export const SECTIONS_TOTAL = SECTIONS.length;
-
-/** Название тарифа для показа. Неизвестный тариф не должен ронять экран. */
 export const planLabel = (plan) => PLAN_LIMITS[plan]?.label ?? PLAN_LIMITS[DEFAULT_PLAN].label;

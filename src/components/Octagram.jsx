@@ -99,9 +99,19 @@ function buildPoints(matrix) {
   });
 }
 
-export default function Octagram({ matrix, onOpenSection, sectionsUnlocked = false }) {
-  const [layers, setLayers] = useState({ age: true, rod: true, money: true, love: true });
-  const [selected, setSelected] = useState("point_C");
+/**
+ * @param {object}  matrix     — результат calculateMatrix() или calculatePair()
+ * @param {string}  [emphasis] — луч, на котором держится страница: 'SE' для
+ *                               финансов, 'SW' для отношений. Он подсвечен
+ *                               и его точка выбрана при открытии.
+ * @param {boolean} [showAge]  — возрастное кольцо. У матрицы пары возраста
+ *                               нет, поэтому там слой выключается целиком.
+ */
+export default function Octagram({
+  matrix, onOpenSection, sectionsUnlocked = false, emphasis = null, showAge = true,
+}) {
+  const [layers, setLayers] = useState({ age: showAge, rod: true, money: true, love: true });
+  const [selected, setSelected] = useState(emphasis ? `point_${emphasis}` : "point_C");
   const [hovered, setHovered] = useState(null);
 
   const points = useMemo(() => buildPoints(matrix), [matrix]);
@@ -109,6 +119,7 @@ export default function Octagram({ matrix, onOpenSection, sectionsUnlocked = fal
 
   const outer = ORDER.map((k) => at(k));
   const rayVisible = (corner) => layers[RAY_LAYER[corner]];
+  const visibleLayers = showAge ? LAYERS : LAYERS.filter((l) => l.id !== "age");
 
   const colorOf = (p) =>
     p.kind === "main" ? C.gold
@@ -120,7 +131,7 @@ export default function Octagram({ matrix, onOpenSection, sectionsUnlocked = fal
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
       <div style={S.layerRow}>
-        {LAYERS.map((l) => {
+        {visibleLayers.map((l) => {
           const on = layers[l.id];
           return (
             <button key={l.id} className="chip" style={{
@@ -166,10 +177,12 @@ export default function Octagram({ matrix, onOpenSection, sectionsUnlocked = fal
 
         {["NW", "NE", "SE", "SW"].map((k) => rayVisible(k) && (
           <line key={"ray" + k} x1={at(k)[0]} y1={at(k)[1]} x2={CX} y2={CY}
-            stroke={RAY_COLOR[k]} strokeWidth="1.6" opacity="0.5" />
+            stroke={RAY_COLOR[k]}
+            strokeWidth={emphasis === k ? 3.2 : 1.6}
+            opacity={emphasis === k ? 0.95 : emphasis ? 0.28 : 0.5} />
         ))}
 
-        {layers.age && <AgeRing matrix={matrix} />}
+        {layers.age && showAge && <AgeRing matrix={matrix} />}
 
         {points.map((p) => {
           if (p.layer && !layers[p.layer]) return null;

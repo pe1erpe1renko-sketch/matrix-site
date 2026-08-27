@@ -1,20 +1,27 @@
 import React from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
-import { PLAN_ORDER, PLAN_LIMITS, sectionsOpen, SECTIONS_TOTAL } from "../lib/plans.js";
+import { PLAN_ORDER, PLAN_LIMITS } from "../lib/plans.js";
+import { useAccess, setPlan, unlockReport, lockReport } from "../lib/access.js";
 
 /**
- * DEV-ПЕРЕКЛЮЧАТЕЛЬ ТАРИФА
- * ========================
- * Служебный инструмент для проверки доступов на предпросмотре: видно,
- * что открыто на бесплатном тарифе и что появляется после оплаты,
- * без входа и без оплаты.
+ * DEV-ПЕРЕКЛЮЧАТЕЛЬ ДОСТУПОВ
+ * =========================
+ * Служебный инструмент для предпросмотра: можно выбрать тариф и открыть
+ * разбор, не заводя вход и не платя.
  *
- * Оформлен пунктиром и подписан явно, чтобы его не приняли за элемент
- * сайта. УБРАТЬ, когда появится настоящая авторизация: тариф придёт
- * с бэкенда, а не из переключателя в браузере.
+ * Здесь же видно главное правило: платят за дату, а не за калькулятор.
+ * Откройте разбор на /matrica/13-07-1998 и перейдите на /finansy/13-07-1998 —
+ * он уже открыт, единица лимита не тратится второй раз. А /detskaya
+ * по другой дате останется закрытой: это другой разбор.
+ *
+ * Оформлен пунктиром и подписан явно, чтобы его не приняли за элемент сайта.
+ * УБРАТЬ вместе с появлением настоящей авторизации и оплаты.
  */
-export default function DevPlanSwitch({ plan, onChange }) {
+export default function DevPlanSwitch({ reportKey, dates, sectionsTotal, sectionsOpen }) {
+  const { plan, reports, limit, unlocked, canUnlockMore } = useAccess(reportKey);
+  const limitLabel = Number.isFinite(limit) ? limit : "∞";
+
   return (
     <div style={S.devBar}>
       <span style={S.devLabel}>Служебное · тариф</span>
@@ -28,15 +35,37 @@ export default function DevPlanSwitch({ plan, onChange }) {
             borderColor: on ? C.lilacBtn : C.border,
             color: on ? C.ink : C.text,
             fontWeight: on ? 600 : 400,
-          }} onClick={() => onChange(id)}>
+          }} onClick={() => setPlan(id)}>
             {PLAN_LIMITS[id].label}
           </button>
         );
       })}
 
+      <span style={{ ...S.devDivider }} />
+
+      {unlocked ? (
+        <button className="chip" style={{
+          ...S.chip, background: "transparent", borderColor: C.gold, color: C.gold,
+        }} onClick={() => lockReport(reportKey)}>
+          Разбор открыт — закрыть
+        </button>
+      ) : (
+        <button className="chip" disabled={!canUnlockMore} style={{
+          ...S.chip,
+          background: canUnlockMore ? C.gold : "transparent",
+          borderColor: canUnlockMore ? C.gold : C.border,
+          color: canUnlockMore ? C.ink : C.muted,
+          fontWeight: canUnlockMore ? 600 : 400,
+        }} onClick={() => unlockReport(reportKey)}>
+          {canUnlockMore ? "Открыть разбор по этим датам" : "Лимит тарифа исчерпан"}
+        </button>
+      )}
+
       <p style={S.devHint}>
-        Переключатель для проверки доступов, на сайте его не будет.
-        Сейчас открыто разделов: {sectionsOpen(plan)} из {SECTIONS_TOTAL}.
+        Разборов открыто: {reports.length} из {limitLabel}. Этот разбор считается
+        по {dates.length > 1 ? "датам" : "дате"} {dates.join(" и ")} — на этом же наборе дат
+        работают все страницы, которые из него считаются.
+        Разделов видно: {sectionsOpen} из {sectionsTotal}.
       </p>
     </div>
   );

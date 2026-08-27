@@ -2,8 +2,11 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
 import Home from "./pages/Home.jsx";
-import CalcResult from "./pages/CalcResult.jsx";
 import MatricaResult from "./pages/MatricaResult.jsx";
+import FinansyResult from "./pages/FinansyResult.jsx";
+import DetskayaResult from "./pages/DetskayaResult.jsx";
+import PrognozResult from "./pages/PrognozResult.jsx";
+import PairResult from "./pages/PairResult.jsx";
 import Chat from "./pages/Chat.jsx";
 import Tarify from "./pages/Tarify.jsx";
 import Profil from "./pages/Profil.jsx";
@@ -38,17 +41,14 @@ export default function App() {
             <Route key={c.id} path={c.path} element={<Home />} />
           ))}
 
-          {/* разбор матрицы судьбы — открывается по прямой ссылке */}
-          <Route path="/matrica/:date" element={<MatricaResult />} />
-
-          {/* остальные результаты пока заглушка — задача 3 */}
-          {CALC_NAV.filter((c) => c.id !== "matrica").map((c) => (
-            <Route
-              key={c.id + "-result"}
-              path={c.pairs ? `${c.path}/:dateA/:dateB` : `${c.path}/:date`}
-              element={<CalcResult />}
-            />
-          ))}
+          {/* результаты расчёта — открываются по прямой ссылке.
+              Одна дата в адресе у личных расчётов, две у парных. */}
+          <Route path="/matrica/:date"  element={<MatricaResult />} />
+          <Route path="/finansy/:date"  element={<FinansyResult />} />
+          <Route path="/detskaya/:date" element={<DetskayaResult />} />
+          <Route path="/prognoz/:date"  element={<PrognozResult />} />
+          <Route path="/sovmestimost/:dateA/:dateB" element={<PairResult pageId="sovmestimost" />} />
+          <Route path="/biznes/:dateA/:dateB"       element={<PairResult pageId="biznes" />} />
 
           {/* кабинет */}
           <Route path="/chat" element={<Chat />} />
