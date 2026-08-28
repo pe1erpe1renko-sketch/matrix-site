@@ -6,6 +6,8 @@ import { Spark } from "../components/Icons.jsx";
 import { CALC_NAV, DEFAULT_CALC, calcById, activeNavId } from "../routes.js";
 import { partsToUrlDate } from "../lib/urlDate.js";
 import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
+import { PlanCard } from "../components/PlanCard.jsx";
+import { SUBSCRIPTION_PLANS } from "../lib/plans.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import Octagram from "../components/Octagram.jsx";
@@ -180,6 +182,9 @@ export default function Home() {
   const [a, setA] = useState({ name: "", d: "", m: "", y: "", g: "" });
   const [b, setB] = useState({ name: "", d: "", m: "", y: "", g: "" });
   const [faqOpen, setFaqOpen] = useState(0);
+  /* Какую карточку тарифа человек рассматривает. Пока не выбрал ничего —
+     null, и тогда никто не приглушён: страница открывается спокойной. */
+  const [chosenPlan, setChosenPlan] = useState(null);
   const isPhone = useIsPhone();
 
   const filled = (p) => p.name.trim() && p.d && p.m && p.y && p.g;
@@ -397,42 +402,23 @@ export default function Home() {
           Начните бесплатно, продолжайте <em style={S.h1em}>по подписке</em>
         </h2>
 
-        <div className="card" style={S.onceRow}>
-          <div style={{ flex: "1 1 280px" }}>
-            <div style={S.planName}>Разовый разбор</div>
-            <div style={S.priceRow}>
-              <span style={S.price}>490</span><span style={S.priceUnit}>₽</span>
-            </div>
-            <div style={S.priceHint}>один платёж, доступ навсегда</div>
-            <p style={S.planLead}>Одна матрица судьбы целиком — все 25 разделов вместо четырёх.</p>
-          </div>
-          <div style={{ flex: "1 1 360px" }}>
-            <div style={S.infoLabel}>Что откроется</div>
-            <div style={S.onceList}>
-              {["Предназначение и дело по душе","Деньги: канал и утечки","Отношения, близость, притяжение","Род: мужская и женская линии","Карма, испытания, прошлые жизни","Здоровье и энергия по чакрам","Детско-родительские связи","PDF со всем разбором"].map((x) => (
-                <div key={x} style={S.li}><span style={S.uMark}>—</span><span>{x}</span></div>
-              ))}
-            </div>
-          </div>
-          <div style={S.onceCtaWrap}>
-            <Link to="/tarify" className="link" style={S.link}>Что входит полностью</Link>
-            <Link to="/tarify" className="btnGold"
-              style={{ ...S.ctaSmall, background: C.gold, color: C.ink, textAlign: "center" }}>Купить за 490 ₽</Link>
-          </div>
-        </div>
+        <PlanCard
+          id="once" layout="wide" accent={C.gold}
+          chosen={chosenPlan === "once"} dimmed={chosenPlan !== null && chosenPlan !== "once"}
+          onSelect={setChosenPlan}
+          detailsTo="/tarify"
+          cta={{ label: "Купить за 490 ₽", to: "/tarify", variant: "gold" }} />
 
         <h3 style={S.h3}>Или подписка — сервис, который работает каждый день</h3>
 
         <div style={S.plans}>
-          <Plan badge="ОПТИМАЛЬНЫЙ" badgeSolid featured name="Свой путь" price="590" unit="₽ / мес"
-            lead="На 100 ₽ дороже разового — и это уже не разбор, а сервис, который открывается каждый день."
-            items={["2 матрицы судьбы вместо одной","Аркан дня в Telegram — каждый вечер на завтра","ИИ-наставник: 5 вопросов в день","Архив прогнозов — остаётся даже после отмены","PDF по обеим матрицам"]} />
-          <Plan badge="ВЫГОДНО" name="Близкий круг" price="990" unit="₽ / мес"
-            lead="Прогнозы получаете не только вы. Каждый вечер они уходят вашим близким прямо в Telegram."
-            items={["5 матриц судьбы","Аркан дня в Telegram — до 3 человек","У каждого своя ссылка на бота","ИИ-наставник: 20 вопросов в день"]} />
-          <Plan name="Без границ" price="1790" unit="₽ / мес"
-            lead="Без счётчиков. Для тех, кто работает с матрицами постоянно."
-            items={["Неограниченное число матриц","Аркан дня в Telegram — до 7 человек","ИИ-наставник без ограничений","Приоритетная обработка запросов"]} />
+          {SUBSCRIPTION_PLANS.map((id) => (
+            <PlanCard key={id} id={id} layout="full"
+              chosen={chosenPlan === id} dimmed={chosenPlan !== null && chosenPlan !== id}
+              onSelect={setChosenPlan}
+              detailsTo="/tarify"
+              cta={{ label: "Выбрать", to: "/tarify", variant: id === "path" ? "lilac" : "outline" }} />
+          ))}
         </div>
 
         <p style={S.forever}>
@@ -530,36 +516,6 @@ function Person({ data, set, label, idPrefix }) {
           value={data.y} onChange={up("y")} inputMode="numeric" maxLength={4} />
         <datalist id={idPrefix + "years"}>{YEARS.map((y) => <option key={y} value={y} />)}</datalist>
       </div>
-    </div>
-  );
-}
-
-function Plan({ badge, badgeSolid, name, price, unit, lead, items, featured }) {
-  return (
-    <div className="card" style={{
-      ...S.plan,
-      borderColor: featured ? C.lilac : C.border,
-      background: featured ? SURFACE.cardHi : SURFACE.card,
-      boxShadow: featured ? `0 26px 70px -34px ${C.lilac}` : "none",
-    }}>
-      <div style={S.badgeSlot}>
-        {badge && <span style={{
-          ...S.badge,
-          background: badgeSolid ? C.lilacBtn : "transparent",
-          color: badgeSolid ? C.ink : C.lilac, borderColor: C.lilac,
-        }}>{badge}</span>}
-      </div>
-      <div style={S.planName}>{name}</div>
-      <div style={S.priceRow}>
-        <span style={S.price}>{price}</span><span style={S.priceUnit}>{unit}</span>
-      </div>
-      <p style={S.planLead}>{lead}</p>
-      <div style={{ flex: 1 }}>
-        {items.map((x) => <div key={x} style={S.li}><span style={S.uMark}>—</span><span>{x}</span></div>)}
-      </div>
-      <Link to="/tarify" className="link" style={{ ...S.link, marginTop: 18 }}>Что входит полностью</Link>
-      <Link to="/tarify" className={featured ? "btnLilac" : "btnOutline"}
-        style={{ ...S.ctaSmall, width: "100%", marginTop: 12, textAlign: "center" }}>Выбрать</Link>
     </div>
   );
 }

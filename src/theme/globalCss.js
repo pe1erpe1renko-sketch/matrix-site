@@ -83,23 +83,13 @@ a { color: inherit; text-decoration: none; }
 }
 @media (prefers-reduced-motion: reduce) { .soundHint { animation: none; } }
 
-/* Карточки тарифов. Подъём и свечение — только там, где есть наведение;
-   на телефоне остаётся одна лишь подсветка выбранной. */
-.planCard {
-  transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s ease,
-              border-color .18s ease, opacity .18s ease, background .18s ease;
-}
-.planCardLift:hover {
-  transform: translateY(-4px);
-  border-color: ${C.borderHi};
-  box-shadow: 0 22px 48px -28px ${C.lilac};
-  opacity: 1;
-}
-.planBtn { transition: transform .1s ease, background .18s ease, box-shadow .18s ease; }
+/* Карточки тарифов. Подъём, рамка, свечение и приглушение соседей
+   считаются в самом компоненте (components/PlanCard.jsx) встроенным
+   стилем — правилом :hover их было бы не задать, встроенный стиль его
+   перебивает. Классу остаётся только отклик на нажатие: transform
+   кнопки инлайном не задаётся, поэтому :active здесь работает. */
 .planBtn:not(:disabled):active { transform: scale(0.96); }
-@media (prefers-reduced-motion: reduce) {
-  .planCard, .planCardLift:hover, .planBtn { transition: none; transform: none; }
-}
+@media (prefers-reduced-motion: reduce) { .planBtn:not(:disabled):active { transform: none; } }
 
 /* Бегущий индикатор у текущей строки сцены расчёта. */
 .theatreRun { animation: theatreRun 700ms linear forwards; }

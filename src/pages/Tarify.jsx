@@ -1,7 +1,8 @@
 import React from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
-import { PLAN_LIMITS, PLAN_ORDER } from "../lib/plans.js";
+import { PLAN_LIMITS, PLAN_ORDER, PLAN_PRICE } from "../lib/plans.js";
+import { PlanCard } from "../components/PlanCard.jsx";
 import { useAccess, setPlan } from "../lib/access.js";
 import { usePeople, telegramUsed } from "../lib/people.js";
 import { useConversations, messagesToday } from "../lib/conversations.js";
@@ -20,12 +21,10 @@ import { useState } from "react";
  *
  * Кнопки перехода пока переключают тариф на месте — это заглушка вместо
  * оплаты. Настоящий платёж придёт в задаче 5 (payment.js).
+ *
+ * Сами карточки рисует общий компонент components/PlanCard.jsx — тот же,
+ * что и на главной. Цены и тексты приходят из lib/plans.js.
  */
-
-const PRICES = {
-  free: "0 ₽", once: "490 ₽ разово", path: "590 ₽/мес",
-  circle: "990 ₽/мес", unlimited: "1790 ₽/мес",
-};
 
 /* История платежей — пример разметки. Придёт с бэкенда вместе с чеками. */
 const HISTORY = [
@@ -70,7 +69,7 @@ export default function Tarify() {
         <div style={{ flex: "1 1 240px" }}>
           <div style={S.planBadge}>ТЕКУЩИЙ</div>
           <div style={S.planNowName}>{limits.label}</div>
-          <div style={S.planNowPrice}>{PRICES[plan]}</div>
+          <div style={S.planNowPrice}>{PLAN_PRICE[plan].short}</div>
           <div style={S.dimSm}>
             {plan === "free"
               ? "Бесплатный доступ, списаний нет"
@@ -121,52 +120,16 @@ export default function Tarify() {
         <div style={S.blockTitle}>Все тарифы</div>
         <div style={S.half}>
           {PLAN_ORDER.map((id) => {
-            const item = PLAN_LIMITS[id];
             const current = id === plan;
-            const chosen = id === selected;
-            /* На телефоне подъём и приглушение убраны: на маленьком экране
-               это мешает читать, а наведения там всё равно нет. */
-            const dimmed = !isPhone && !chosen;
-
             return (
-              <div key={id} className={isPhone ? "planCard" : "planCard planCardLift"}
-                role="button" tabIndex={0}
-                aria-pressed={chosen}
-                onClick={() => setSelected(id)}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(id); } }}
-                style={{
-                  ...S.block,
-                  padding: "16px 18px",
-                  borderColor: chosen ? C.lilac : C.border,
-                  background: chosen ? "rgba(31,24,65,0.9)" : "rgba(10,8,23,0.4)",
-                  boxShadow: chosen ? `0 20px 54px -26px ${C.lilac}` : "none",
-                  transform: chosen && !isPhone ? "scale(1.025)" : "none",
-                  opacity: dimmed ? 0.62 : 1,
-                }}>
-                <div style={{ color: C.white, fontSize: 15, marginBottom: 4 }}>
-                  {item.label}
-                  {current && <span style={{ ...S.dimSm, color: C.gold, marginLeft: 8 }}>текущий</span>}
-                </div>
-                <div style={{ color: C.gold, fontSize: 14, marginBottom: 10 }}>{PRICES[id]}</div>
-                <div style={S.dimSm}>
-                  Матриц: {Number.isFinite(item.matrices) ? item.matrices : "без счёта"}<br />
-                  Наставник: {item.messages ? (Number.isFinite(item.messages) ? `${item.messages} в день` : "без ограничений") : "—"}<br />
-                  Telegram: {item.telegram || "—"}
-                </div>
-                <button className={`planBtn ${current ? "btnGhost" : chosen ? "btnGold" : "btnOutline"}`}
-                  disabled={current}
-                  style={{
-                    ...S.btnSm, width: "100%", marginTop: 12,
-                    border: current || chosen ? "none" : `1px solid ${C.border}`,
-                    background: chosen && !current ? C.gold : "transparent",
-                    color: current ? C.muted : chosen ? C.ink : C.white,
-                    fontWeight: chosen ? 600 : 500,
-                    boxShadow: chosen && !current ? `0 12px 30px -14px ${C.gold}` : "none",
-                  }}
-                  onClick={(e) => { e.stopPropagation(); setPlan(id); }}>
-                  {current ? "Текущий" : chosen ? "Перейти на этот тариф" : "Выбрать"}
-                </button>
-              </div>
+              <PlanCard key={id} id={id} layout="compact" current={current}
+                chosen={id === selected} dimmed={selected !== null && selected !== id}
+                onSelect={setSelected}
+                cta={{
+                  label: current ? "Текущий" : id === selected ? "Перейти на этот тариф" : "Выбрать",
+                  disabled: current,
+                  onClick: () => setPlan(id),
+                }} />
             );
           })}
         </div>

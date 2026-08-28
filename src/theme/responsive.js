@@ -23,6 +23,7 @@ const QUERIES = {
   phone: `(max-width: ${PHONE_MAX}px)`,
   tablet: `(min-width: ${PHONE_MAX + 1}px) and (max-width: ${TABLET_MAX}px)`,
   coarse: '(pointer: coarse)',
+  calm: '(prefers-reduced-motion: reduce)',
 };
 
 /** Сервер и старые браузеры без matchMedia: считаем, что это десктоп. */
@@ -76,6 +77,13 @@ export function useIsNarrow() {
  * и только тратят батарею, поэтому выключаются полностью.
  */
 export const useIsTouch = () => useQuery('coarse');
+
+/**
+ * Человек попросил систему не анимировать. Медиазапрос сюда вынесен потому,
+ * что встроенный стиль правилом из таблицы не отменить: движение приходится
+ * гасить в самом компоненте.
+ */
+export const useReducedMotion = () => useQuery('calm');
 
 /** Выбор значения по текущей ширине: pick(bp, { phone: 12, desktop: 24 }). */
 export const pick = (bp, variants) =>
