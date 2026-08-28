@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { C, SURFACE } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
-import { PLAN_LIMITS, PLAN_PRICE, PLAN_COPY } from "../lib/plans.js";
+import { PLAN_LIMITS, PLAN_PRICE, PLAN_COPY, money } from "../lib/plans.js";
 import { useIsPhone, useReducedMotion, TAP } from "../theme/responsive.js";
 
 /**
@@ -127,16 +127,21 @@ function FullBody({ id, cta, detailsTo, detailsLabel }) {
         {copy.badge && (
           <span style={{
             ...S.badge,
-            background: copy.badgeSolid ? C.lilacBtn : "transparent",
-            color: copy.badgeSolid ? C.ink : C.lilac, borderColor: C.lilac,
+            background: copy.badgeSolid === false ? "transparent" : C.lilacBtn,
+            color: copy.badgeSolid === false ? C.lilac : C.ink, borderColor: C.lilac,
           }}>{copy.badge}</span>
         )}
       </div>
+      {/* Тема тарифа стоит НАД названием: тарифы отличаются не количеством,
+          а тем, что в них появляется. */}
+      {copy.theme && <div style={S.themeTag}>{copy.theme}</div>}
       <div style={S.planName}>{PLAN_LIMITS[id].label}</div>
       <div style={S.priceRow}>
-        <span style={S.price}>{price.amount}</span><span style={S.priceUnit}>{price.unit}</span>
+        <span style={S.price}>{money(price.amount)}</span><span style={S.priceUnit}>{price.unit}</span>
       </div>
+      {price.hint && <div style={S.priceHint}>{price.hint}</div>}
       <p style={S.planLead}>{copy.lead}</p>
+      {copy.keyLine && <div style={S.keyLine}>{copy.keyLine}</div>}
       <div style={{ flex: 1 }}>
         {(copy.items || []).map((x) => (
           <div key={x} style={S.li}><span style={S.uMark}>—</span><span>{x}</span></div>
@@ -156,9 +161,10 @@ function WideBody({ id, cta, detailsTo, detailsLabel }) {
   return (
     <>
       <div style={{ flex: "1 1 280px" }}>
+        {copy.theme && <div style={S.themeTag}>{copy.theme}</div>}
         <div style={S.planName}>{PLAN_LIMITS[id].label}</div>
         <div style={S.priceRow}>
-          <span style={S.price}>{price.amount}</span><span style={S.priceUnit}>{price.unit}</span>
+          <span style={S.price}>{money(price.amount)}</span><span style={S.priceUnit}>{price.unit}</span>
         </div>
         {price.hint && <div style={S.priceHint}>{price.hint}</div>}
         <p style={S.planLead}>{copy.lead}</p>
@@ -191,10 +197,8 @@ function CompactBody({ id, current, cta }) {
       </div>
       <div style={{ color: C.gold, fontSize: 14, marginBottom: 10 }}>{PLAN_PRICE[id].short}</div>
       <div style={S.dimSm}>
-        Матриц: {Number.isFinite(limits.matrices) ? limits.matrices : "без счёта"}<br />
-        Наставник: {limits.messages
-          ? (Number.isFinite(limits.messages) ? `${limits.messages} в день` : "без ограничений")
-          : "—"}<br />
+        Дат целиком: {Number.isFinite(limits.matrices) ? limits.matrices : "без счёта"}<br />
+        Молний: {limits.bolts || "—"}{limits.kind === "sub" ? " в месяц" : ""}<br />
         Telegram: {limits.telegram || "—"}
       </div>
       <PlanCta {...cta} style={{ width: "100%", marginTop: 12 }} />
@@ -212,7 +216,7 @@ function CompactBody({ id, current, cta }) {
  * Сжатие при нажатии оставлено классу .planBtn: transform здесь
  * встроенным стилем не задаётся, иначе :active было бы перебито.
  */
-export function PlanCta({ label, to, onClick, disabled = false, variant = "outline", style }) {
+export function PlanCta({ label, to, state, onClick, disabled = false, variant = "outline", style }) {
   const { chosen, lit } = useContext(CardState);
 
   const filled =
@@ -238,7 +242,10 @@ export function PlanCta({ label, to, onClick, disabled = false, variant = "outli
 
   /* Ссылка на главной, кнопка в кабинете — разметка одна. */
   if (to && !disabled) {
-    return <Link to={to} className="planBtn" style={look} onClick={(e) => e.stopPropagation()}>{label}</Link>;
+    return (
+      <Link to={to} state={state} className="planBtn" style={look}
+        onClick={(e) => e.stopPropagation()}>{label}</Link>
+    );
   }
   return (
     <button className="planBtn" type="button" disabled={disabled} style={look}

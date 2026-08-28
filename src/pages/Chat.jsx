@@ -2,13 +2,16 @@ import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
-import { PLAN_LIMITS, PLAN_ORDER } from "../lib/plans.js";
+import { BOLT_COST } from "../lib/plans.js";
+import { useBolts, spendBolts } from "../lib/bolts.js";
+import { Bolt } from "../components/Icons.jsx";
+import { BoltShortage } from "../components/BoltGate.jsx";
 import { useAccess } from "../lib/access.js";
 import { useAccount } from "../lib/account.js";
 import { usePeople, personLabel } from "../lib/people.js";
-import { useConversations, startConversation, openConversation, appendExchange, messagesToday } from "../lib/conversations.js";
+import { useConversations, startConversation, openConversation, appendExchange } from "../lib/conversations.js";
 import { buildMentorContext, mentorPlaceholder } from "../lib/mentorContext.js";
-import { calculateMatrix, toISODate } from "../lib/matrixEngine.js";
+import { calculateMatrix } from "../lib/matrixEngine.js";
 import { Spark } from "../components/Icons.jsx";
 import LoginModal from "../components/LoginModal.jsx";
 import { backToPage, useBackPoint } from "../lib/returnTo.js";
@@ -52,9 +55,13 @@ export default function Chat() {
   const isPhone = useIsPhone();
   const back = useBackPoint();
 
-  const limits = PLAN_LIMITS[plan];
-  const askedToday = messagesToday(list, toISODate(new Date()));
-  const left = Number.isFinite(limits.messages) ? Math.max(0, limits.messages - askedToday) : Infinity;
+  const { balance } = useBolts();
+  const [shortage, setShortage] = useState(false);
+
+  /* Сообщение наставнику стоит молнию. Цена стоит на кнопке, а не всплывает
+     после отправки, и подтверждения на неё нет: в переписке оно раздражает
+     сильнее, чем защищает. */
+  const cost = BOLT_COST.message;
 
   const active = list.find((c) => c.id === activeId) || null;
   const messages = active ? active.messages : [];
@@ -72,7 +79,12 @@ export default function Chat() {
 
   const send = (text) => {
     const question = String(text).trim();
-    if (!question || !matrix || left <= 0) return;
+    if (!question || !matrix) return;
+
+    /* Не хватает — кнопку не блокируем, показываем окно с недостачей
+       и ценой пакета: это лучший момент рассказать про тариф. */
+    const paid = spendBolts(cost, "сообщение наставнику");
+    if (!paid.ok) { setShortage(true); return; }
 
     /* Контекст пересобирается на каждый вопрос: человек мог переключить,
        о ком идёт речь, прямо посреди разговора. */
@@ -99,31 +111,6 @@ export default function Chat() {
             onClick={() => setLogin(true)}>Войти</button>
         </div>
         {login && <LoginModal back={back} onClose={() => setLogin(false)} />}
-      </div>
-    );
-  }
-
-  /* На «Бесплатно» и «Разовом» наставника нет вовсе. Показывать там
-     «лимит исчерпан» — вранье: лимит не исчерпан, услуги просто нет. */
-  if (limits.messages === 0) {
-    return (
-      <div style={{ ...S.cabinet, maxWidth: 620, margin: "0 auto" }}>
-        <BackToReport />
-        <div style={S.intro}>
-          <div style={S.introIcon}><Spark size={26} /></div>
-          <h1 style={S.introTitle}>ИИ-наставник</h1>
-          <div style={S.introSub}>Разговор о вашей матрице и о том, что происходит в жизни</div>
-          <p style={S.introText}>
-            На тарифе «{limits.label}» наставника нет. Он открывается на платных тарифах:
-            {" "}{PLAN_ORDER.filter((id) => PLAN_LIMITS[id].messages > 0)
-              .map((id) => `«${PLAN_LIMITS[id].label}» — ${Number.isFinite(PLAN_LIMITS[id].messages)
-                ? `${PLAN_LIMITS[id].messages} в день` : "без счёта"}`)
-              .join(", ")}.
-          </p>
-          <Link to="/tarify" state={backToPage("/chat", "Вернуться к наставнику")} className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
-            Посмотреть тарифы
-          </Link>
-        </div>
       </div>
     );
   }
@@ -177,10 +164,8 @@ export default function Chat() {
             );
           })}
         </div>
-        <span style={{ ...S.counter, color: left <= 3 ? C.pink : C.muted }}>
-          {Number.isFinite(left)
-            ? `осталось ${left} из ${limits.messages}`
-            : "без ограничений"}
+        <span style={{ ...S.counter, color: balance <= 3 ? C.pink : C.muted }}>
+          <Bolt size={12} /> {balance} на балансе
         </span>
       </div>
 
@@ -275,8 +260,8 @@ export default function Chat() {
 
             <div style={S.inputBox}>
               <textarea className="fld" style={S.chatArea} rows={1}
-                placeholder={left > 0 ? "Спросите о своей матрице…" : "Лимит сообщений на сегодня исчерпан"}
-                value={draft} disabled={left <= 0}
+                placeholder="Спросите о своей матрице…"
+                value={draft}
                 onChange={(e) => {
                   setDraft(e.target.value);
                   e.target.style.height = "auto";
@@ -285,18 +270,29 @@ export default function Chat() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(draft); }
                 }} />
-              <button className="btnGold" style={{ ...S.sendBtn, background: C.gold, color: C.ink }}
-                onClick={() => send(draft)} aria-label="Отправить">
+              {/* Цена видна ДО нажатия: «Отправить ⚡1». */}
+              <button className="btnGold" style={{
+                ...S.sendBtn, background: C.gold, color: C.ink,
+                width: "auto", padding: "0 14px", gap: 6,
+              }} onClick={() => send(draft)} aria-label={`Отправить, спишется ${cost} молния`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M12 19V5M12 5l-6 6M12 5l6 6" stroke="currentColor"
                     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
+                <Bolt size={13} color={C.ink} />
+                <span style={{ fontWeight: 600, fontSize: 13.5 }}>{cost}</span>
               </button>
             </div>
 
             <p style={S.chatNote}>
+              Сообщение наставнику стоит {cost} молнию. Читать свои разборы,
+              считать матрицу и получать аркан дня — бесплатно всегда.
               Не предсказывает события и не заменяет врача, психолога или юриста.
             </p>
+
+            {shortage && (
+              <BoltShortage cost={cost} balance={balance} onClose={() => setShortage(false)} />
+            )}
           </div>
         </div>
       )}

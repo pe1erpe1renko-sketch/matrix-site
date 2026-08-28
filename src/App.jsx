@@ -10,6 +10,8 @@ import PairResult from "./pages/PairResult.jsx";
 import TypeResult from "./pages/TypeResult.jsx";
 import Chat from "./pages/Chat.jsx";
 import Tarify from "./pages/Tarify.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import CheckoutSuccess from "./pages/CheckoutSuccess.jsx";
 import Profil from "./pages/Profil.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { CALC_NAV } from "./routes.js";
@@ -73,6 +75,9 @@ export default function App() {
           {/* кабинет */}
           <Route path="/chat" element={<Chat />} />
           <Route path="/tarify" element={<Tarify />} />
+          {/* оформление: тариф, разбор или пакет молний — товар в адресе */}
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/success" element={<CheckoutSuccess />} />
           <Route path="/profil" element={<Profil />} />
 
           <Route path="*" element={<NotFound />} />

@@ -367,6 +367,16 @@ export const S = {
     transition: "border-color .18s ease, background .18s ease",
   },
   badgeSlot: { height: 28, marginBottom: 6 },
+  /* Тема тарифа над названием и золотая строка «что появляется». */
+  themeTag: {
+    fontSize: 11.5, letterSpacing: "0.12em", textTransform: "uppercase",
+    color: C.lilac, marginBottom: 8,
+  },
+  keyLine: {
+    fontSize: 12.5, color: C.gold, padding: "9px 13px", borderRadius: R.sm,
+    background: "rgba(228,190,114,0.08)", border: "1px solid rgba(228,190,114,0.24)",
+    marginBottom: 15,
+  },
   badge: {
     fontSize: 10.5, letterSpacing: "0.13em", padding: "5px 12px",
     borderRadius: R.pill, border: "1px solid", fontWeight: 600,
@@ -1202,4 +1212,210 @@ export const S = {
     border: `1px solid ${C.borderHi}`, background: SURFACE.cardHi,
   },
   paywallTitle: { fontFamily: FONT.serif, fontSize: 20, color: C.white, lineHeight: 1.3 },
+  /* ---- страница тарифов ---- */
+
+  modeToggle: {
+    display: "inline-flex", gap: 4, padding: 4, borderRadius: R.pill,
+    background: "rgba(23,18,46,0.8)", border: `1px solid ${C.border}`,
+  },
+  modeBtn: {
+    padding: "9px 26px", borderRadius: R.pill, border: "none",
+    fontSize: 14, fontFamily: "inherit", transition: "all .18s ease",
+  },
+
+  onceWide: {
+    display: "flex", flexWrap: "wrap", gap: 40,
+    padding: "30px 34px", borderRadius: R.xl,
+    background: "rgba(31,24,65,0.7)", border: `1px solid ${C.border}`,
+  },
+  onceMark: { display: "flex", gap: 11, padding: "7px 0", fontSize: 14.5 },
+  markSign: { flexShrink: 0, width: 14 },
+
+  foreverWide: {
+    display: "flex", flexWrap: "wrap", gap: 32, alignItems: "center",
+    marginTop: 18, padding: "28px 32px", borderRadius: R.xl,
+    background: "rgba(228,190,114,0.06)", border: "1px solid rgba(228,190,114,0.32)",
+  },
+
+  boltRow: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))",
+    gap: 14, marginBottom: 22,
+  },
+  boltCard: {
+    padding: "20px 22px", borderRadius: R.lg,
+    background: SURFACE.card, border: `1px solid ${C.border}`,
+  },
+  boltN: {
+    display: "flex", alignItems: "center", gap: 8, fontFamily: FONT.serif,
+    fontSize: 26, color: C.gold, marginBottom: 6,
+  },
+  packs: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 14,
+  },
+  pack: {
+    position: "relative", padding: "24px 22px", borderRadius: R.lg,
+    border: "1px solid", textAlign: "center",
+    display: "flex", flexDirection: "column", gap: 4,
+  },
+  packBadge: {
+    position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)",
+    fontSize: 9.5, letterSpacing: "0.12em", padding: "3px 11px",
+    borderRadius: R.pill, background: C.gold, color: C.ink, fontWeight: 700,
+    whiteSpace: "nowrap",
+  },
+  packN: {
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+    fontFamily: FONT.serif, fontSize: 30, color: C.white, marginBottom: 4,
+  },
+
+  cmpWrap: {
+    borderRadius: R.lg, border: `1px solid ${C.border}`,
+    background: "rgba(23,18,46,0.6)", overflowX: "auto",
+  },
+  cmpRow: {
+    display: "grid", gridTemplateColumns: "minmax(190px, 2fr) repeat(4, minmax(72px, 1fr))",
+    alignItems: "center", padding: "13px 20px", gap: 12,
+    borderTop: `1px solid ${C.border}`, minWidth: 620,
+  },
+  cmpHead: { borderTop: "none", background: "rgba(10,8,23,0.6)" },
+  cmpHeadCell: {
+    textAlign: "center", fontSize: 11.5, letterSpacing: "0.1em",
+    textTransform: "uppercase", fontWeight: 600,
+  },
+  cmpName: { fontSize: 14, color: C.text },
+  cmpCell: { textAlign: "center", fontSize: 14 },
+  /* ---- оформление покупки ---- */
+
+  checkout: {
+    display: "grid", gridTemplateColumns: "minmax(320px, 1fr) minmax(300px, 380px)",
+    gap: 26, alignItems: "start",
+  },
+  backRow: { display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 18 },
+  backLink2: {
+    display: "inline-flex", alignItems: "center", gap: 8, background: "none",
+    border: "none", color: C.lilac, fontSize: 13.5, fontFamily: "inherit",
+    padding: 0, transition: "color .16s ease",
+  },
+  needTag: {
+    display: "inline-flex", alignItems: "center", gap: 8,
+    fontSize: 11.5, letterSpacing: "0.1em", textTransform: "uppercase",
+    color: C.gold, marginBottom: 14, fontWeight: 600,
+  },
+  needDot: { width: 7, height: 7, borderRadius: 4, background: C.gold, display: "block" },
+  agreeRow: { display: "flex", gap: 13, alignItems: "flex-start", textAlign: "left", width: "100%",
+    background: "none", border: "none", fontFamily: "inherit", padding: 0 },
+  agreeBox: {
+    width: 21, height: 21, borderRadius: 7, border: "1.5px solid", flexShrink: 0,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    marginTop: 1, transition: "all .16s ease",
+  },
+  agreeText: { fontSize: 13.5, lineHeight: 1.6, color: C.text },
+  calmBox: {
+    display: "flex", gap: 12, alignItems: "flex-start", padding: "14px 18px",
+    borderRadius: R.md, background: "rgba(183,156,232,0.07)",
+    border: `1px solid ${C.borderHi}`, fontSize: 13, color: C.text, marginTop: 15,
+  },
+
+  sumWrap: { position: "sticky", top: 26 },
+  summary: {
+    padding: "24px 26px 26px", borderRadius: R.xl,
+    background: "rgba(31,24,65,0.8)", border: `1px solid ${C.borderHi}`,
+    boxShadow: "0 30px 80px -50px rgba(0,0,0,0.9)",
+  },
+  sumTitle: { fontFamily: FONT.serif, fontSize: 24, color: C.white },
+  sumSub: { fontSize: 12.5, color: C.lilac, marginTop: 4 },
+  sumRow: { display: "flex", justifyContent: "space-between", fontSize: 13.5, padding: "4px 0" },
+  sumDivider: { height: 1, background: C.border, margin: "18px 0 14px" },
+  totalRow: {
+    display: "flex", justifyContent: "space-between", alignItems: "baseline",
+    marginTop: 12, paddingTop: 14, borderTop: `1px solid ${C.border}`,
+  },
+  totalValue: { fontFamily: FONT.serif, fontSize: 30, color: C.gold, lineHeight: 1 },
+  nextPay: { fontSize: 12, color: C.muted, marginTop: 8, textAlign: "right" },
+
+  payWrap: { position: "relative" },
+  payBtn: {
+    width: "100%", marginTop: 20, padding: "15px 20px", borderRadius: R.md,
+    fontSize: 15.5, fontWeight: 600, border: "none", fontFamily: "inherit",
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+    transition: "background .18s ease, box-shadow .18s ease",
+  },
+  payTip: {
+    position: "absolute", bottom: "calc(100% + 10px)", left: "50%",
+    transform: "translateX(-50%)", whiteSpace: "nowrap", zIndex: 5,
+    background: C.cardHi, border: `1px solid ${C.gold}`, color: C.gold,
+    fontSize: 12.5, padding: "7px 13px", borderRadius: R.sm,
+    pointerEvents: "none", opacity: 0, transition: "opacity .16s ease",
+  },
+  pays: { display: "flex", gap: 7, flexWrap: "wrap", justifyContent: "center", marginTop: 16 },
+  payTag: { fontSize: 11, color: C.muted, padding: "4px 10px", borderRadius: R.pill, border: `1px solid ${C.border}` },
+  secure: { fontSize: 11.5, color: C.muted, marginTop: 12, textAlign: "center", lineHeight: 1.5 },
+  spin: {
+    width: 15, height: 15, borderRadius: "50%", display: "block",
+    border: "2px solid rgba(20,15,43,0.25)", borderTopColor: C.ink,
+  },
+
+  appliedRow: {
+    display: "flex", alignItems: "center", gap: 11, padding: "10px 13px",
+    borderRadius: R.md, background: "rgba(95,192,140,0.1)",
+    border: "1px solid rgba(95,192,140,0.4)",
+  },
+
+  /* ---- экран после оплаты ---- */
+  okWrap: { maxWidth: 720, margin: "0 auto", paddingTop: 30 },
+  okIcon: {
+    width: 68, height: 68, borderRadius: "50%", background: C.ok,
+    display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 22px",
+  },
+  okCard: {
+    padding: "24px 26px", borderRadius: R.xl, textAlign: "center",
+    background: SURFACE.card, border: `1px solid ${C.border}`,
+  },
+  okBig: { fontFamily: FONT.serif, fontSize: 42, color: C.gold, lineHeight: 1 },
+  okList: { display: "inline-block", textAlign: "left" },
+  okBtns: { display: "flex", gap: 12, flexWrap: "wrap", marginTop: 20, justifyContent: "center" },
+  upsell: {
+    marginTop: 30, padding: "26px 28px", borderRadius: R.xl, textAlign: "center",
+    background: "rgba(228,190,114,0.06)", border: "1px solid rgba(228,190,114,0.32)",
+  },
+  upGrid: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
+    gap: 22, textAlign: "left",
+  },
+  upCol: {
+    fontSize: 11.5, letterSpacing: "0.1em", textTransform: "uppercase",
+    color: C.muted, marginBottom: 11,
+  },
+  upLine: { fontSize: 13.5, padding: "5px 0", display: "flex", gap: 9 },
+  startTile: {
+    padding: "18px", borderRadius: R.md, textAlign: "left",
+    background: SURFACE.card, border: `1px solid ${C.border}`,
+    fontFamily: "inherit", transition: "border-color .18s ease, transform .18s ease",
+  },
+  /* ---- молнии в шапке ---- */
+  boltBtn: {
+    display: "inline-flex", alignItems: "center", gap: 6,
+    height: 34, padding: "0 12px", borderRadius: R.pill,
+    background: "rgba(228,190,114,0.1)", border: `1px solid rgba(228,190,114,0.32)`,
+    color: C.gold, fontFamily: "inherit", position: "relative",
+    transition: "background .16s ease, border-color .16s ease",
+  },
+  boltPanel: {
+    position: "absolute", right: 0, top: "calc(100% + 10px)", zIndex: 41,
+    width: "min(320px, calc(100vw - 32px))", padding: "18px 20px",
+    borderRadius: R.lg, background: "rgba(13,10,30,0.98)",
+    border: `1px solid ${C.borderHi}`, boxShadow: "0 28px 70px -30px rgba(0,0,0,0.95)",
+    textAlign: "left",
+  },
+  boltRowLine: {
+    display: "flex", gap: 10, alignItems: "center", fontSize: 13,
+    padding: "7px 0", borderTop: `1px solid ${C.border}`, color: C.text,
+  },
+
+  /* ---- окно списания и нехватки молний ---- */
+  boltModalRow: {
+    display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
+    borderRadius: R.md, background: "rgba(228,190,114,0.08)",
+    border: "1px solid rgba(228,190,114,0.3)", marginBottom: 14,
+  },
 };

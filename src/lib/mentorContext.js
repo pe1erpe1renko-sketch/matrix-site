@@ -62,7 +62,7 @@ export function buildMentorContext(matrix, person, plan) {
     plan: {
       id: plan,
       label: limits.label,
-      messagesPerDay: limits.messages,
+      boltsPerMonth: limits.bolts,
       archive: limits.archive,
       pdf: limits.pdf,
     },

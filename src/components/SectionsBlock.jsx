@@ -4,6 +4,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import SectionList from "./SectionList.jsx";
 import { backToReport } from "../lib/returnTo.js";
+import { urlDatesFromPath } from "../lib/urlDate.js";
 import { noteSphere } from "../lib/hints.js";
 import { TAP } from "../theme/responsive.js";
 
@@ -106,12 +107,15 @@ export default function SectionsBlock({
               Второй раз за ту же дату платить не нужно.
             </p>
           </div>
-          <Link to="/tarify" state={backToReport(location, openId)} className="btnGold"
+          {/* Ведём сразу в оформление по ЭТИМ датам: лишний переход через
+              общий прайс теряет людей на ровном месте. */}
+          <Link to={`/checkout?product=matrix&${urlDatesFromPath(location.pathname).map((d) => `date=${d}`).join("&")}`}
+            state={backToReport(location, openId)} className="btnGold"
             style={{
               ...S.ctaSmall, background: C.gold, color: C.ink, minHeight: TAP,
               display: "inline-flex", alignItems: "center", justifyContent: "center",
             }}>
-            Открыть разбор
+            Открыть разбор целиком
           </Link>
         </div>
       )}

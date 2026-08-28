@@ -140,6 +140,19 @@ export function RoundIcon({ name, accent, size = 46 }) {
   );
 }
 
+/**
+ * Молния — значок валюты для нейросети. Стоит на кнопках рядом с ценой:
+ * человек должен видеть, сколько спишется, ДО нажатия.
+ */
+export function Bolt({ size = 14, color = C.gold }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}
+      style={{ flexShrink: 0, display: "inline-block", verticalAlign: "-1px" }} aria-hidden="true">
+      <path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 z" />
+    </svg>
+  );
+}
+
 /** Звезда логотипа. Она же — маркер в мелких подписях. */
 export function Spark({ size = 16 }) {
   return (

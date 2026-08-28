@@ -43,5 +43,13 @@ export function partsToUrlDate({ d, m, y }) {
   return `${pad(Number(d))}-${pad(Number(m))}-${String(y)}`;
 }
 
+/**
+ * Все даты из адреса страницы по порядку:
+ * '/sovmestimost/13-07-1998/09-04-1992' → ['13-07-1998', '09-04-1992'].
+ * Нужно там, где даты не переданы пропсом, а адрес под рукой.
+ */
+export const urlDatesFromPath = (pathname) =>
+  String(pathname || '').split('/').filter((part) => /^\d{2}-\d{2}-\d{4}$/.test(part));
+
 /** Как показывать дату в тексте: '13-07-1998' → '13.07.1998'. */
 export const urlDateToHuman = (urlDate) => String(urlDate || "").replace(/-/g, ".");

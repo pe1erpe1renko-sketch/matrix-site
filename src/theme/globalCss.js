@@ -91,6 +91,28 @@ a { color: inherit; text-decoration: none; }
 .planBtn:not(:disabled):active { transform: scale(0.96); }
 @media (prefers-reduced-motion: reduce) { .planBtn:not(:disabled):active { transform: none; } }
 
+/* Оформление покупки. */
+.backLink2:hover { color: ${C.goldHi}; }
+.backLink2:hover span:first-child { transform: translateX(-3px); }
+.needAgree { animation: needGlow 2.4s ease-in-out infinite; }
+@keyframes needGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(228,190,114,0); }
+  50% { box-shadow: 0 0 26px -6px rgba(228,190,114,0.45); }
+}
+.agreeRow:hover span:first-child { border-color: ${C.lilac}; }
+.spin { animation: spinTurn .7s linear infinite; }
+@keyframes spinTurn { to { transform: rotate(360deg); } }
+.okIcon { animation: okPop .5s cubic-bezier(.2,1.4,.4,1); }
+@keyframes okPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.startTile:hover { border-color: ${C.lilac}; transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) {
+  .needAgree, .okIcon, .spin { animation: none; }
+}
+@media (max-width: 860px) { .sumWrap { position: static !important; } }
+
+/* Строка таблицы сравнения тарифов. */
+.cmpRow:hover { background: rgba(183,156,232,0.05); }
+
 /* Облачко-подсказка. */
 .hintClose:hover { color: ${C.white}; }
 @media (prefers-reduced-motion: reduce) { .hintCard { transition: none; } }

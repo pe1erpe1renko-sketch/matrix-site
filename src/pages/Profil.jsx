@@ -14,6 +14,10 @@ import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { Meter, Switch, CopyButton, MiniOcta, Field, Modal } from "../components/Controls.jsx";
 import LoginModal from "../components/LoginModal.jsx";
 import { backToPage, useBackPoint } from "../lib/returnTo.js";
+import { BOLT_COST } from "../lib/plans.js";
+import { useBolts, spendBolts } from "../lib/bolts.js";
+import { Bolt } from "../components/Icons.jsx";
+import { BoltConfirm, BoltShortage } from "../components/BoltGate.jsx";
 import { useHintState, setHintsOff } from "../lib/hints.js";
 import BackToReport from "../components/BackToReport.jsx";
 import PersonModal from "../components/PersonModal.jsx";
@@ -134,8 +138,20 @@ function GuestView({ people, onLogin }) {
 function MatricesTab({ people, plan }) {
   const limits = PLAN_LIMITS[plan];
   const [modal, setModal] = useState(null);        // 'new' | person
+  const [gate, setGate] = useState(null);          // 'confirm' | 'short'
+  const { balance } = useBolts();
   const tgOn = telegramUsed(people);
   const full = people.length >= limits.matrices;
+
+  /* Дата сверх тарифа стоит молний. Списание крупное, поэтому спрашиваем
+     подтверждение: человек должен видеть, сколько останется. */
+  const askExtraDate = () => setGate(balance >= BOLT_COST.date ? "confirm" : "short");
+
+  const payExtraDate = () => {
+    const paid = spendBolts(BOLT_COST.date, "дата сверх тарифа");
+    setGate(null);
+    if (paid.ok) setModal("new");
+  };
 
   return (
     <>
@@ -148,9 +164,15 @@ function MatricesTab({ people, plan }) {
         {/* Лимит исчерпан — кнопка не гаснет, а ведёт туда, где его снимают.
             Серая мёртвая кнопка ничего не объясняет и никуда не ведёт. */}
         {full
-          ? <Link to="/tarify" state={backToPage("/profil", "Вернуться в кабинет")} className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
-              Расширить тариф
-            </Link>
+          ? (
+            /* Лимит тарифа исчерпан — но это не тупик: дату сверх тарифа
+               можно открыть за молнии. Цена стоит на кнопке. */
+            <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink, gap: 7,
+              display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+              onClick={askExtraDate}>
+              Добавить дату <Bolt size={13} color={C.ink} /> {BOLT_COST.date}
+            </button>
+          )
           : <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}
               onClick={() => setModal("new")}>+ Добавить матрицу</button>}
       </div>
@@ -162,11 +184,13 @@ function MatricesTab({ people, plan }) {
         ))}
 
         {full ? (
-          <Link to="/tarify" state={backToPage("/profil", "Вернуться в кабинет")} className="addCard" style={S.addCard}>
+          <button className="addCard" style={S.addCard} onClick={askExtraDate}>
             <span style={S.addPlus}>+</span>
-            <span>Нужен тариф выше</span>
-            <span style={S.dimSm}>на «{limits.label}» матриц {limits.matrices}</span>
-          </Link>
+            <span>Дата сверх тарифа</span>
+            <span style={S.dimSm}>
+              <Bolt size={12} /> {BOLT_COST.date} — или тариф выше, там даты входят
+            </span>
+          </button>
         ) : (
           <button className="addCard" style={S.addCard} onClick={() => setModal("new")}>
             <span style={S.addPlus}>+</span>
@@ -179,6 +203,15 @@ function MatricesTab({ people, plan }) {
           </button>
         )}
       </div>
+
+      {gate === "confirm" && (
+        <BoltConfirm cost={BOLT_COST.date} balance={balance}
+          what="Откроется ещё одна дата сверх тарифа. Разбор по ней остаётся у вас навсегда."
+          onConfirm={payExtraDate} onClose={() => setGate(null)} />
+      )}
+      {gate === "short" && (
+        <BoltShortage cost={BOLT_COST.date} balance={balance} onClose={() => setGate(null)} />
+      )}
 
       {modal && (
         <PersonModal person={modal === "new" ? null : modal} onClose={() => setModal(null)} />

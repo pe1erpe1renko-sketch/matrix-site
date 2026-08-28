@@ -11,6 +11,7 @@ import Sky from "./Sky.jsx";
 import LoginModal from "./LoginModal.jsx";
 import SupportModal from "./SupportModal.jsx";
 import SoundButton from "./SoundButton.jsx";
+import BoltBalance from "./BoltBalance.jsx";
 import HintBubble from "./HintBubble.jsx";
 import { useAccount, signOut } from "../lib/account.js";
 import { useAccess } from "../lib/access.js";
@@ -325,6 +326,7 @@ function TopBar({ onMenu, onSupport }) {
       </Link>
 
       <div style={S.topActions}>
+        <BoltBalance />
         <SoundButton />
         <SupportButton onClick={onSupport} />
       </div>
@@ -340,6 +342,8 @@ function TopBar({ onMenu, onSupport }) {
 function TopActions({ onSupport }) {
   return (
     <div style={S.topFloat}>
+      {/* Баланс молний виден всегда: списания без видимого баланса пугают. */}
+      <BoltBalance />
       <SoundButton />
       <SupportButton onClick={onSupport} />
     </div>
