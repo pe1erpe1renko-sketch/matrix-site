@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
-import { BOLT_COST } from "../lib/plans.js";
+import { BOLT_COST, PLAN_LIMITS } from "../lib/plans.js";
 import { useBolts, spendBolts } from "../lib/bolts.js";
 import { Bolt } from "../components/Icons.jsx";
 import { BoltShortage } from "../components/BoltGate.jsx";
@@ -10,7 +10,8 @@ import { useAccess } from "../lib/access.js";
 import { useAccount } from "../lib/account.js";
 import { usePeople, personLabel } from "../lib/people.js";
 import { useConversations, startConversation, openConversation, appendExchange } from "../lib/conversations.js";
-import { buildMentorContext, mentorPlaceholder } from "../lib/mentorContext.js";
+import { mentorPlaceholder } from "../lib/mentorContext.js";
+import { MENTOR_HINTS, buildRequest } from "../lib/prompts.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
 import { Spark } from "../components/Icons.jsx";
 import LoginModal from "../components/LoginModal.jsx";
@@ -26,7 +27,7 @@ import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
  *
  * ПЕРЕКЛЮЧАТЕЛЬ «О КОМ ГОВОРИМ» меняет контекст, который уходит наставнику:
  * выбрали ребёнка — уходит его матрица, а не своя. Контекст собирает
- * buildMentorContext() из src/lib/mentorContext.js.
+ * buildMentorContext() из src/lib/prompts.js.
  *
  * ИСТОРИЯ: каждый разговор хранится отдельно, название формируется
  * по первому вопросу. «Новый разговор» всегда начинает пустой.
@@ -34,13 +35,6 @@ import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
  * Пока нейросеть не подключена, ответ собирается шаблоном на НАСТОЯЩИХ
  * числах — экран не выглядит сломанным, и видно, что контекст доезжает.
  */
-
-const HINTS = [
-  "Почему в отношениях повторяется одно и то же?",
-  "На что опереться в текущем периоде?",
-  "Через что ко мне приходят деньги?",
-  "Как подойти к ребёнку, чтобы не давить?",
-];
 
 export default function Chat() {
   const account = useAccount();
@@ -86,10 +80,21 @@ export default function Chat() {
     const paid = spendBolts(cost, "сообщение наставнику");
     if (!paid.ok) { setShortage(true); return; }
 
-    /* Контекст пересобирается на каждый вопрос: человек мог переключить,
-       о ком идёт речь, прямо посреди разговора. */
-    const context = buildMentorContext(matrix, about, plan);
-    const answer = mentorPlaceholder(context, question);
+    /* Запрос собирается на КАЖДЫЙ вопрос: человек мог переключить,
+       о ком идёт речь, прямо посреди разговора — тогда меняются все числа.
+       Контекст матрицы собирает buildMentorContext внутри buildRequest.
+       Когда подключится провайдер (lib/chat.js), этот же запрос уйдёт
+       на бэкенд, а пока ответ собирает заглушка на настоящих числах. */
+    buildRequest({
+      kind: "mentor",
+      messages: [...messages.map((m) => ({
+        role: m.role === "me" ? "user" : "assistant", content: m.text,
+      })), { role: "user", content: question }],
+      matrix,
+      person: { name: personLabel(about), birthDate: about.birthDate, sex: about.gender },
+      plan: PLAN_LIMITS[plan],
+    });
+    const answer = mentorPlaceholder(matrix, about, question);
 
     appendExchange({ question, answer, personId: about.id, personName: personLabel(about) });
     setDraft("");
@@ -127,7 +132,7 @@ export default function Chat() {
             и он будет отвечать через ваши числа.
           </p>
           <Link to="/profil" className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
-            Добавить матрицу
+            Добавить разбор
           </Link>
         </div>
       </div>
@@ -246,7 +251,7 @@ export default function Chat() {
             {/* Подсказки только на пустом экране: в разговоре они мешают. */}
             {empty && (
               <div style={{ ...S.hints, ...(isPhone ? { flexDirection: "column", alignItems: "stretch" } : null) }}>
-                {HINTS.map((hint) => (
+                {MENTOR_HINTS.map((hint) => (
                   <button key={hint} className="chip"
                     style={{
                       ...S.chip, background: "transparent",

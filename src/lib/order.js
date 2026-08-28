@@ -52,16 +52,16 @@ export function readOrder(params) {
       lines: [
         `Хватит на ${Math.floor(pack.n / BOLT_COST.message)} сообщений наставнику`,
         `или на ${Math.floor(pack.n / BOLT_COST.image)} AI-образов`,
-        `или на ${Math.floor(pack.n / BOLT_COST.date)} дополнительных дат`,
+        `или на ${Math.floor(pack.n / BOLT_COST.report)} дополнительных разборов`,
       ],
       note: 'Списание однократное. Молнии не сгорают, пока активна подписка.',
       backLabel: 'Другие пакеты молний',
     };
   }
 
-  /* По умолчанию — разбор: самый частый вход в оплату. Дат может быть две
-     (совместимость, бизнес, мама и ребёнок) — тогда это один разбор
-     по набору дат, как и записано в правиле оплаты. */
+  /* По умолчанию — разбор: самый частый вход в оплату. Дат в нём может
+     быть две (совместимость, бизнес, мама и ребёнок) — это всё равно
+     ОДИН разбор, как и записано в правиле оплаты. */
   const dates = params.getAll('date').filter(Boolean);
   const date = dates[0] || null;
   const copy = PLAN_COPY.once;
@@ -72,7 +72,7 @@ export function readOrder(params) {
     recurrent: false,
     date,
     dates,
-    title: dates.length > 1 ? 'Разбор по двум датам' : 'Разбор одной даты',
+    title: dates.length > 1 ? 'Разбор по двум датам' : 'Разбор',
     sub: human || 'дата выбирается в разборе',
     price: PLAN_PRICE.once.amount,
     lines: [

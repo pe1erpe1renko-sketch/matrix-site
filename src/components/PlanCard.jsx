@@ -197,7 +197,7 @@ function CompactBody({ id, current, cta }) {
       </div>
       <div style={{ color: C.gold, fontSize: 14, marginBottom: 10 }}>{PLAN_PRICE[id].short}</div>
       <div style={S.dimSm}>
-        Дат целиком: {Number.isFinite(limits.matrices) ? limits.matrices : "без счёта"}<br />
+        Разборов: {Number.isFinite(limits.reports) ? limits.reports : "без счёта"}<br />
         Молний: {limits.bolts || "—"}{limits.kind === "sub" ? " в месяц" : ""}<br />
         Telegram: {limits.telegram || "—"}
       </div>

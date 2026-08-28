@@ -165,8 +165,16 @@ function Question({ slot, section, sectionId, open, onToggle, isPhone }) {
 }
 
 function Answer({ slot, section, isPhone }) {
+  /* Тип промпта и его поля пришли готовыми из lib/pageSections.js:
+     компонент не решает, каким промптом писать текст. */
   const { loading, text } = useSlotText({
     key: slot.key,
+    kind: slot.kind,
+    pairKind: slot.pairKind,
+    aspect: slot.aspect,
+    yearArcana: slot.yearArcana,
+    periodArcana: slot.periodArcana,
+    year: slot.year,
     slotLabel: slot.label,
     arcana: slot.arcana,
     sectionTitle: section.title,

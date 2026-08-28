@@ -122,7 +122,7 @@ export default function PersonModal({ person, onClose }) {
           color: ready ? C.ink : C.faint,
         }}
         onClick={save}>
-        {editing ? "Сохранить" : "Добавить матрицу"}
+        {editing ? "Сохранить" : "Добавить разбор"}
       </button>
     </Modal>
   );

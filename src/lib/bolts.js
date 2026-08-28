@@ -5,7 +5,7 @@ import { PLAN_LIMITS, BOLT_COST } from './plans.js';
  * МОЛНИИ — БАЛАНС И СПИСАНИЯ
  * ==========================
  * Молнии тратятся ТОЛЬКО на то, что считает нейросеть: сообщение
- * наставнику, AI-образ, дата сверх тарифа. Всё остальное — чтение
+ * наставнику, AI-образ, разбор сверх тарифа. Всё остальное — чтение
  * разборов, расчёт матрицы, аркан дня, PDF — бесплатно всегда.
  * Цены лежат в plans.js (BOLT_COST), здесь только кошелёк.
  *
@@ -60,13 +60,13 @@ export const canAfford = (cost) => store.get().balance >= cost;
 
 /**
  * Сколько всего действий можно сделать на текущий баланс.
- * Нужно на экране после покупки пакета: «хватит на 30 образов или 3 даты».
+ * Нужно на экране после покупки пакета: «хватит на 30 образов или 3 разбора».
  */
 export function boltsWorth(balance) {
   return {
     messages: Math.floor(balance / BOLT_COST.message),
     images: Math.floor(balance / BOLT_COST.image),
-    dates: Math.floor(balance / BOLT_COST.date),
+    reports: Math.floor(balance / BOLT_COST.report),
   };
 }
 

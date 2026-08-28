@@ -699,7 +699,7 @@ export const S = {
   track: { height: 5, borderRadius: 3, background: "rgba(183,156,232,.14)", overflow: "hidden" },
   fill: { height: "100%", borderRadius: 3, transition: "width .3s ease" },
 
-  /* карточки матриц */
+  /* карточки разборов */
   pGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 330px), 1fr))", gap: 16 },
   pCard: {
     background: SURFACE.card, border: "1px solid", borderRadius: R.xl,

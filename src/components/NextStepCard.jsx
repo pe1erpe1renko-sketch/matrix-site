@@ -63,7 +63,7 @@ export default function NextStepCard({ step, selfDate, sectionId }) {
           <>
             <p style={S.stepNote}>
               На тарифе «{PLAN_LIMITS[plan].label}» открыто {reports.length} из {limit}{" "}
-              {plural(limit, "разбор", "разбора", "разборов")}. Чтобы посчитать ещё одну дату,
+              {plural(limit, "разбор", "разбора", "разборов")}. Чтобы открыть ещё один разбор,
               нужен тариф выше — уже открытые разборы при этом остаются.
             </p>
             <Link to="/tarify" state={backToReport(location, sectionId)}

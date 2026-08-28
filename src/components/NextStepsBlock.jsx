@@ -66,7 +66,7 @@ export default function NextStepsBlock({ selfDate, background = C.bgAlt }) {
               <div style={S.stepHead}>Разборы по тарифу кончились</div>
               <p style={S.stepNote}>
                 На тарифе «{PLAN_LIMITS[plan].label}» открыто {reports.length} из {limit}.
-                Чтобы посчитать ещё одну дату, нужен тариф выше — уже открытые разборы
+                Чтобы открыть ещё один разбор, нужен тариф выше — уже открытые разборы
                 при этом остаются.
               </p>
               <button className="btnOutline" onClick={() => navigate("/tarify", { state: backToReport(location) })} style={{

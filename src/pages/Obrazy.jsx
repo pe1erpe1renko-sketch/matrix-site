@@ -18,6 +18,7 @@ import { usePeople, personLabel } from "../lib/people.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
 import { partsToUrlDate, urlDateToISO, isoToUrlDate } from "../lib/urlDate.js";
 import { useIsPhone, TAP } from "../theme/responsive.js";
+import { useSlotText } from "../components/useSlotText.js";
 
 /**
  * AI-ОБРАЗЫ — /obrazy
@@ -353,7 +354,8 @@ export default function Obrazy() {
             <div style={{ ...S.sumTitle, marginBottom: 12 }}>
               Готово. Это ваш {themeById(result.themeId).name.toLowerCase()}
             </div>
-            <p style={{ ...S.infoText, marginTop: 0 }}>{themeById(result.themeId).hint}</p>
+            <ImageText result={result} />
+            <p style={{ ...S.infoText }}>{themeById(result.themeId).hint}</p>
 
             <div style={S.obrazBtns}>
               <button className="btnGold" style={{ ...S.ctaSmall, background: C.gold, color: C.ink, minHeight: TAP }}
@@ -382,5 +384,30 @@ export default function Obrazy() {
         <BoltShortage cost={price.cost || 5} balance={balance} onClose={() => setShortage(false)} />
       )}
     </div>
+  );
+}
+
+/**
+ * Текст к образу. Просит у контентного слоя тип 'image' — короткие
+ * два-три предложения о том, что в образе про этого человека.
+ * Ключ включает тему и аркан: сочетаний конечное число, и текст,
+ * написанный один раз, дальше отдаётся бесплатно.
+ */
+function ImageText({ result }) {
+  const theme = themeById(result.themeId);
+  const { loading, text } = useSlotText({
+    key: `image_${result.themeId}_${result.arcana}`,
+    kind: "image",
+    theme: theme.name,
+    themeAbout: theme.about,
+    arcana: result.arcana,
+    slotLabel: theme.name,
+    sectionTitle: "AI-образ",
+  });
+
+  return (
+    <p style={{ ...S.infoText, marginTop: 0, opacity: loading ? 0.45 : 1 }}>
+      {loading ? "Собираем текст к образу…" : text}
+    </p>
   );
 }

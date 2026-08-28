@@ -95,7 +95,7 @@ export default function Tarify() {
         </div>
 
         <div style={{ flex: "2 1 360px", display: "grid", gap: 14 }}>
-          <Meter label="Даты целиком" now={people.length} max={limits.matrices} wide />
+          <Meter label="Разборы" now={people.length} max={limits.reports} wide />
           <Meter label="Прогнозов в Telegram" now={telegramUsed(people)} max={limits.telegram} wide />
           <div>
             <div style={S.meterTop}>

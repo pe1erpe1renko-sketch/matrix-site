@@ -25,7 +25,7 @@ import PersonModal from "../components/PersonModal.jsx";
 /**
  * ЛИЧНЫЙ КАБИНЕТ — /profil
  * ========================
- * Три вкладки: мои матрицы, прогнозы, данные.
+ * Три вкладки: мои разборы, прогнозы, данные.
  *
  * Все лимиты берутся из PLAN_LIMITS по текущему тарифу. Зашитых чисел
  * в разметке нет: сменился тариф — счётчики поехали сами.
@@ -37,7 +37,7 @@ export default function Profil() {
   const account = useAccount();
   const people = usePeople();
   const { plan } = useAccess();
-  const [tab, setTab] = useState("matrices");
+  const [tab, setTab] = useState("reports");
   const [login, setLogin] = useState(false);
   const isPhone = useIsPhone();
   const back = useBackPoint();
@@ -66,7 +66,7 @@ export default function Profil() {
         <>
           <div className={isPhone ? "hScroll" : undefined}
             style={isPhone ? { ...hScrollRow, ...S.cabTabs, flexWrap: "nowrap" } : S.cabTabs}>
-            {[["matrices", "Мои матрицы"], ["feed", "Прогнозы"], ["data", "Данные"]].map(([id, label]) => {
+            {[["reports", "Мои разборы"], ["feed", "Прогнозы"], ["data", "Данные"]].map(([id, label]) => {
               const on = tab === id;
               return (
                 <button key={id} style={{
@@ -79,7 +79,7 @@ export default function Profil() {
             })}
           </div>
 
-          {tab === "matrices" && <MatricesTab people={people} plan={plan} />}
+          {tab === "reports" && <ReportsTab people={people} plan={plan} />}
           {tab === "feed" && <FeedTab people={people} />}
           {tab === "data" && <DataTab account={account} />}
         </>
@@ -135,20 +135,20 @@ function GuestView({ people, onLogin }) {
 
 /* ═══════════ МОИ МАТРИЦЫ ═══════════ */
 
-function MatricesTab({ people, plan }) {
+function ReportsTab({ people, plan }) {
   const limits = PLAN_LIMITS[plan];
   const [modal, setModal] = useState(null);        // 'new' | person
   const [gate, setGate] = useState(null);          // 'confirm' | 'short'
   const { balance } = useBolts();
   const tgOn = telegramUsed(people);
-  const full = people.length >= limits.matrices;
+  const full = people.length >= limits.reports;
 
-  /* Дата сверх тарифа стоит молний. Списание крупное, поэтому спрашиваем
+  /* Разбор сверх тарифа стоит молний. Списание крупное, поэтому спрашиваем
      подтверждение: человек должен видеть, сколько останется. */
-  const askExtraDate = () => setGate(balance >= BOLT_COST.date ? "confirm" : "short");
+  const askExtraReport = () => setGate(balance >= BOLT_COST.report ? "confirm" : "short");
 
-  const payExtraDate = () => {
-    const paid = spendBolts(BOLT_COST.date, "дата сверх тарифа");
+  const payExtraReport = () => {
+    const paid = spendBolts(BOLT_COST.report, "разбор сверх тарифа");
     setGate(null);
     if (paid.ok) setModal("new");
   };
@@ -157,7 +157,7 @@ function MatricesTab({ people, plan }) {
     <>
       <div style={S.rowBetween}>
         <div style={S.meters}>
-          <Meter label="Матрицы" now={people.length} max={limits.matrices} />
+          <Meter label="Разборы" now={people.length} max={limits.reports} />
           <Meter label="Прогнозов в Telegram" now={tgOn} max={limits.telegram} />
         </div>
 
@@ -165,16 +165,16 @@ function MatricesTab({ people, plan }) {
             Серая мёртвая кнопка ничего не объясняет и никуда не ведёт. */}
         {full
           ? (
-            /* Лимит тарифа исчерпан — но это не тупик: дату сверх тарифа
+            /* Лимит тарифа исчерпан — но это не тупик: разбор сверх тарифа
                можно открыть за молнии. Цена стоит на кнопке. */
             <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink, gap: 7,
               display: "inline-flex", alignItems: "center", justifyContent: "center" }}
-              onClick={askExtraDate}>
-              Добавить дату <Bolt size={13} color={C.ink} /> {BOLT_COST.date}
+              onClick={askExtraReport}>
+              Добавить разбор <Bolt size={13} color={C.ink} /> {BOLT_COST.report}
             </button>
           )
           : <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}
-              onClick={() => setModal("new")}>+ Добавить матрицу</button>}
+              onClick={() => setModal("new")}>+ Добавить разбор</button>}
       </div>
 
       {/* Вход в образы стоит там, где человек смотрит на свои матрицы:
@@ -195,20 +195,20 @@ function MatricesTab({ people, plan }) {
         ))}
 
         {full ? (
-          <button className="addCard" style={S.addCard} onClick={askExtraDate}>
+          <button className="addCard" style={S.addCard} onClick={askExtraReport}>
             <span style={S.addPlus}>+</span>
-            <span>Дата сверх тарифа</span>
+            <span>Разбор сверх тарифа</span>
             <span style={S.dimSm}>
-              <Bolt size={12} /> {BOLT_COST.date} — или тариф выше, там даты входят
+              <Bolt size={12} /> {BOLT_COST.report} — или тариф выше, там разборы входят
             </span>
           </button>
         ) : (
           <button className="addCard" style={S.addCard} onClick={() => setModal("new")}>
             <span style={S.addPlus}>+</span>
-            <span>Добавить матрицу</span>
+            <span>Добавить разбор</span>
             <span style={S.dimSm}>
-              {Number.isFinite(limits.matrices)
-                ? `осталось ${limits.matrices - people.length}`
+              {Number.isFinite(limits.reports)
+                ? `осталось ${limits.reports - people.length}`
                 : "без ограничений"}
             </span>
           </button>
@@ -216,12 +216,12 @@ function MatricesTab({ people, plan }) {
       </div>
 
       {gate === "confirm" && (
-        <BoltConfirm cost={BOLT_COST.date} balance={balance}
-          what="Откроется ещё одна дата сверх тарифа. Разбор по ней остаётся у вас навсегда."
+        <BoltConfirm cost={BOLT_COST.report} balance={balance}
+          what="Откроется ещё один разбор сверх тарифа. Он остаётся у вас навсегда."
           onConfirm={payExtraDate} onClose={() => setGate(null)} />
       )}
       {gate === "short" && (
-        <BoltShortage cost={BOLT_COST.date} balance={balance} onClose={() => setGate(null)} />
+        <BoltShortage cost={BOLT_COST.report} balance={balance} onClose={() => setGate(null)} />
       )}
 
       {modal && (

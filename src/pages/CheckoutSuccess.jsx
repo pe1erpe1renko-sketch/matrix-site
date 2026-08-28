@@ -139,20 +139,20 @@ function UpsellPath({ price }) {
     <div className="card" style={S.upsell}>
       <div style={S.blockTitle}>Стоит знать</div>
       <div style={{ ...S.sumTitle, marginBottom: 20, lineHeight: 1.3 }}>
-        Вы заплатили {money(price)} ₽ за одну дату. За {money(path)} ₽ в месяц — совсем другое
+        Вы заплатили {money(price)} ₽ за один разбор. За {money(path)} ₽ в месяц — совсем другое
       </div>
 
       <div style={S.upGrid}>
         <div>
           <div style={S.upCol}>Сейчас у вас</div>
-          {["1 дата", "Аркан дня — только сегодня",
+          {["1 разбор", "Аркан дня — только сегодня",
             `${PLAN_LIMITS.once.bolts} молний разово`, "Telegram не подключён"].map((x) => (
             <div key={x} style={S.upLine}><span style={{ color: C.muted }}>—</span> {x}</div>
           ))}
         </div>
         <div>
           <div style={{ ...S.upCol, color: C.gold }}>С подпиской «{PLAN_LIMITS.path.label}»</div>
-          {["2 даты", "Аркан дня каждое утро",
+          {["2 разбора", "Аркан дня каждое утро",
             `${PLAN_LIMITS.path.bolts} молний каждый месяц`, "Прогноз в Telegram себе"].map((x) => (
             <div key={x} style={S.upLine}><span style={{ color: C.ok }}>✓</span> {x}</div>
           ))}
