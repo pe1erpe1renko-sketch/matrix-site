@@ -11,6 +11,8 @@ import { buildMentorContext, mentorPlaceholder } from "../lib/mentorContext.js";
 import { calculateMatrix, toISODate } from "../lib/matrixEngine.js";
 import { Spark } from "../components/Icons.jsx";
 import LoginModal from "../components/LoginModal.jsx";
+import { backToPage, useBackPoint } from "../lib/returnTo.js";
+import BackToReport from "../components/BackToReport.jsx";
 import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 
 /**
@@ -48,6 +50,7 @@ export default function Chat() {
   const [aboutId, setAboutId] = useState(null);
   const [login, setLogin] = useState(false);
   const isPhone = useIsPhone();
+  const back = useBackPoint();
 
   const limits = PLAN_LIMITS[plan];
   const askedToday = messagesToday(list, toISODate(new Date()));
@@ -83,6 +86,7 @@ export default function Chat() {
   if (!account.signedIn) {
     return (
       <div style={{ ...S.cabinet, maxWidth: 620, margin: "0 auto" }}>
+        <BackToReport />
         <div style={S.intro}>
           <div style={S.introIcon}><Spark size={26} /></div>
           <h1 style={S.introTitle}>ИИ-наставник</h1>
@@ -94,7 +98,7 @@ export default function Chat() {
           <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}
             onClick={() => setLogin(true)}>Войти</button>
         </div>
-        {login && <LoginModal onClose={() => setLogin(false)} />}
+        {login && <LoginModal back={back} onClose={() => setLogin(false)} />}
       </div>
     );
   }
@@ -104,6 +108,7 @@ export default function Chat() {
   if (limits.messages === 0) {
     return (
       <div style={{ ...S.cabinet, maxWidth: 620, margin: "0 auto" }}>
+        <BackToReport />
         <div style={S.intro}>
           <div style={S.introIcon}><Spark size={26} /></div>
           <h1 style={S.introTitle}>ИИ-наставник</h1>
@@ -115,7 +120,7 @@ export default function Chat() {
                 ? `${PLAN_LIMITS[id].messages} в день` : "без счёта"}`)
               .join(", ")}.
           </p>
-          <Link to="/tarify" className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
+          <Link to="/tarify" state={backToPage("/chat", "Вернуться к наставнику")} className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
             Посмотреть тарифы
           </Link>
         </div>
@@ -126,6 +131,7 @@ export default function Chat() {
   if (!people.length) {
     return (
       <div style={{ ...S.cabinet, maxWidth: 620, margin: "0 auto" }}>
+        <BackToReport />
         <div style={S.intro}>
           <div style={S.introIcon}><Spark size={26} /></div>
           <h1 style={S.introTitle}>ИИ-наставник</h1>
@@ -143,6 +149,14 @@ export default function Chat() {
 
   return (
     <div style={S.chatPage}>
+      {/* В рабочем чате кнопка возврата стоит в строке вкладок:
+          отдельной полосой она съела бы высоту, а чат считает её
+          от окна и без запаса. */}
+      {back && (
+        <div style={{ padding: "12px var(--chatX) 0", flexShrink: 0 }}>
+          <BackToReport style={{ marginBottom: 0 }} />
+        </div>
+      )}
       <div style={S.chatTop}>
         <div style={S.chatTabs}>
           {[["chat", "Новый разговор"], ["history", "История"]].map(([id, label]) => {

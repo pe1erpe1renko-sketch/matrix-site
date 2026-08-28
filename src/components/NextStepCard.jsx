@@ -6,6 +6,7 @@ import { RoundIcon } from "./Icons.jsx";
 import DateFields from "./DateFields.jsx";
 import { partsToUrlDate, urlDateToISO } from "../lib/urlDate.js";
 import { useAccess } from "../lib/access.js";
+import { backToReport } from "../lib/returnTo.js";
 import { PLAN_LIMITS } from "../lib/plans.js";
 import { useIsPhone, TAP } from "../theme/responsive.js";
 
@@ -25,7 +26,7 @@ import { useIsPhone, TAP } from "../theme/responsive.js";
  * и посчитать новую дату можно как везде на сайте: числа считаются всегда,
  * под замком только трактовки.
  */
-export default function NextStepCard({ step, selfDate }) {
+export default function NextStepCard({ step, selfDate, sectionId }) {
   const isPhone = useIsPhone();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,7 +66,8 @@ export default function NextStepCard({ step, selfDate }) {
               {plural(limit, "разбор", "разбора", "разборов")}. Чтобы посчитать ещё одну дату,
               нужен тариф выше — уже открытые разборы при этом остаются.
             </p>
-            <Link to="/tarify" className="btnOutline" style={{
+            <Link to="/tarify" state={backToReport(location, sectionId)}
+              className="btnOutline" style={{
               ...S.ctaSmall, marginTop: 12, minHeight: TAP, border: `1px solid ${C.border}`,
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               color: C.white, width: isPhone ? "100%" : "auto",
@@ -91,7 +93,8 @@ export default function NextStepCard({ step, selfDate }) {
             </button>
           </>
         ) : (
-          <Link to={target} className="stepLink" style={{
+          <Link to={target} state={backToReport(location, sectionId)}
+            className="stepLink" style={{
             display: "inline-flex", alignItems: "center", gap: 9, marginTop: 14,
             minHeight: TAP, color: step.accent, fontSize: 14.5, fontWeight: 600,
             textDecoration: "none",

@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { calculateMatrix, calculatePair } from "../lib/matrixEngine.js";
 import { buildViewSections, pageView, questionsTotal, questionsOpen } from "../lib/pageSections.js";
 import { reportKey, useAccess } from "../lib/access.js";
@@ -7,6 +7,7 @@ import { useAccount } from "../lib/account.js";
 import { rememberGuestCalculation } from "../lib/people.js";
 import { wasSeen, markSeen } from "../lib/seenReports.js";
 import { urlDateToISO, urlDateToHuman } from "../lib/urlDate.js";
+import { rememberReport } from "../lib/recent.js";
 
 /**
  * ОБЩАЯ ПОДГОТОВКА СТРАНИЦЫ РАСЧЁТА
@@ -24,6 +25,7 @@ import { urlDateToISO, urlDateToHuman } from "../lib/urlDate.js";
  */
 export function useCalcPage(pageId) {
   const params = useParams();
+  const { pathname } = useLocation();
   const view = pageView(pageId);
 
   const urlDates = view.pair ? [params.dateA, params.dateB] : [params.date];
@@ -55,6 +57,11 @@ export function useCalcPage(pageId) {
     if (!rememberDate) return;
     rememberGuestCalculation({ birthDate: rememberDate, kind: pageId === "detskaya" ? "child" : "personal" });
   }, [rememberDate, pageId]);
+
+  /* Посчитанное попадает в список недавних на главной: человек вернётся
+     через день и не будет вводить ту же дату заново. */
+  const calculated = valid && matrix ? pathname : null;
+  useEffect(() => { rememberReport(calculated); }, [calculated]);
 
   const sections = useMemo(
     () => (matrix ? buildViewSections(matrix, view.sections, { unlocked: access.unlocked }) : []),

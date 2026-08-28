@@ -1059,4 +1059,35 @@ export const S = {
     marginTop: 14, padding: "18px 20px", borderRadius: R.lg,
     border: `1px solid ${C.borderHi}`, background: SURFACE.cardHi,
   },
+  /* Кнопка возврата к разбору вверху страницы, куда человека увели. */
+  backLink: {
+    display: "inline-flex", alignItems: "center", gap: 10,
+    padding: "11px 18px", borderRadius: R.pill, marginBottom: 18,
+    border: `1px solid ${C.gold}`, background: "rgba(228,190,114,0.10)",
+    color: C.white, fontSize: 14.5, fontWeight: 600, fontFamily: "inherit",
+    transition: "background .18s ease, box-shadow .18s ease",
+  },
+
+  /* Строка последних расчётов над формой на главной. */
+  recentRow: {
+    display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8,
+    margin: "16px 0 4px",
+  },
+  recentChip: {
+    display: "inline-flex", alignItems: "center", gap: 2,
+    borderRadius: R.pill, border: `1px solid ${C.border}`,
+    background: "rgba(10,8,23,0.5)", overflow: "hidden",
+  },
+  recentDate: {
+    padding: "7px 4px 7px 12px", fontSize: 13, color: C.text,
+    fontFamily: "inherit", background: "none", border: "none",
+    transition: "color .16s ease",
+  },
+  recentDrop: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    width: 26, alignSelf: "stretch", padding: 0,
+    background: "none", border: "none", color: C.faint,
+    fontSize: 15, lineHeight: 1, fontFamily: "inherit",
+    transition: "color .16s ease",
+  },
 };

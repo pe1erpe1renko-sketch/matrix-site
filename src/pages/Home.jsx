@@ -8,6 +8,7 @@ import { partsToUrlDate } from "../lib/urlDate.js";
 import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { PlanCard } from "../components/PlanCard.jsx";
 import DateFields from "../components/DateFields.jsx";
+import RecentReports from "../components/RecentReports.jsx";
 import { SUBSCRIPTION_PLANS } from "../lib/plans.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
@@ -232,6 +233,10 @@ export default function Home() {
           <div style={{ ...S.form, ...(isPhone ? { order: 1, padding: "20px 16px 22px" } : null) }}>
             <div style={S.formTitle}>Рассчитать матрицу</div>
             <div style={S.formSub}>Выберите тип расчёта и заполните данные</div>
+
+            {/* Уже посчитанное открывается нажатием: вводить ту же дату
+                во второй раз человек не должен. */}
+            <RecentReports />
 
             <div className={isPhone ? "hScroll" : undefined}
               style={isPhone ? { ...hScrollRow, gap: 8, paddingBottom: 4 } : S.tabs}>

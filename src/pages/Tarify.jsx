@@ -8,6 +8,7 @@ import { usePeople, telegramUsed } from "../lib/people.js";
 import { useConversations, messagesToday } from "../lib/conversations.js";
 import { toISODate } from "../lib/matrixEngine.js";
 import { Meter } from "../components/Controls.jsx";
+import BackToReport from "../components/BackToReport.jsx";
 import { useIsPhone, TAP } from "../theme/responsive.js";
 import { useState } from "react";
 
@@ -58,6 +59,10 @@ export default function Tarify() {
 
   return (
     <div style={S.cabinet}>
+      {/* Пришёл из разбора — вверху обратная дорога. Пришёл из меню —
+          кнопки нет: возвращать некуда. */}
+      <BackToReport />
+
       <div style={S.head}>
         <div>
           <div style={S.eyebrow}>Тарифы и оплата</div>

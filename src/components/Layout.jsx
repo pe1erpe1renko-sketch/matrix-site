@@ -14,6 +14,7 @@ import SoundButton from "./SoundButton.jsx";
 import { useAccount, signOut } from "../lib/account.js";
 import { useAccess } from "../lib/access.js";
 import { PLAN_LIMITS } from "../lib/plans.js";
+import { BackProvider, useResolveBackPoint } from "../lib/returnTo.js";
 
 /**
  * ОБЩИЙ МАКЕТ
@@ -44,6 +45,11 @@ export default function Layout() {
 
   const account = useAccount();
   const { plan } = useAccess();
+
+  /* Откуда человек пришёл на эту страницу и куда его вернуть.
+     Считается один раз здесь и раздаётся вниз: страница тарифов рисует
+     кнопку возврата, модалка входа возвращает туда же после входа. */
+  const backPoint = useResolveBackPoint();
 
   /* У наставника свой полноэкранный макет — подвал под ним лишний. */
   const fullHeight = active === "chat";
@@ -199,11 +205,13 @@ export default function Layout() {
           transition: "margin-left .24s cubic-bezier(.4,0,.2,1)",
         }),
       }}>
-        <Outlet />
+        <BackProvider value={backPoint}>
+          <Outlet />
+        </BackProvider>
         {!fullHeight && <Footer />}
       </main>
 
-      {login && <LoginModal onClose={() => setLogin(false)} />}
+      {login && <LoginModal back={backPoint} onClose={() => setLogin(false)} />}
       {support && <SupportModal accountId={account.id} onClose={() => setSupport(false)} />}
     </div>
   );

@@ -13,6 +13,8 @@ import { Ic } from "../components/Icons.jsx";
 import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { Meter, Switch, CopyButton, MiniOcta, Field, Modal } from "../components/Controls.jsx";
 import LoginModal from "../components/LoginModal.jsx";
+import { backToPage, useBackPoint } from "../lib/returnTo.js";
+import BackToReport from "../components/BackToReport.jsx";
 import PersonModal from "../components/PersonModal.jsx";
 
 /**
@@ -33,11 +35,14 @@ export default function Profil() {
   const [tab, setTab] = useState("matrices");
   const [login, setLogin] = useState(false);
   const isPhone = useIsPhone();
+  const back = useBackPoint();
 
   const limits = PLAN_LIMITS[plan];
 
   return (
     <div style={S.cabinet}>
+      <BackToReport />
+
       <div style={S.head}>
         <div>
           <div style={S.eyebrow}>Личный кабинет</div>
@@ -77,7 +82,7 @@ export default function Profil() {
         <GuestView people={people} onLogin={() => setLogin(true)} />
       )}
 
-      {login && <LoginModal onClose={() => setLogin(false)} />}
+      {login && <LoginModal back={back} onClose={() => setLogin(false)} />}
     </div>
   );
 }
@@ -142,7 +147,7 @@ function MatricesTab({ people, plan }) {
         {/* Лимит исчерпан — кнопка не гаснет, а ведёт туда, где его снимают.
             Серая мёртвая кнопка ничего не объясняет и никуда не ведёт. */}
         {full
-          ? <Link to="/tarify" className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
+          ? <Link to="/tarify" state={backToPage("/profil", "Вернуться в кабинет")} className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}>
               Расширить тариф
             </Link>
           : <button className="btnGold" style={{ ...S.btn, background: C.gold, color: C.ink }}
@@ -156,7 +161,7 @@ function MatricesTab({ people, plan }) {
         ))}
 
         {full ? (
-          <Link to="/tarify" className="addCard" style={S.addCard}>
+          <Link to="/tarify" state={backToPage("/profil", "Вернуться в кабинет")} className="addCard" style={S.addCard}>
             <span style={S.addPlus}>+</span>
             <span>Нужен тариф выше</span>
             <span style={S.dimSm}>на «{limits.label}» матриц {limits.matrices}</span>

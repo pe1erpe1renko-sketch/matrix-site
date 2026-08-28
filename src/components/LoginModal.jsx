@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { signIn, SOCIAL_NAMES } from "../lib/account.js";
@@ -18,8 +19,13 @@ import { Modal, CheckRow } from "./Controls.jsx";
  *
  * ПРИ ВХОДЕ гостевые расчёты переносятся в аккаунт: человек их уже сделал,
  * терять их нельзя. Что при этом происходит с лимитом — см. claimGuestPeople.
+ *
+ * ВОЗВРАТ. Если человек ушёл регистрироваться из разбора, после входа
+ * он попадает обратно в разбор, а не остаётся на странице, куда его увели.
+ * Точку возврата даёт макет (lib/returnTo.js); пришёл из меню — её нет,
+ * и человек остаётся там же, где был.
  */
-export default function LoginModal({ onClose }) {
+export default function LoginModal({ onClose, back }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,10 +36,13 @@ export default function LoginModal({ onClose }) {
   const isSignup = mode === "signup";
   const ready = email.trim() && password.trim() && (!isSignup || (agreeData && agreeTerms));
 
+  const navigate = useNavigate();
+
   const finish = (via, mail) => {
     signIn({ via, email: mail });
     claimGuestPeople(plan);
     onClose();
+    if (back && back.to) navigate(back.to);
   };
 
   return (

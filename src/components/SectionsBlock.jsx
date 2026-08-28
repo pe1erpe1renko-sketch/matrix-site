@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import SectionList from "./SectionList.jsx";
@@ -16,6 +17,10 @@ import SectionList from "./SectionList.jsx";
  * заголовку: иначе человек нажимает сферу внизу экрана, содержимое
  * появляется ниже видимой области, и непонятно, куда смотреть.
  *
+ * АДРЕС ВИДА ?section=relations раскрывает нужную сферу сразу. Так
+ * человек возвращается с тарифов ровно туда, где закрытый вопрос его
+ * остановил, и так же работает «Подробнее» из панели точки октаграммы.
+ *
  * @param {string} [selfDate] — дата страницы в виде ДД-ММ-ГГГГ. Передаётся
  *        вниз, в карточки следующего шага в конце каждой сферы.
  * @param {{id: string, at: number}} [openRequest] — просьба раскрыть
@@ -27,6 +32,8 @@ export default function SectionsBlock({
   sections, spheres, total, open, title, lead, background = C.bgAlt, openRequest, selfDate,
 }) {
   const [openId, setOpenId] = useState(null);
+  const [searchParams] = useSearchParams();
+  const askedSection = searchParams.get("section");
 
   /* Подъезжаем к заголовку сферы, а не к её середине. Отступ сверху берём
      из --appTop: на телефоне там висит шапка, и без вычета заголовок
@@ -52,6 +59,15 @@ export default function SectionsBlock({
     setOpenId(openRequest.id);
     scrollToSphere(openRequest.id);
   }, [openRequest, scrollToSphere]);
+
+  /* Сфера из адреса. Раскрываем только если она есть на этой странице:
+     чужой ?section= не должен оставлять разбор в непонятном состоянии. */
+  useEffect(() => {
+    if (!askedSection || !sections.some((s) => s.id === askedSection)) return;
+    setOpenId(askedSection);
+    scrollToSphere(askedSection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [askedSection, scrollToSphere]);
 
   return (
     <section style={{ ...S.section, background }}>

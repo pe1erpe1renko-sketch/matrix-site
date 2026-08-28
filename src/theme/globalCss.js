@@ -91,6 +91,12 @@ a { color: inherit; text-decoration: none; }
 .planBtn:not(:disabled):active { transform: scale(0.96); }
 @media (prefers-reduced-motion: reduce) { .planBtn:not(:disabled):active { transform: none; } }
 
+/* Кнопка возврата к разбору и чипы недавних расчётов. */
+.backLink:hover { background: rgba(228,190,114,0.2); box-shadow: 0 12px 34px -18px ${C.gold}; }
+.recentChip:hover { border-color: ${C.borderHi}; }
+.recentDate:hover { color: ${C.gold}; }
+.recentDrop:hover { color: ${C.pink}; }
+
 /* Ссылка-переход в карточке следующего шага. Цвет у неё свой у каждой
    сферы и задан встроенным стилем, поэтому на наведение отвечаем
    яркостью и сдвигом стрелки — их инлайн не занимает. */
@@ -163,5 +169,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
   }
   /* Ссылка внутри строки состояния остаётся по левому краю. */
   .link { justify-content: flex-start; }
+
+  /* Чип недавнего расчёта: сама дата и крестик — две разные цели,
+     и промахнуться по соседней нельзя. */
+  .recentChip { min-height: 44px; }
+  .recentDate { min-height: 44px; display: inline-flex; align-items: center; }
+  .recentDrop { min-width: 40px; }
 }
 `;

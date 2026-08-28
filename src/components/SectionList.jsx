@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { C, SURFACE } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import { useIsPhone, TAP } from "../theme/responsive.js";
 import { useSlotText } from "./useSlotText.js";
 import { stepForSphere } from "../lib/nextSteps.js";
+import { backToReport } from "../lib/returnTo.js";
 import NextStepCard from "./NextStepCard.jsx";
 
 /**
@@ -99,12 +100,13 @@ function Sphere({ section, open, onToggle, selfDate }) {
               key={slot.id}
               slot={slot}
               section={section}
+              sectionId={section.id}
               open={questionId === slot.id}
               onToggle={() => setQuestionId(questionId === slot.id ? null : slot.id)}
               isPhone={isPhone}
             />
           ))}
-          {step && <NextStepCard step={step} selfDate={selfDate} />}
+          {step && <NextStepCard step={step} selfDate={selfDate} sectionId={section.id} />}
         </div>
       )}
     </section>
@@ -115,10 +117,15 @@ function Sphere({ section, open, onToggle, selfDate }) {
  * Один вопрос. Открытый — кнопка, раскрывающая ответ.
  * Закрытый — ссылка на пейволл: число показываем, трактовку нет.
  */
-function Question({ slot, section, open, onToggle, isPhone }) {
+function Question({ slot, section, sectionId, open, onToggle, isPhone }) {
+  const location = useLocation();
+
   if (slot.locked) {
+    /* Уводим на тарифы вместе с обратной дорогой: человек вернётся
+       в эту же сферу, а не в начало разбора. */
     return (
-      <Link to="/tarify" className="qRow" style={{ ...S.qRow, ...S.qLocked, minHeight: TAP }}>
+      <Link to="/tarify" state={backToReport(location, sectionId)}
+        className="qRow" style={{ ...S.qRow, ...S.qLocked, minHeight: TAP }}>
         <span style={{ ...S.qArcana, color: C.muted, borderColor: C.border }}>{slot.arcana}</span>
         <span style={{ ...S.qLabel, color: C.text }}>{slot.label}</span>
         <Lock />

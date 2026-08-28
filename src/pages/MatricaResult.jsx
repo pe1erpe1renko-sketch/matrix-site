@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useState } from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
@@ -31,16 +30,11 @@ import { useCalcPage } from "../components/useCalcPage.js";
 export default function MatricaResult() {
   const page = useCalcPage("matrica");
 
-  /* ?section=money — так «Подробнее» с главной попадает сразу в нужную сферу.
-     Раскрытием и прокруткой занимается SectionsBlock, сюда кладём только
-     просьбу. Поле at нужно, чтобы повторный клик по той же точке сработал. */
-  const [searchParams] = useSearchParams();
+  /* Клик по точке октаграммы раскрывает нужную сферу разбора. Раскрытием
+     и прокруткой занимается SectionsBlock, сюда кладём только просьбу.
+     Поле at нужно, чтобы повторный клик по той же точке сработал.
+     Адрес вида ?section=money SectionsBlock читает сам. */
   const [sphereRequest, setSphereRequest] = useState(null);
-
-  useEffect(() => {
-    const id = searchParams.get("section");
-    if (id) setSphereRequest({ id, at: Date.now() });
-  }, [searchParams]);
 
   const { matrix } = page;
 

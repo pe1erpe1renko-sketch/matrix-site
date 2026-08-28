@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { C, SURFACE } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { RoundIcon } from "./Icons.jsx";
@@ -7,6 +7,7 @@ import DateFields from "./DateFields.jsx";
 import { NEXT_PEOPLE } from "../lib/nextSteps.js";
 import { partsToUrlDate, urlDateToISO } from "../lib/urlDate.js";
 import { useAccess } from "../lib/access.js";
+import { backToReport } from "../lib/returnTo.js";
 import { PLAN_LIMITS } from "../lib/plans.js";
 import { useIsPhone, TAP } from "../theme/responsive.js";
 
@@ -27,6 +28,7 @@ import { useIsPhone, TAP } from "../theme/responsive.js";
 export default function NextStepsBlock({ selfDate, background = C.bgAlt }) {
   const isPhone = useIsPhone();
   const navigate = useNavigate();
+  const location = useLocation();
   const { plan, limit, reports } = useAccess();
   const [openId, setOpenId] = useState(null);
   const [date, setDate] = useState({ d: "", m: "", y: "" });
@@ -67,7 +69,7 @@ export default function NextStepsBlock({ selfDate, background = C.bgAlt }) {
                 Чтобы посчитать ещё одну дату, нужен тариф выше — уже открытые разборы
                 при этом остаются.
               </p>
-              <button className="btnOutline" onClick={() => navigate("/tarify")} style={{
+              <button className="btnOutline" onClick={() => navigate("/tarify", { state: backToReport(location) })} style={{
                 ...S.ctaSmall, marginTop: 12, minHeight: TAP, border: `1px solid ${C.border}`,
                 background: "transparent", color: C.white, width: isPhone ? "100%" : "auto",
               }}>Посмотреть тарифы</button>
