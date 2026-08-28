@@ -509,22 +509,31 @@ export const S = {
   /* ---------- разбор: сферы и вопросы ---------- */
   sectionsWrap: { display: "flex", flexDirection: "column", gap: 14 },
   sphere: {
-    border: `1px solid ${C.border}`, borderRadius: R.xl,
-    background: SURFACE.card, padding: "20px var(--secX20, 22px) 18px",
-    transition: "border-color .18s ease",
+    border: "1px solid", borderRadius: R.xl, overflow: "hidden",
+    transition: "border-color .18s ease, background .18s ease",
   },
+  /* Свёрнутая сфера — не строка таблицы, а карточка: заголовок серифом,
+     подзаголовок обычным текстом, счётчик справа. По ней хочется нажать. */
   sphereHead: {
-    display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-    gap: 14, flexWrap: "wrap", marginBottom: 14,
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+    gap: 16, width: "100%", background: "none", border: "none",
+    fontFamily: "inherit", textAlign: "left",
   },
   sphereTitle: {
-    fontFamily: FONT.serif, fontSize: 21, color: C.white,
-    margin: 0, fontWeight: 600, lineHeight: 1.2,
+    display: "block", fontFamily: FONT.serif, fontSize: 20, color: C.white,
+    fontWeight: 600, lineHeight: 1.2,
   },
-  sphereLead: { margin: "5px 0 0", color: C.muted, fontSize: 13, lineHeight: 1.45 },
+  sphereLead: {
+    display: "block", marginTop: 5, color: C.muted, fontSize: 13, lineHeight: 1.45,
+  },
+  sphereRight: { display: "flex", alignItems: "center", gap: 12, flexShrink: 0 },
   sphereCount: {
-    fontSize: 11.5, letterSpacing: "0.08em", color: C.gold, flexShrink: 0,
-    border: `1px solid ${C.border}`, borderRadius: R.pill, padding: "4px 11px",
+    fontSize: 11.5, letterSpacing: "0.06em", color: C.gold, whiteSpace: "nowrap",
+    border: `1px solid ${C.border}`, borderRadius: R.pill, padding: "5px 11px",
+  },
+  sphereChevron: {
+    display: "flex", alignItems: "center", justifyContent: "center",
+    transition: "transform .22s ease, color .18s ease",
   },
   qList: { display: "flex", flexDirection: "column", gap: 6 },
   qRow: {

@@ -73,6 +73,7 @@ a { color: inherit; text-decoration: none; }
 .btnGhost:hover { color: ${C.white}; }
 .socialBtn:hover { border-color: ${C.lilac}; }
 .qRow:hover { border-color: ${C.lilac}; background: rgba(31,24,65,0.72); }
+.sphere:hover { border-color: ${C.borderHi}; }
 
 /* ---- мобильный режим ---- */
 

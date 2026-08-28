@@ -301,17 +301,56 @@ export function toISODate(date) {
 }
 
 /**
- * АРКАН ЛИЧНОГО ГОДА = день + месяц рождения + текущий календарный год.
+ * АРКАН ЛИЧНОГО ГОДА = день + месяц рождения + год личного цикла.
  *
- * Меняется раз в год, в день рождения. Отсюда берётся раздел «Личный год»:
- * какая энергия ведёт человека ближайшие двенадцать месяцев.
+ * МЕНЯЕТСЯ В ДЕНЬ РОЖДЕНИЯ, А НЕ ПЕРВОГО ЯНВАРЯ. Если день рождения
+ * в текущем календарном году ещё не наступил, идёт ПРОШЛЫЙ личный год.
+ *
+ * Почему так: аркан считается от дня и месяца рождения, то есть привязан
+ * к личному циклу человека. Если менять его первого января, личный год
+ * у всех стартует одновременно — это уже гороскоп, а не матрица.
  *
  * Не путать с арканом периода жизни (2,5 года по возрастной шкале)
- * и с арканом дня.
+ * и с арканом дня (меняется каждые сутки).
+ *
+ * @param {string} birthDate — 'YYYY-MM-DD'
+ * @param {string|Date} on — на какой момент считаем: ISO-строка или Date
  */
-export function yearArcana(birthDate, year) {
-  const { m, d } = parseDate(birthDate);
-  return toArcana(d + m + year);
+export function yearArcana(birthDate, on) {
+  const birth = parseDate(birthDate);
+  const today = asParts(on);
+  return toArcana(birth.d + birth.m + cycleYear(birth, today));
+}
+
+/** Разбирает и ISO-строку, и Date — движку удобно принимать оба. */
+function asParts(on) {
+  if (typeof on === 'string') return parseDate(on);
+  return { y: on.getFullYear(), m: on.getMonth() + 1, d: on.getDate() };
+}
+
+/** Год личного цикла: до дня рождения идёт предыдущий. */
+function cycleYear(birth, today) {
+  const birthdayPassed = today.m > birth.m || (today.m === birth.m && today.d >= birth.d);
+  return birthdayPassed ? today.y : today.y - 1;
+}
+
+/**
+ * Дата следующей смены аркана года — ближайший день рождения.
+ * Нужна для уведомлений «через N дней начинается новый личный год».
+ *
+ * 29 февраля в невисокосный год переносим на 28-е: несуществующую дату
+ * отдавать наружу нельзя, а ждать четыре года до уведомления — тем более.
+ */
+export function nextYearChange(birthDate, on) {
+  const birth = parseDate(birthDate);
+  const today = asParts(on);
+  const year = cycleYear(birth, today) + 1;
+
+  const isLeap = (y) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+  const day = birth.m === 2 && birth.d === 29 && !isLeap(year) ? 28 : birth.d;
+
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${year}-${pad(birth.m)}-${pad(day)}`;
 }
 
 /**
@@ -333,7 +372,8 @@ export function buildToday(timeline, birthDate, now = new Date()) {
     tomorrowDate: tomorrowISO,
     tomorrowArcana: dayArcana(tomorrowISO, period.arcana),
     year: now.getFullYear(),
-    yearArcana: yearArcana(birthDate, now.getFullYear()),
+    yearArcana: yearArcana(birthDate, now),
+    yearChangeDate: nextYearChange(birthDate, now),
   };
 }
 

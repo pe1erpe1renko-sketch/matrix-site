@@ -9,64 +9,91 @@ import { useSlotText } from "./useSlotText.js";
 /**
  * РАЗБОР: СФЕРЫ И ВОПРОСЫ
  * =======================
- * Сфера — крупный блок, внутри неё список вопросов кнопками.
- * Нажатие раскрывает ответ именно на этот вопрос.
+ * Два уровня раскрытия, и на каждом открыт РОВНО ОДИН элемент.
  *
- * ПОЧЕМУ ТАК, А НЕ СТЕНОЙ ТЕКСТА: длинную статью читают один раз
- * и закрывают. Список вопросов хочется прокликать целиком, потому что
- * каждый следующий заголовок звучит как «это про меня». Поэтому
- * заголовки вопросов крупные и читаются как вопросы, а не как рубрики.
+ * СФЕРЫ свёрнуты по умолчанию. Человек видит всю карту разбора на одном
+ * экране — двенадцать заголовков — и выбирает, что ему интересно. Если
+ * раскрыть всё сразу, до последней сферы пришлось бы листать девяносто
+ * два вопроса.
+ *
+ * ВОПРОСЫ внутри сферы тоже раскрываются по одному. Нажал вопрос —
+ * получил ответ именно на него; нажал другой — предыдущий свернулся.
  *
  * ДОСТУП СЧИТАЕТСЯ ПО ВОПРОСУ, а не по сфере: в платной сфере первый
  * вопрос открыт всегда, чтобы человек попробовал везде.
  *
  * Закрытый вопрос текст НЕ запрашивает вообще. Иначе оплаченный контент
  * приезжал бы в браузер неоплатившему и лежал бы в разметке.
- *
- * Открытый ответ грузится в момент раскрытия: в рабочем режиме каждый
- * незнакомый текст — это запрос к нейросети, тянуть все 92 сразу незачем.
  */
-export default function SectionList({ sections }) {
+export default function SectionList({ sections, openId, onToggle }) {
   return (
     <div style={S.sectionsWrap}>
-      {sections.map((section) => <Sphere key={section.id} section={section} />)}
+      {sections.map((section) => (
+        <Sphere
+          key={section.id}
+          section={section}
+          open={openId === section.id}
+          onToggle={() => onToggle(section.id)}
+        />
+      ))}
     </div>
   );
 }
 
-function Sphere({ section }) {
+function Sphere({ section, open, onToggle }) {
   const isPhone = useIsPhone();
-  /* Первый доступный вопрос раскрыт сразу: иначе сфера выглядит
-     как список ссылок, и непонятно, что внутри вообще есть текст. */
   const firstOpen = section.slots.find((slot) => !slot.locked);
-  const [openId, setOpenId] = useState(firstOpen ? firstOpen.id : null);
+  const [questionId, setQuestionId] = useState(firstOpen ? firstOpen.id : null);
 
   const openCount = section.slots.filter((slot) => !slot.locked).length;
+  const allOpen = openCount === section.slots.length;
 
   return (
-    <section id={`section-${section.id}`} className="card" style={S.sphere}>
-      <div style={S.sphereHead}>
-        <div style={{ minWidth: 0 }}>
-          <h3 style={S.sphereTitle}>{section.title}</h3>
-          <p style={S.sphereLead}>{section.lead}</p>
+    <section id={`section-${section.id}`} className="sphere" style={{
+      ...S.sphere,
+      borderColor: open ? C.borderHi : C.border,
+      background: open ? SURFACE.cardHi : SURFACE.card,
+    }}>
+      <button style={{ ...S.sphereHead, padding: isPhone ? "16px 16px" : "18px 22px" }}
+        onClick={onToggle} aria-expanded={open}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <span style={S.sphereTitle}>{section.title}</span>
+          <span style={S.sphereLead}>{section.lead}</span>
         </div>
-        <span style={S.sphereCount}>
-          {openCount} из {section.slots.length}
-        </span>
-      </div>
 
-      <div style={S.qList}>
-        {section.slots.map((slot) => (
-          <Question
-            key={slot.id}
-            slot={slot}
-            section={section}
-            open={openId === slot.id}
-            onToggle={() => setOpenId(openId === slot.id ? null : slot.id)}
-            isPhone={isPhone}
-          />
-        ))}
-      </div>
+        <span style={S.sphereRight}>
+          <span style={S.sphereCount}>
+            {allOpen
+              ? `${section.slots.length} ${plural(section.slots.length, "вопрос", "вопроса", "вопросов")}`
+              : `${openCount} из ${section.slots.length}`}
+          </span>
+          <span style={{
+            ...S.sphereChevron,
+            transform: open ? "rotate(180deg)" : "none",
+            color: open ? C.gold : C.muted,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9.5 L12 15.5 L18 9.5" stroke="currentColor" strokeWidth="1.9"
+                strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </span>
+      </button>
+
+      {open && (
+        <div style={{ ...S.qList, padding: isPhone ? "0 12px 14px" : "0 18px 16px" }}>
+          {section.slots.map((slot) => (
+            <Question
+              key={slot.id}
+              slot={slot}
+              section={section}
+              open={questionId === slot.id}
+              onToggle={() => setQuestionId(questionId === slot.id ? null : slot.id)}
+              isPhone={isPhone}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -90,7 +117,7 @@ function Question({ slot, section, open, onToggle, isPhone }) {
     <div>
       <button className="qRow" style={{
         ...S.qRow, minHeight: TAP,
-        background: open ? SURFACE.cardHi : "transparent",
+        background: open ? "rgba(10,8,23,0.5)" : "transparent",
         borderColor: open ? C.borderHi : C.border,
       }} onClick={onToggle} aria-expanded={open}>
         <span style={{
@@ -143,4 +170,11 @@ function Lock() {
       <path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7" stroke={C.muted} strokeWidth="1.6" />
     </svg>
   );
+}
+
+function plural(n, one, few, many) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
 }

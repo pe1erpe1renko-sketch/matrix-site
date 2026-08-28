@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
@@ -29,20 +29,16 @@ import { useCalcPage } from "../components/useCalcPage.js";
 export default function MatricaResult() {
   const page = useCalcPage("matrica");
 
-  /* ?section=money — так «Подробнее» с главной попадает сразу в нужную сферу. */
+  /* ?section=money — так «Подробнее» с главной попадает сразу в нужную сферу.
+     Раскрытием и прокруткой занимается SectionsBlock, сюда кладём только
+     просьбу. Поле at нужно, чтобы повторный клик по той же точке сработал. */
   const [searchParams] = useSearchParams();
-  const requestedSection = searchParams.get("section");
+  const [sphereRequest, setSphereRequest] = useState(null);
 
-  /* Пришли по ссылке со сферой — доводим до неё, а не бросаем вверху страницы.
-     Ждём кадр: к моменту эффекта сферы уже в разметке, но ещё не разложены. */
   useEffect(() => {
-    if (!requestedSection) return undefined;
-    const id = requestAnimationFrame(() => {
-      const node = document.getElementById(`section-${requestedSection}`);
-      if (node) node.scrollIntoView({ behavior: "auto", block: "start" });
-    });
-    return () => cancelAnimationFrame(id);
-  }, [requestedSection]);
+    const id = searchParams.get("section");
+    if (id) setSphereRequest({ id, at: Date.now() });
+  }, [searchParams]);
 
   const { matrix } = page;
 
@@ -57,10 +53,7 @@ export default function MatricaResult() {
   }
 
   /* Переход из панели точки октаграммы к нужной сфере разбора. */
-  const openSectionById = (id) => {
-    const node = document.getElementById(`section-${id}`);
-    if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  const openSectionById = (id) => setSphereRequest({ id, at: Date.now() });
 
   const { today } = matrix;
   const ru = (n) => String(n).replace(".", ",");
@@ -143,6 +136,7 @@ export default function MatricaResult() {
         spheres={page.spheresTotal}
         total={page.questionsTotal}
         open={page.questionsOpen}
+        openRequest={sphereRequest}
       />
     </>
   );

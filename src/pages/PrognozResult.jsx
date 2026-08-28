@@ -133,45 +133,63 @@ export default function PrognozResult() {
 /**
  * ЛИЧНЫЙ ГОД
  * ==========
- * Аркан года считает движок: день и месяц рождения плюс текущий
- * календарный год. Значит и меняется он вместе с календарным годом,
- * первого января, — это видно прямо из формулы.
+ * Аркан года считает движок от дня и месяца рождения, поэтому меняется он
+ * В ДЕНЬ РОЖДЕНИЯ, а не первого января: год у каждого свой. Дату следующей
+ * смены движок отдаёт готовой — today.yearChangeDate.
  *
  * Не путать с двумя соседними числами: аркан дня меняется каждые сутки,
  * аркан периода жизни держится 2,5 года. Здесь третий масштаб.
  */
 function PersonalYear({ today }) {
-  const nextYear = today.year + 1;
+  const change = humanDate(today.yearChangeDate);
+  const daysLeft = daysUntil(today.date, today.yearChangeDate);
 
   return (
     <div className="card" style={S.dayCard}>
       <div style={S.dayBigWrap}>
         <span style={S.dayBig}>{today.yearArcana}</span>
         <div style={S.dayArcName}>{ARCANA_NAMES[today.yearArcana]}</div>
-        <div style={{ ...S.dayPeriod, marginTop: 6 }}>{today.year} год</div>
+        <div style={{ ...S.dayPeriod, marginTop: 6 }}>до {change}</div>
       </div>
 
       <div>
-        <div style={S.infoLabel}>Энергия ближайших двенадцати месяцев</div>
+        <div style={S.infoLabel}>Энергия текущего личного года</div>
         <p style={S.slotText}>
           Аркан {today.yearArcana} ({ARCANA_NAMES[today.yearArcana]}) ведёт вас
-          весь {today.year} год. Он считается от дня и месяца вашего рождения
-          и текущего года, поэтому у каждого человека свой: одна и та же дата
-          в календаре даёт разным людям разные арканы года.
+          до {change}. Он считается от дня и месяца вашего рождения, поэтому
+          личный год у каждого свой: он начинается не первого января,
+          а в ваш день рождения.
         </p>
 
         <div style={S.dayTomorrow}>
-          Разбор года — в сфере «Личный год» ниже на странице
+          Следующий личный год начнётся {change}
+          <span style={{ color: C.muted }}> · через {daysLeft} {plural(daysLeft, "день", "дня", "дней")}</span>
         </div>
 
         <p style={S.dayPeriod}>
-          Аркан года сменится вместе с календарным годом: с 1 января {nextYear}
-          {" "}пойдёт следующий. Это третий масштаб рядом с арканом дня, который
-          меняется каждые сутки, и арканом периода жизни, который держится 2,5 года.
+          Разбор года — в сфере «Личный год» ниже на странице. Это третий масштаб
+          рядом с арканом дня, который меняется каждые сутки, и арканом периода
+          жизни, который держится 2,5 года.
         </p>
       </div>
     </div>
   );
+}
+
+const MONTHS_GEN = ["января","февраля","марта","апреля","мая","июня",
+                    "июля","августа","сентября","октября","ноября","декабря"];
+
+/** '2027-07-13' → «13 июля 2027». */
+function humanDate(iso) {
+  const [y, m, d] = String(iso).split("-").map(Number);
+  return `${d} ${MONTHS_GEN[m - 1]} ${y}`;
+}
+
+/** Сколько суток осталось между двумя ISO-датами. */
+function daysUntil(fromISO, toISO) {
+  const day = 24 * 60 * 60 * 1000;
+  const diff = Date.parse(`${toISO}T00:00:00Z`) - Date.parse(`${fromISO}T00:00:00Z`);
+  return Math.max(0, Math.round(diff / day));
 }
 
 /** «1,88» → «1 год 11 месяцев». Дробные годы человеку ничего не говорят. */

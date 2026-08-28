@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import SectionList from "./SectionList.jsx";
@@ -11,10 +11,46 @@ import SectionList from "./SectionList.jsx";
  *
  * Счётчик считает ВОПРОСЫ, а не сферы: «15 из 92» человеку понятнее,
  * чем «12 сфер», и честно показывает, сколько ещё не открыто.
+ *
+ * Открыта ровно одна сфера, и при раскрытии страница подъезжает к её
+ * заголовку: иначе человек нажимает сферу внизу экрана, содержимое
+ * появляется ниже видимой области, и непонятно, куда смотреть.
+ *
+ * @param {{id: string, at: number}} [openRequest] — просьба раскрыть
+ *        конкретную сферу извне: так работает «Подробнее» из панели точки
+ *        октаграммы и адрес вида ?section=money. Поле at нужно, чтобы
+ *        повторный клик по той же точке снова сработал.
  */
 export default function SectionsBlock({
-  sections, spheres, total, open, title, lead, background = C.bgAlt,
+  sections, spheres, total, open, title, lead, background = C.bgAlt, openRequest,
 }) {
+  const [openId, setOpenId] = useState(null);
+
+  /* Подъезжаем к заголовку сферы, а не к её середине. Отступ сверху берём
+     из --appTop: на телефоне там висит шапка, и без вычета заголовок
+     оказался бы под ней. */
+  const scrollToSphere = useCallback((id) => {
+    requestAnimationFrame(() => {
+      const node = document.getElementById(`section-${id}`);
+      if (!node) return;
+      const raw = getComputedStyle(document.documentElement).getPropertyValue("--appTop");
+      const offset = (parseInt(raw, 10) || 0) + 12;
+      window.scrollTo({ top: node.getBoundingClientRect().top + window.scrollY - offset, behavior: "smooth" });
+    });
+  }, []);
+
+  const toggle = (id) => {
+    const next = openId === id ? null : id;
+    setOpenId(next);
+    if (next) scrollToSphere(next);
+  };
+
+  useEffect(() => {
+    if (!openRequest || !openRequest.id) return;
+    setOpenId(openRequest.id);
+    scrollToSphere(openRequest.id);
+  }, [openRequest, scrollToSphere]);
+
   return (
     <section style={{ ...S.section, background }}>
       <div style={S.eyebrow}>Разбор</div>
@@ -25,9 +61,9 @@ export default function SectionsBlock({
         </>}
       </h2>
       <p style={{ ...S.infoText, maxWidth: 660, margin: "-14px 0 26px" }}>
-        {lead || "Нажмите на вопрос — откроется ответ по вашим числам. Числа посчитаны по всем вопросам сразу, под замком только трактовки."}
+        {lead || "Выберите сферу — раскроется список вопросов. Нажмите вопрос, и откроется ответ по вашим числам. Числа посчитаны по всем вопросам сразу, под замком только трактовки."}
       </p>
-      <SectionList sections={sections} />
+      <SectionList sections={sections} openId={openId} onToggle={toggle} />
     </section>
   );
 }
