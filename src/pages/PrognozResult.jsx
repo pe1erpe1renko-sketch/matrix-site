@@ -9,6 +9,7 @@ import MonthCalendar from "../components/MonthCalendar.jsx";
 import AgeTimeline from "../components/AgeTimeline.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
+import NextStepsBlock from "../components/NextStepsBlock.jsx";
 import { useCalcPage } from "../components/useCalcPage.js";
 
 /**
@@ -130,8 +131,11 @@ export default function PrognozResult() {
         spheres={page.spheresTotal}
         total={page.questionsTotal}
         open={page.questionsOpen}
+        selfDate={page.urlDates[0]}
         lead="Аркан дня и период открыты бесплатно. Разбор следующего отрезка — на платном тарифе."
       />
+
+      <NextStepsBlock selfDate={page.urlDates[0]} background={C.bg} />
     </>
   );
 }

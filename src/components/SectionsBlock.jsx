@@ -16,13 +16,15 @@ import SectionList from "./SectionList.jsx";
  * заголовку: иначе человек нажимает сферу внизу экрана, содержимое
  * появляется ниже видимой области, и непонятно, куда смотреть.
  *
+ * @param {string} [selfDate] — дата страницы в виде ДД-ММ-ГГГГ. Передаётся
+ *        вниз, в карточки следующего шага в конце каждой сферы.
  * @param {{id: string, at: number}} [openRequest] — просьба раскрыть
  *        конкретную сферу извне: так работает «Подробнее» из панели точки
  *        октаграммы и адрес вида ?section=money. Поле at нужно, чтобы
  *        повторный клик по той же точке снова сработал.
  */
 export default function SectionsBlock({
-  sections, spheres, total, open, title, lead, background = C.bgAlt, openRequest,
+  sections, spheres, total, open, title, lead, background = C.bgAlt, openRequest, selfDate,
 }) {
   const [openId, setOpenId] = useState(null);
 
@@ -63,7 +65,7 @@ export default function SectionsBlock({
       <p style={{ ...S.infoText, maxWidth: 660, margin: "-14px 0 26px" }}>
         {lead || "Выберите сферу — раскроется список вопросов. Нажмите вопрос, и откроется ответ по вашим числам. Числа посчитаны по всем вопросам сразу, под замком только трактовки."}
       </p>
-      <SectionList sections={sections} openId={openId} onToggle={toggle} />
+      <SectionList sections={sections} openId={openId} onToggle={toggle} selfDate={selfDate} />
     </section>
   );
 }

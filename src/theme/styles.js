@@ -1026,4 +1026,37 @@ export const S = {
     border: `1px solid ${C.border}`, borderRadius: R.md, padding: "14px 16px",
     marginBottom: 10, display: "flex", flexDirection: "column", gap: 6,
   },
+  /* ---- исследовательские переходы ----
+     Карточка в конце сферы и блок «кого посмотрим дальше». */
+
+  stepCard: {
+    display: "flex", gap: 16, alignItems: "flex-start",
+    marginTop: 12, padding: "18px 20px", borderRadius: R.lg,
+    border: `1px solid ${C.border}`, background: "rgba(10,8,23,0.45)",
+  },
+  stepHead: { fontFamily: FONT.serif, fontSize: 17.5, color: C.white, lineHeight: 1.3 },
+  stepText: { fontSize: 14, color: C.text, lineHeight: 1.6, margin: "8px 0 0" },
+  stepFieldLabel: {
+    display: "block", fontSize: 10.5, letterSpacing: "0.13em",
+    textTransform: "uppercase", color: C.muted, margin: "16px 0 7px",
+  },
+  stepNote: { fontSize: 12.5, color: C.muted, marginTop: 10, lineHeight: 1.5 },
+  stepArrow: { transition: "transform .16s ease", flexShrink: 0 },
+
+  nextTiles: {
+    display: "grid", gap: 12,
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 230px), 1fr))",
+  },
+  nextTile: {
+    display: "flex", alignItems: "center", gap: 13, textAlign: "left",
+    padding: "14px 16px", borderRadius: R.lg, border: "1px solid",
+    fontFamily: "inherit", width: "100%",
+    transition: "border-color .18s ease, background .18s ease, box-shadow .18s ease",
+  },
+  nextTileName: { fontSize: 15.5, fontWeight: 600, lineHeight: 1.25 },
+  nextTileSub: { fontSize: 12.5, color: C.muted, marginTop: 2 },
+  nextForm: {
+    marginTop: 14, padding: "18px 20px", borderRadius: R.lg,
+    border: `1px solid ${C.borderHi}`, background: SURFACE.cardHi,
+  },
 };

@@ -81,6 +81,27 @@ export const Ic = {
         stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
   ),
+  /* два человека — родители, друг */
+  people: (p) => (
+    <svg {...p} viewBox="0 0 24 24" fill="none">
+      <circle cx="9" cy="8.2" r="3.2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2.8 19.4c0-3.4 2.8-5.8 6.2-5.8s6.2 2.4 6.2 5.8" stroke="currentColor"
+        strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M16.4 5.4a3.2 3.2 0 0 1 0 6.2" stroke="currentColor" strokeWidth="1.5"
+        strokeLinecap="round" />
+      <path d="M17.4 13.9c2.4.5 3.8 2.6 3.8 5.5" stroke="currentColor" strokeWidth="1.5"
+        strokeLinecap="round" />
+    </svg>
+  ),
+  /* календарь — личный год */
+  calendar: (p) => (
+    <svg {...p} viewBox="0 0 24 24" fill="none">
+      <rect x="3.2" y="5" width="17.6" height="15.4" rx="2.6" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M3.2 9.6h17.6" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M8 3.2v3.4M16 3.2v3.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="12" cy="14.6" r="1.5" fill="currentColor" />
+    </svg>
+  ),
   profil: (p) => (
     <svg {...p} viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="8" r="3.6" stroke="currentColor" strokeWidth="1.5" />
@@ -89,6 +110,24 @@ export const Ic = {
     </svg>
   ),
 };
+
+/**
+ * Круглый значок в цвете акцента: исследовательские карточки и плитки
+ * «кого посмотрим дальше». Цвет один на обводку, фон и саму иконку —
+ * так значок читается на тёмном фоне и не спорит с золотом кнопки.
+ */
+export function RoundIcon({ name, accent, size = 46 }) {
+  const Glyph = Ic[name] || Ic.matrica;
+  return (
+    <span aria-hidden="true" style={{
+      width: size, height: size, flexShrink: 0, borderRadius: "50%",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      background: `${accent}1F`, border: `1px solid ${accent}59`, color: accent,
+    }}>
+      <Glyph width={size * 0.48} height={size * 0.48} />
+    </span>
+  );
+}
 
 /** Звезда логотипа. Она же — маркер в мелких подписях. */
 export function Spark({ size = 16 }) {

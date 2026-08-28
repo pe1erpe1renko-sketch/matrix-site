@@ -91,6 +91,13 @@ a { color: inherit; text-decoration: none; }
 .planBtn:not(:disabled):active { transform: scale(0.96); }
 @media (prefers-reduced-motion: reduce) { .planBtn:not(:disabled):active { transform: none; } }
 
+/* Ссылка-переход в карточке следующего шага. Цвет у неё свой у каждой
+   сферы и задан встроенным стилем, поэтому на наведение отвечаем
+   яркостью и сдвигом стрелки — их инлайн не занимает. */
+.stepLink:hover { filter: brightness(1.18); }
+.stepLink:hover svg { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) { .stepLink:hover svg { transform: none; } }
+
 /* Бегущий индикатор у текущей строки сцены расчёта. */
 .theatreRun { animation: theatreRun 700ms linear forwards; }
 @keyframes theatreRun { from { width: 0; } to { width: 100%; } }

@@ -7,6 +7,7 @@ import { CALC_NAV, DEFAULT_CALC, calcById, activeNavId } from "../routes.js";
 import { partsToUrlDate } from "../lib/urlDate.js";
 import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { PlanCard } from "../components/PlanCard.jsx";
+import DateFields from "../components/DateFields.jsx";
 import { SUBSCRIPTION_PLANS } from "../lib/plans.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
@@ -132,8 +133,6 @@ const DEMO_MATRIX = calculateMatrix("1998-07-13");
 
 const ARCANA = Object.values(ARCANA_NAMES);
 
-const MONTHS = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
-const YEARS = Array.from({ length: 106 }, (_, i) => 2026 - i);
 
 
 
@@ -503,19 +502,7 @@ function Person({ data, set, label, idPrefix }) {
         </div>
       </div>
       <label style={S.fieldLabel}>Дата рождения</label>
-      <div style={S.dateRow}>
-        <select className="fld" style={S.select} value={data.d} onChange={up("d")}>
-          <option value="">День</option>
-          {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}
-        </select>
-        <select className="fld" style={S.select} value={data.m} onChange={up("m")}>
-          <option value="">Месяц</option>
-          {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-        </select>
-        <input className="fld" style={S.select} list={idPrefix + "years"} placeholder="Год"
-          value={data.y} onChange={up("y")} inputMode="numeric" maxLength={4} />
-        <datalist id={idPrefix + "years"}>{YEARS.map((y) => <option key={y} value={y} />)}</datalist>
-      </div>
+      <DateFields value={data} onChange={(next) => set({ ...data, ...next })} idPrefix={idPrefix} />
     </div>
   );
 }

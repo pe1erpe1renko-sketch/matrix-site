@@ -13,6 +13,7 @@ import AncestralLines from "../components/AncestralLines.jsx";
 import DayArcana from "../components/DayArcana.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
+import NextStepsBlock from "../components/NextStepsBlock.jsx";
 import { useCalcPage } from "../components/useCalcPage.js";
 
 /**
@@ -142,8 +143,11 @@ export default function MatricaResult() {
         spheres={page.spheresTotal}
         total={page.questionsTotal}
         open={page.questionsOpen}
+        selfDate={page.urlDates[0]}
         openRequest={sphereRequest}
       />
+
+      <NextStepsBlock selfDate={page.urlDates[0]} background={C.bg} />
     </>
   );
 }

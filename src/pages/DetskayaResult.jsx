@@ -113,6 +113,7 @@ export default function DetskayaResult() {
         spheres={page.spheresTotal}
         total={page.questionsTotal}
         open={page.questionsOpen}
+        selfDate={page.urlDates[0]}
         lead="Разделы написаны для родителя: не «вы такой», а «ребёнок такой, и вот что с этим делать». Числа открыты все, под замком только трактовки."
       />
     </>

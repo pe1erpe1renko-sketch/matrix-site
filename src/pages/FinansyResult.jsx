@@ -7,6 +7,7 @@ import CalcTheatre from "../components/CalcTheatre.jsx";
 import Octagram from "../components/Octagram.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
+import NextStepsBlock from "../components/NextStepsBlock.jsx";
 import { useCalcPage } from "../components/useCalcPage.js";
 
 /**
@@ -94,8 +95,11 @@ export default function FinansyResult() {
         spheres={page.spheresTotal}
         total={page.questionsTotal}
         open={page.questionsOpen}
+        selfDate={page.urlDates[0]}
         lead="Денежные числа посчитаны целиком — они ваши. Под замком только трактовки. Разбор открывается один раз на дату и действует на всех страницах, которые считаются по ней."
       />
+
+      <NextStepsBlock selfDate={page.urlDates[0]} background={C.bg} />
     </>
   );
 }

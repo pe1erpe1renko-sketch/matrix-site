@@ -5,6 +5,8 @@ import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import { useIsPhone, TAP } from "../theme/responsive.js";
 import { useSlotText } from "./useSlotText.js";
+import { stepForSphere } from "../lib/nextSteps.js";
+import NextStepCard from "./NextStepCard.jsx";
 
 /**
  * РАЗБОР: СФЕРЫ И ВОПРОСЫ
@@ -24,8 +26,16 @@ import { useSlotText } from "./useSlotText.js";
  *
  * Закрытый вопрос текст НЕ запрашивает вообще. Иначе оплаченный контент
  * приезжал бы в браузер неоплатившему и лежал бы в разметке.
+ *
+ * В конце раскрытой сферы стоит карточка следующего шага: дочитал про
+ * отношения — считаем совместимость. В свёрнутой сфере её нет, иначе
+ * список сфер превратился бы в список предложений.
+ *
+ * @param {string} [selfDate] — дата этой страницы в виде ДД-ММ-ГГГГ.
+ *        Без неё переходы, которые считаются по двум датам, собрать
+ *        не из чего, и карточки не показываются.
  */
-export default function SectionList({ sections, openId, onToggle }) {
+export default function SectionList({ sections, openId, onToggle, selfDate }) {
   return (
     <div style={S.sectionsWrap}>
       {sections.map((section) => (
@@ -34,19 +44,21 @@ export default function SectionList({ sections, openId, onToggle }) {
           section={section}
           open={openId === section.id}
           onToggle={() => onToggle(section.id)}
+          selfDate={selfDate}
         />
       ))}
     </div>
   );
 }
 
-function Sphere({ section, open, onToggle }) {
+function Sphere({ section, open, onToggle, selfDate }) {
   const isPhone = useIsPhone();
   const firstOpen = section.slots.find((slot) => !slot.locked);
   const [questionId, setQuestionId] = useState(firstOpen ? firstOpen.id : null);
 
   const openCount = section.slots.filter((slot) => !slot.locked).length;
   const allOpen = openCount === section.slots.length;
+  const step = selfDate ? stepForSphere(section.id) : null;
 
   return (
     <section id={`section-${section.id}`} className="sphere" style={{
@@ -92,6 +104,7 @@ function Sphere({ section, open, onToggle }) {
               isPhone={isPhone}
             />
           ))}
+          {step && <NextStepCard step={step} selfDate={selfDate} />}
         </div>
       )}
     </section>
