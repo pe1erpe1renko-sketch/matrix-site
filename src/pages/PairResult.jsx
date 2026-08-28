@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
@@ -25,7 +25,6 @@ import { useCalcPage } from "../components/useCalcPage.js";
  */
 export default function PairResult({ pageId }) {
   const page = useCalcPage(pageId);
-  const [openSection, setOpenSection] = useState(page.view.sections[0].id);
 
   if (!page.valid) {
     return (
@@ -78,8 +77,8 @@ export default function PairResult({ pageId }) {
             : "Расчёт по двум датам. Это карта связки, а не оценка человека: она показывает, как складывается работа двоих."}
           reportKey={page.reportKey}
           isoDates={page.isoDates}
-          sectionsTotal={page.sectionsTotal}
-          sectionsOpen={page.sectionsOpen}
+          questionsTotal={page.questionsTotal}
+          questionsOpen={page.questionsOpen}
           backTo={isLove ? "/sovmestimost" : "/biznes"}
         />
 
@@ -113,7 +112,7 @@ export default function PairResult({ pageId }) {
               matrix={matrix}
               showAge={false}
               emphasis={isLove ? "SW" : "SE"}
-              sectionsUnlocked={page.access.unlocked}
+             
             />
           </div>
 
@@ -140,10 +139,9 @@ export default function PairResult({ pageId }) {
 
       <SectionsBlock
         sections={page.sections}
-        total={page.sectionsTotal}
-        open={page.sectionsOpen}
-        openId={openSection}
-        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+        spheres={page.spheresTotal}
+        total={page.questionsTotal}
+        open={page.questionsOpen}
         lead={isLove
           ? "Числа пары посчитаны целиком. Под замком только трактовки."
           : "Числа связки посчитаны целиком. Под замком только трактовки."}

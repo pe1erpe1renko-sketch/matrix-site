@@ -109,7 +109,7 @@ function buildPoints(matrix) {
  *                               нет, поэтому там слой выключается целиком.
  */
 export default function Octagram({
-  matrix, onOpenSection, sectionsUnlocked = false, emphasis = null, showAge = true,
+  matrix, onOpenSection, emphasis = null, showAge = true,
 }) {
   const [layers, setLayers] = useState({ age: showAge, rod: true, money: true, love: true });
   const [selected, setSelected] = useState(emphasis ? `point_${emphasis}` : "point_C");
@@ -239,7 +239,7 @@ export default function Octagram({
         </div>
       )}
 
-      <PointPanel point={active} onOpenSection={onOpenSection} sectionsUnlocked={sectionsUnlocked} />
+      <PointPanel point={active} onOpenSection={onOpenSection} />
     </div>
   );
 }
@@ -378,7 +378,7 @@ function AgeRing({ matrix }) {
  * одно и то же число участвует в нескольких разделах, и карта позиций
  * знает, в каком оно расписано подробно.
  */
-function PointPanel({ point, onOpenSection, sectionsUnlocked }) {
+function PointPanel({ point, onOpenSection }) {
   const section = point ? findSectionForPoint(point.path) : null;
 
   /* У девяти главных точек в движке есть своя короткая подпись —
@@ -402,8 +402,6 @@ function PointPanel({ point, onOpenSection, sectionsUnlocked }) {
     );
   }
 
-  const locked = section && section.access === "paid" && !sectionsUnlocked;
-
   return (
     <div style={S.octaPanel}>
       <div style={S.octaPanelTop}>
@@ -419,11 +417,12 @@ function PointPanel({ point, onOpenSection, sectionsUnlocked }) {
         {loading ? "Загружаем трактовку…" : text}
       </p>
 
+      {/* Сфера всегда доступна хотя бы одним вопросом, поэтому ссылка
+          никуда не упирается и «под замком» здесь писать нечего. */}
       {section && onOpenSection && (
         <button className="link" style={{ ...S.link, marginTop: 12 }}
           onClick={() => onOpenSection(section.sectionId)}>
-          {locked ? `Подробнее в разделе «${section.sectionTitle}» — под замком`
-                  : `Подробнее: ${section.sectionTitle}`}
+          Подробнее: сфера «{section.sectionTitle}»
         </button>
       )}
     </div>

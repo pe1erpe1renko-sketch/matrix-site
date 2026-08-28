@@ -10,15 +10,15 @@ import DevPlanSwitch from "./DevPlanSwitch.jsx";
  * расчёта, даты и ссылка «посчитать другие даты».
  */
 export default function ResultHeader({
-  eyebrow, humanDates, lead, reportKey, isoDates, sectionsTotal, sectionsOpen, backTo,
+  eyebrow, humanDates, lead, reportKey, isoDates, questionsTotal, questionsOpen, backTo,
 }) {
   return (
     <>
       <DevPlanSwitch
         reportKey={reportKey}
         dates={isoDates}
-        sectionsTotal={sectionsTotal}
-        sectionsOpen={sectionsOpen}
+        questionsTotal={questionsTotal}
+        questionsOpen={questionsOpen}
       />
 
       <div style={S.resultHead}>

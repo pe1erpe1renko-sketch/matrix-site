@@ -506,8 +506,44 @@ export const S = {
   },
   lineLbl: { fontSize: 14, color: C.text },
 
-  /* 25 разделов */
-  sectionsWrap: { display: "flex", flexDirection: "column", gap: 10 },
+  /* ---------- разбор: сферы и вопросы ---------- */
+  sectionsWrap: { display: "flex", flexDirection: "column", gap: 14 },
+  sphere: {
+    border: `1px solid ${C.border}`, borderRadius: R.xl,
+    background: SURFACE.card, padding: "20px var(--secX20, 22px) 18px",
+    transition: "border-color .18s ease",
+  },
+  sphereHead: {
+    display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+    gap: 14, flexWrap: "wrap", marginBottom: 14,
+  },
+  sphereTitle: {
+    fontFamily: FONT.serif, fontSize: 21, color: C.white,
+    margin: 0, fontWeight: 600, lineHeight: 1.2,
+  },
+  sphereLead: { margin: "5px 0 0", color: C.muted, fontSize: 13, lineHeight: 1.45 },
+  sphereCount: {
+    fontSize: 11.5, letterSpacing: "0.08em", color: C.gold, flexShrink: 0,
+    border: `1px solid ${C.border}`, borderRadius: R.pill, padding: "4px 11px",
+  },
+  qList: { display: "flex", flexDirection: "column", gap: 6 },
+  qRow: {
+    display: "flex", alignItems: "center", gap: 12, width: "100%",
+    padding: "10px 12px", borderRadius: R.md, border: "1px solid",
+    fontFamily: "inherit", textAlign: "left", transition: "all .16s ease",
+  },
+  qLocked: { borderColor: C.border, background: "transparent", opacity: 0.72 },
+  qArcana: {
+    width: 30, height: 30, borderRadius: 9, border: "1px solid", flexShrink: 0,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontFamily: FONT.serif, fontSize: 15, lineHeight: 1,
+  },
+  qLabel: { flex: 1, minWidth: 0, fontSize: 15, lineHeight: 1.35 },
+  qSign: { fontSize: 20, lineHeight: 1, flexShrink: 0, transition: "transform .2s ease" },
+  qAnswer: {
+    borderLeft: `2px solid ${C.gold}`, margin: "8px 0 12px 14px",
+  },
+  qAnswerTop: { color: C.lilac, fontSize: 12.5, marginBottom: 8 },
   sectionItem: {
     border: "1px solid", borderRadius: R.lg, overflow: "hidden",
     transition: "border-color .18s ease, background .18s ease",

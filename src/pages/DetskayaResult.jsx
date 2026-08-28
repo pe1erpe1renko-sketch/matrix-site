@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
@@ -25,7 +25,6 @@ import { useCalcPage } from "../components/useCalcPage.js";
  */
 export default function DetskayaResult() {
   const page = useCalcPage("detskaya");
-  const [openSection, setOpenSection] = useState(page.view.sections[0].id);
 
   if (!page.valid) {
     return (
@@ -53,8 +52,8 @@ export default function DetskayaResult() {
           humanDates={page.humanDates}
           reportKey={page.reportKey}
           isoDates={page.isoDates}
-          sectionsTotal={page.sectionsTotal}
-          sectionsOpen={page.sectionsOpen}
+          questionsTotal={page.questionsTotal}
+          questionsOpen={page.questionsOpen}
           backTo="/detskaya"
         />
 
@@ -91,7 +90,7 @@ export default function DetskayaResult() {
               <span style={S.infoLabel}>Октаграмма</span>
               <span style={S.demoDate}>{page.humanDates[0]}</span>
             </div>
-            <Octagram matrix={matrix} sectionsUnlocked={page.access.unlocked} />
+            <Octagram matrix={matrix} />
           </div>
           <div className="card" style={S.demoCard}>
             <div style={S.demoHead}>
@@ -105,10 +104,9 @@ export default function DetskayaResult() {
 
       <SectionsBlock
         sections={page.sections}
-        total={page.sectionsTotal}
-        open={page.sectionsOpen}
-        openId={openSection}
-        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+        spheres={page.spheresTotal}
+        total={page.questionsTotal}
+        open={page.questionsOpen}
         lead="Разделы написаны для родителя: не «вы такой», а «ребёнок такой, и вот что с этим делать». Числа открыты все, под замком только трактовки."
       />
     </>

@@ -301,6 +301,20 @@ export function toISODate(date) {
 }
 
 /**
+ * АРКАН ЛИЧНОГО ГОДА = день + месяц рождения + текущий календарный год.
+ *
+ * Меняется раз в год, в день рождения. Отсюда берётся раздел «Личный год»:
+ * какая энергия ведёт человека ближайшие двенадцать месяцев.
+ *
+ * Не путать с арканом периода жизни (2,5 года по возрастной шкале)
+ * и с арканом дня.
+ */
+export function yearArcana(birthDate, year) {
+  const { m, d } = parseDate(birthDate);
+  return toArcana(d + m + year);
+}
+
+/**
  * Блок «сегодня» целиком: период жизни + аркан на сегодня + аркан на завтра.
  *
  * Завтрашний аркан нужен, потому что бот рассылает прогноз ВЕЧЕРОМ НА ЗАВТРА,
@@ -318,6 +332,8 @@ export function buildToday(timeline, birthDate, now = new Date()) {
     dayArcana: dayArcana(todayISO, period.arcana),
     tomorrowDate: tomorrowISO,
     tomorrowArcana: dayArcana(tomorrowISO, period.arcana),
+    year: now.getFullYear(),
+    yearArcana: yearArcana(birthDate, now.getFullYear()),
   };
 }
 

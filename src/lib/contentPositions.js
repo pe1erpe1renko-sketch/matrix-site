@@ -13,267 +13,245 @@
  * КЛЮЧ ТЕКСТА в базе: `${slot.id}_${аркан}`  →  'money_channel_main_20'
  */
 
+/**
+ * СФЕРЫ И ВОПРОСЫ
+ * ===============
+ * Разбор устроен не как 25 длинных статей, а как набор сфер, внутри
+ * каждой — от шести до десяти коротких вопросов. Человек нажимает на
+ * вопрос и получает ответ именно на него.
+ *
+ * Смысл дробления: длинный текст читают один раз и закрывают. Список
+ * вопросов хочется прокликать целиком, потому что каждый следующий
+ * заголовок звучит как «это про меня».
+ *
+ * ДОСТУП: у каждой сферы есть access по умолчанию, но отдельные вопросы
+ * могут быть помечены free: true — они открыты всем. В каждой сфере
+ * открыт хотя бы один вопрос, чтобы человек попробовал везде.
+ *
+ * ПУТИ МОГУТ ПОВТОРЯТЬСЯ. Это не ошибка: один и тот же Аркан в позиции
+ * «денежный канал» и в позиции «что мешает сближаться» читается
+ * по-разному. Текст привязан к паре «вопрос + число», а не к числу.
+ *
+ * ИДЕНТИФИКАТОРЫ НЕ ПЕРЕИМЕНОВЫВАТЬ. На пяти из них висят эталонные
+ * тексты из seedTexts.js: character_day, comfort_core, money_channel_main,
+ * relation_line, purpose_personal.
+ */
+
 export const SECTIONS = [
-  // ─────────────── ОТКРЫТО БЕСПЛАТНО ───────────────
+  // ─────────────────────────────────────────────
   {
-    id: 'character',
-    title: 'Ваш характер и сильные стороны',
-    lead: 'Как вы проявляетесь в жизни и какими вас видят другие.',
-    access: 'free',
+    id: 'personality',
+    title: 'Личность',
+    lead: 'Кто вы на самом деле и каким вас видят снаружи.',
+    access: 'paid',
     slots: [
-      { id: 'character_day',   label: 'Главный талант при рождении', path: 'core.W' },
-      { id: 'character_month', label: 'Внутренняя сила',             path: 'core.N' },
-      { id: 'character_year',  label: 'Что передано родом',          path: 'core.E' },
-    ],
-  },
-  {
-    id: 'comfort',
-    title: 'Что даёт вам внутренний комфорт',
-    lead: 'Состояние, в котором вы восстанавливаетесь и приходите в ресурс.',
-    access: 'free',
-    slots: [
-      { id: 'comfort_core', label: 'Зона комфорта', path: 'core.C' },
-    ],
-  },
-  {
-    id: 'year_forecast',
-    title: 'Разбор по годам',
-    lead: 'Энергия текущего и будущих периодов вашей жизни.',
-    access: 'free',
-    dynamic: 'timeline', // слот выбирается селектором периода
-    slots: [
-      { id: 'year_energy', label: 'Энергия периода', path: 'today.arcana' },
-    ],
-  },
-  {
-    id: 'day_arcana',
-    title: 'Аркан дня',
-    lead: 'Ваша энергия на сегодня.',
-    access: 'free',
-    daily: true,
-    slots: [
-      // ВНИМАНИЕ: именно dayArcana, а не arcana.
-      // today.arcana — аркан периода жизни, он держится 2,5 года.
-      // today.dayArcana — аркан на сегодня, меняется каждые сутки.
-      { id: 'day_energy', label: 'Аркан дня', path: 'today.dayArcana' },
+      { id: 'character_day',   label: 'Каким вас видят с первого взгляда', path: 'core.W', free: true },
+      { id: 'core_soul',       label: 'Ваш центральный аркан: ядро души',  path: 'core.C', free: true },
+      { id: 'comfort_core',    label: 'Что даёт вам опору',                path: 'core.C' },
+      { id: 'person_strength', label: 'Сильные стороны',                   path: 'core.N' },
+      { id: 'person_shadow',   label: 'Ваша теневая сторона',              path: 'diagonals.SW.mid' },
+      { id: 'person_pressure', label: 'Как вы ведёте себя под давлением',  path: 'core.S' },
+      { id: 'person_talk',     label: 'Как с вами лучше разговаривать',    path: 'chakras.rows.2.emotions' },
+      { id: 'person_hide',     label: 'Что вы прячете от других',          path: 'chakras.rows.1.emotions' },
+      { id: 'person_grow',     label: 'Зона роста',                        path: 'axes.vertical.startInner' },
     ],
   },
 
-  // ─────────────── ПОД ЗАМКОМ ───────────────
+  // ─────────────────────────────────────────────
   {
     id: 'purpose',
-    title: 'Предназначение: зачем вы здесь',
-    lead: 'Четыре уровня задачи — от личной до планетарной.',
+    title: 'Предназначение',
+    lead: 'Зачем вы здесь и куда ведёт ваш путь.',
     access: 'paid',
     slots: [
-      { id: 'purpose_personal',  label: 'Поиск себя',         path: 'purpose.personal.result' },
-      { id: 'purpose_social',    label: 'Социализация',       path: 'purpose.social.result' },
-      { id: 'purpose_spiritual', label: 'Духовная гармония',  path: 'purpose.spiritual.result' },
-      { id: 'purpose_planetary', label: 'Планетарное',        path: 'purpose.planetary.result' },
+      { id: 'purpose_personal',  label: 'Поиск себя',                      path: 'purpose.personal.result', free: true },
+      { id: 'purpose_social',    label: 'Реализация в социуме',            path: 'purpose.social.result' },
+      { id: 'purpose_spiritual', label: 'Духовная задача',                 path: 'purpose.spiritual.result' },
+      { id: 'purpose_planetary', label: 'Планетарное предназначение',      path: 'purpose.planetary.result' },
+      { id: 'purpose_before40',  label: 'Предназначение до 40 лет',        path: 'core.E' },
+      { id: 'purpose_after40',   label: 'Предназначение после 40 лет',     path: 'core.S' },
+      { id: 'purpose_talents',   label: 'Таланты, которые надо раскрыть',  path: 'core.N' },
+      { id: 'purpose_vector',    label: 'Куда двигаться дальше',           path: 'purpose.personal.earth' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'profession',
-    title: 'Профессия и дело по душе',
-    lead: 'В какой деятельности ваша энергия раскрывается лучше всего.',
+    id: 'money',
+    title: 'Деньги',
+    lead: 'Где ваш поток усиливается, а где теряется.',
     access: 'paid',
     slots: [
-      { id: 'profession_talent', label: 'Профессиональный талант', path: 'core.N' },
-      { id: 'profession_social', label: 'Реализация в социуме',    path: 'purpose.social.result' },
+      { id: 'money_channel_main', label: 'Ваш денежный канал',             path: 'core.SE', free: true },
+      { id: 'money_channel_way',  label: 'Как раскрыть канал',             path: 'diagonals.SE.mid' },
+      { id: 'money_block',        label: 'Что перекрывает деньги',         path: 'diagonals.SE.outer' },
+      { id: 'money_balance',      label: 'Баланс «даю — получаю»',         path: 'chakras.rows.4.emotions' },
+      { id: 'money_status',       label: 'Отношения со статусом',          path: 'chakras.rows.4.physics' },
+      { id: 'money_growth',       label: 'Путь к росту дохода',            path: 'purpose.social.result' },
+      { id: 'money_profession',   label: 'Деньги через профессию',         path: 'core.N' },
+      { id: 'money_partners',     label: 'Партнёрства и сотрудничество',   path: 'core.SW' },
+      { id: 'money_move',         label: 'Переезд, смена города и страны', path: 'axes.horizontal.endMid' },
+      { id: 'money_rod',          label: 'Денежная программа рода',        path: 'ancestral.male.result' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'money_flow',
-    title: 'Через что к вам приходят деньги',
-    lead: 'Ваш денежный канал и способ его открыть.',
+    id: 'relations',
+    title: 'Отношения',
+    lead: 'Ваш сценарий в любви и то, что его держит.',
     access: 'paid',
     slots: [
-      { id: 'money_channel_main', label: 'Денежный канал',    path: 'core.SE' },
-      { id: 'money_channel_way',  label: 'Как его раскрыть',  path: 'diagonals.SE.mid' },
+      { id: 'relation_line',    label: 'Ваш сценарий в любви',            path: 'core.SW', free: true },
+      { id: 'relation_partner', label: 'Какой партнёр вам подходит',      path: 'core.NE' },
+      { id: 'relation_way',     label: 'Путь к гармонии',                 path: 'diagonals.SW.mid' },
+      { id: 'relation_block',   label: 'Барьер близости',                 path: 'diagonals.SW.outer' },
+      { id: 'relation_repeat',  label: 'Что повторяется из раза в раз',   path: 'core.S' },
+      { id: 'relation_karma',   label: 'Кармические узлы в отношениях',   path: 'chakras.rows.3.energy' },
+      { id: 'relation_heart',   label: 'Состояние сердечного центра',     path: 'chakras.rows.3.emotions' },
+      { id: 'relation_attract', label: 'Чем вы притягиваете',             path: 'core.W' },
+      { id: 'relation_fear',    label: 'Чего вы боитесь в близости',      path: 'diagonals.NE.mid' },
+      { id: 'sex_energy',       label: 'Сексуальность и притяжение',      path: 'chakras.rows.5.energy' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'money_leak',
-    title: 'Почему деньги утекают',
-    lead: 'Где вы теряете ресурс и что с этим делать.',
+    id: 'karma',
+    title: 'Карма',
+    lead: 'Глубинные задачи, которые приходят раз за разом.',
     access: 'paid',
     slots: [
-      { id: 'money_block',  label: 'Финансовый блок',       path: 'diagonals.SE.outer' },
-      { id: 'money_status', label: 'Отношения со статусом', path: 'chakras.rows.4.physics' },
+      { id: 'karma_main',    label: 'Главная кармическая задача',        path: 'core.S', free: true },
+      { id: 'karma_debt',    label: 'Кармический долг',                  path: 'axes.vertical.endOuter' },
+      { id: 'karma_tail',    label: 'Что тянется из прошлого',           path: 'diagonals.NE.outer' },
+      { id: 'karma_repeat',  label: 'Повторяющиеся события',             path: 'axes.vertical.startOuter' },
+      { id: 'karma_before40', label: 'Задача до 40 лет',                 path: 'core.E' },
+      { id: 'karma_lesson',  label: 'Урок, который вы обходите',         path: 'diagonals.NW.mid' },
+      { id: 'karma_fear',    label: 'Тени и страхи по арканам',          path: 'chakras.rows.1.energy' },
+      { id: 'karma_weak',    label: 'Слабые точки энергии',              path: 'chakras.rows.2.energy' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'relationships',
-    title: 'Отношения: ваш сценарий в любви',
-    lead: 'Как вы строите близость и что ищете в партнёре.',
+    id: 'ancestry',
+    title: 'Род',
+    lead: 'Что передано вам по обеим линиям и что с этим делать.',
     access: 'paid',
     slots: [
-      { id: 'relation_line', label: 'Линия отношений',   path: 'core.SW' },
-      { id: 'relation_way',  label: 'Путь к гармонии',   path: 'diagonals.SW.mid' },
+      { id: 'male_result',   label: 'Итог мужской линии',                path: 'ancestral.male.result', free: true },
+      { id: 'male_first',    label: 'Первая программа по отцу',          path: 'ancestral.male.first' },
+      { id: 'male_second',   label: 'Вторая программа по отцу',          path: 'ancestral.male.second' },
+      { id: 'female_result', label: 'Итог женской линии',                path: 'ancestral.female.result' },
+      { id: 'female_first',  label: 'Первая программа по матери',        path: 'ancestral.female.first' },
+      { id: 'female_second', label: 'Вторая программа по матери',        path: 'ancestral.female.second' },
+      { id: 'rod_gift',      label: 'Дары рода: на что опереться',       path: 'core.NW' },
+      { id: 'rod_task',      label: 'Что стоит остановить на себе',      path: 'core.NE' },
+      { id: 'rod_arcana',    label: 'Родовой аркан',                     path: 'purpose.social.result' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'relation_blocks',
-    title: 'Что мешает вам сближаться',
-    lead: 'Внутренние барьеры, из-за которых близость даётся тяжело.',
+    id: 'resource',
+    title: 'Ресурс и энергия',
+    lead: 'Что вас наполняет и куда утекают силы.',
     access: 'paid',
     slots: [
-      { id: 'relation_block', label: 'Барьер близости',     path: 'diagonals.SW.outer' },
-      { id: 'relation_heart', label: 'Состояние Анахаты',   path: 'chakras.rows.3.emotions' },
+      { id: 'energy_source',  label: 'Что вас наполняет',                path: 'chakras.rows.3.physics', free: true },
+      { id: 'energy_leak',    label: 'Куда утекает энергия',             path: 'chakras.total.energy' },
+      { id: 'energy_burnout', label: 'Что вызывает выгорание',           path: 'chakras.rows.2.energy' },
+      { id: 'energy_restore', label: 'Как восстанавливаться',            path: 'chakras.rows.6.physics' },
+      { id: 'energy_hygiene', label: 'Энергетическая гигиена',           path: 'chakras.rows.1.energy' },
+      { id: 'rest_joy',       label: 'Источник радости',                 path: 'chakras.rows.5.physics' },
+      { id: 'energy_weak',    label: 'Слабое звено',                     path: 'chakras.rows.4.energy' },
+      { id: 'energy_total',   label: 'Общий эмоциональный фон',          path: 'chakras.total.emotions' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'sexuality',
-    title: 'Сексуальность и притяжение',
-    lead: 'Природа вашего влечения и то, как вы притягиваете.',
+    id: 'health',
+    title: 'Здоровье',
+    lead: 'Зоны внимания в теле и в состоянии. Не диагноз.',
     access: 'paid',
     slots: [
-      { id: 'sex_energy',     label: 'Сексуальная энергия', path: 'chakras.rows.5.energy' },
-      { id: 'sex_attraction', label: 'Что вас притягивает', path: 'core.SW' },
+      { id: 'health_physics',  label: 'Итог: физика',                    path: 'chakras.total.physics', free: true },
+      { id: 'health_energy',   label: 'Итог: энергия',                   path: 'chakras.total.energy' },
+      { id: 'health_emotions', label: 'Итог: эмоции',                    path: 'chakras.total.emotions' },
+      { id: 'body_base',       label: 'Муладхара: тело и материя',       path: 'chakras.rows.6.energy' },
+      { id: 'health_stress',   label: 'Как тело реагирует на стресс',    path: 'chakras.rows.4.energy' },
+      { id: 'health_attention', label: 'Зоны внимания',                  path: 'chakras.rows.5.emotions' },
+      { id: 'health_mind',     label: 'Ум и тревога',                    path: 'chakras.rows.0.emotions' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'karma_40',
-    title: 'Кармическая задача до 40 лет',
-    lead: 'Что важно закрыть в первой половине жизни.',
+    id: 'family',
+    title: 'Дети и родители',
+    lead: 'Что происходит в связи поколений.',
     access: 'paid',
     slots: [
-      { id: 'karma_material', label: 'Материальная задача', path: 'core.E' },
-      { id: 'karma_main',     label: 'Главный урок',        path: 'core.S' },
+      { id: 'parents_link',    label: 'Связь с родителями',              path: 'chakras.rows.5.physics', free: true },
+      { id: 'parents_task',    label: 'Что осталось непрожитым',         path: 'core.S' },
+      { id: 'children_energy', label: 'Какую энергию вы передаёте детям', path: 'chakras.rows.5.emotions' },
+      { id: 'children_role',   label: 'Ваша роль как родителя',          path: 'core.C' },
+      { id: 'children_talent', label: 'На что обратить внимание в ребёнке', path: 'core.N' },
+      { id: 'family_mother',   label: 'Отношения с матерью',             path: 'ancestral.female.first' },
+      { id: 'family_father',   label: 'Отношения с отцом',               path: 'ancestral.male.first' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'main_test',
-    title: 'Главное испытание жизни',
-    lead: 'Точка, через которую раскрывается ваша сила.',
+    id: 'work',
+    title: 'Профессия и реализация',
+    lead: 'Где ваша энергия раскрывается в деле.',
     access: 'paid',
     slots: [
-      { id: 'test_main', label: 'Главное испытание', path: 'core.S' },
+      { id: 'profession_talent', label: 'Профессиональный талант',       path: 'core.N', free: true },
+      { id: 'profession_social', label: 'Реализация в социуме',          path: 'purpose.social.result' },
+      { id: 'work_style',        label: 'Ваш стиль работы',              path: 'core.C' },
+      { id: 'work_env',          label: 'В какой среде вы раскрываетесь', path: 'axes.horizontal.startMid' },
+      { id: 'work_block',        label: 'Что мешает в карьере',          path: 'diagonals.NW.outer' },
+      { id: 'brand_face',        label: 'Как вас видят коллеги',         path: 'core.W' },
+      { id: 'brand_talent',      label: 'На чём строить личный бренд',   path: 'axes.horizontal.startOuter' },
+      { id: 'work_lead',         label: 'Вы руководитель или исполнитель', path: 'core.E' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'past_lives',
-    title: 'Задачи прошлых воплощений',
-    lead: 'Что вы принесли с собой и почему это повторяется.',
+    id: 'year',
+    title: 'Личный год',
+    lead: 'Какая энергия ведёт вас ближайшие двенадцать месяцев.',
     access: 'paid',
+    yearly: true,
     slots: [
-      { id: 'past_debt', label: 'Кармический долг',  path: 'core.S' },
-      { id: 'past_tail', label: 'Кармический хвост', path: 'diagonals.SW.outer' },
+      { id: 'year_arcana',  label: 'Ваш аркан года',                     path: 'today.yearArcana', free: true },
+      { id: 'year_focus',   label: 'На чём сосредоточиться',             path: 'today.yearArcana' },
+      { id: 'year_risk',    label: 'Чего избегать в этом году',          path: 'today.yearArcana' },
+      { id: 'year_money',   label: 'Деньги в этом году',                 path: 'core.SE' },
+      { id: 'year_love',    label: 'Отношения в этом году',              path: 'core.SW' },
     ],
   },
+
+  // ─────────────────────────────────────────────
   {
-    id: 'male_line',
-    title: 'Что тянется по мужской линии',
-    lead: 'Программа рода по линии отца.',
-    access: 'paid',
+    id: 'forecast',
+    title: 'Прогноз',
+    lead: 'Ваша энергия на сегодня и на текущий отрезок жизни.',
+    access: 'free',
     slots: [
-      { id: 'male_first',  label: 'Первая программа', path: 'ancestral.male.first' },
-      { id: 'male_second', label: 'Вторая программа', path: 'ancestral.male.second' },
-      { id: 'male_result', label: 'Итог линии',       path: 'ancestral.male.result' },
-    ],
-  },
-  {
-    id: 'female_line',
-    title: 'Что тянется по женской линии',
-    lead: 'Программа рода по линии матери.',
-    access: 'paid',
-    slots: [
-      { id: 'female_first',  label: 'Первая программа', path: 'ancestral.female.first' },
-      { id: 'female_second', label: 'Вторая программа', path: 'ancestral.female.second' },
-      { id: 'female_result', label: 'Итог линии',       path: 'ancestral.female.result' },
-    ],
-  },
-  {
-    id: 'ancestral_gifts',
-    title: 'Дары рода: на что опереться',
-    lead: 'Ресурс, который род передал вам как поддержку.',
-    access: 'paid',
-    slots: [
-      { id: 'gift_male',   label: 'Дар мужского рода', path: 'ancestral.male.result' },
-      { id: 'gift_female', label: 'Дар женского рода', path: 'ancestral.female.result' },
-    ],
-  },
-  {
-    id: 'parents_karma',
-    title: 'Детско-родительская карма',
-    lead: 'Что осталось непрожитым в отношениях с родителями.',
-    access: 'paid',
-    slots: [
-      { id: 'parents_link', label: 'Связь с родителями', path: 'chakras.rows.5.physics' },
-      { id: 'parents_task', label: 'Задача отношений',   path: 'core.S' },
-    ],
-  },
-  {
-    id: 'children',
-    title: 'Ваши дети: что важно знать',
-    lead: 'Какую энергию вы передаёте детям.',
-    access: 'paid',
-    slots: [
-      { id: 'children_energy', label: 'Энергия для детей', path: 'chakras.rows.5.emotions' },
-      { id: 'children_role',   label: 'Ваша роль',         path: 'core.C' },
-    ],
-  },
-  {
-    id: 'health_map',
-    title: 'Карта здоровья по чакрам',
-    lead: 'Общее состояние вашего энергополя.',
-    access: 'paid',
-    slots: [
-      { id: 'health_physics',  label: 'Итог: физика',  path: 'chakras.total.physics' },
-      { id: 'health_energy',   label: 'Итог: энергия', path: 'chakras.total.energy' },
-      { id: 'health_emotions', label: 'Итог: эмоции',  path: 'chakras.total.emotions' },
-    ],
-  },
-  {
-    id: 'body_zones',
-    title: 'Уязвимые зоны организма',
-    lead: 'На что обращать внимание в теле.',
-    access: 'paid',
-    slots: [
-      { id: 'body_base', label: 'Муладхара: тело', path: 'chakras.rows.6.physics' },
-    ],
-  },
-  {
-    id: 'energy_leak',
-    title: 'Где вы теряете энергию',
-    lead: 'Каналы, через которые уходит ресурс.',
-    access: 'paid',
-    slots: [
-      { id: 'energy_total', label: 'Общий энергопоток', path: 'chakras.total.energy' },
-      { id: 'energy_weak',  label: 'Слабое звено',      path: 'chakras.rows.2.energy' },
-    ],
-  },
-  {
-    id: 'emotions',
-    title: 'Эмоции и внутренние конфликты',
-    lead: 'Что происходит внутри, когда снаружи всё хорошо.',
-    access: 'paid',
-    slots: [
-      { id: 'emotion_total', label: 'Эмоциональный фон', path: 'chakras.total.emotions' },
-      { id: 'emotion_mind',  label: 'Ум и тревога',      path: 'chakras.rows.1.emotions' },
-    ],
-  },
-  {
-    id: 'personal_brand',
-    title: 'Как вас видят: личный бренд',
-    lead: 'Впечатление, которое вы производите.',
-    access: 'paid',
-    slots: [
-      { id: 'brand_face',   label: 'Внешнее проявление', path: 'core.W' },
-      { id: 'brand_talent', label: 'Сильная сторона',    path: 'core.N' },
-    ],
-  },
-  {
-    id: 'rest',
-    title: 'Ваш формат отдыха',
-    lead: 'Как вы восстанавливаетесь по-настоящему.',
-    access: 'paid',
-    slots: [
-      { id: 'rest_heart', label: 'Что наполняет', path: 'chakras.rows.3.physics' },
-      { id: 'rest_joy',   label: 'Источник радости', path: 'chakras.rows.5.physics' },
+      { id: 'day_energy',  label: 'Аркан дня',                           path: 'today.dayArcana', daily: true },
+      { id: 'year_energy', label: 'Энергия периода жизни',               path: 'today.arcana' },
+      { id: 'period_next', label: 'Что принесёт следующий период',       path: 'today.nextArcana' },
     ],
   },
 ];
+
 
 // ═══════════════════════════════════════════════════════════
 // СЛУЖЕБНОЕ
@@ -591,56 +569,20 @@ export const CHILD_SECTIONS = [
   },
 ];
 
-/**
- * Прогноз. Три уровня на одном экране: день, месяц, период жизни.
- * Считается по той же дате, что и общая матрица, — отдельной оплаты нет.
- * Календарь месяца строится в компоненте вызовом dayArcana() на каждый
- * день, отдельного слота под него не нужно.
- */
-export const FORECAST_SECTIONS = [
-  {
-    id: 'forecast_day',
-    title: 'Аркан дня',
-    lead: 'Ваша энергия на сегодня и на завтра.',
-    access: 'free',
-    daily: true,
-    slots: [
-      { id: 'day_energy', label: 'Сегодня', path: 'today.dayArcana' },
-    ],
-  },
-  {
-    id: 'forecast_period',
-    title: 'Период жизни',
-    lead: 'Какая энергия ведёт вас сейчас и когда сменится.',
-    access: 'free',
-    slots: [
-      { id: 'year_energy', label: 'Энергия периода', path: 'today.arcana' },
-    ],
-  },
-  {
-    id: 'forecast_ahead',
-    title: 'Что дальше',
-    lead: 'Энергия следующего отрезка и как к нему подойти.',
-    access: 'paid',
-    slots: [
-      { id: 'forecast_next',  label: 'Следующий период', path: 'today.nextArcana' },
-      { id: 'forecast_bridge', label: 'Переход',         path: 'core.S' },
-    ],
-  },
-];
+/** Какие сферы показывает каждая страница. Единая точка правды для UI. */
+const byId = (...ids) => ids.map((id) => SECTIONS.find((s) => s.id === id)).filter(Boolean);
 
-/** Какие разделы показывает каждая страница. Единая точка правды для UI. */
 export const PAGE_VIEWS = {
   matrica: { title: 'Матрица судьбы', pair: false, sections: SECTIONS },
   finansy: {
     title: 'Финансы', pair: false,
-    sections: [
-      ...SECTIONS.filter((s) => ['money_flow', 'money_leak', 'profession'].includes(s.id)),
-      ...FINANCE_EXTRA,
-    ],
+    sections: [...byId('money', 'work'), ...FINANCE_EXTRA],
+  },
+  prognoz: {
+    title: 'Прогноз', pair: false,
+    sections: byId('forecast', 'year'),
   },
   detskaya:     { title: 'Детская матрица',      pair: false, sections: CHILD_SECTIONS },
-  prognoz:      { title: 'Прогноз',              pair: false, sections: FORECAST_SECTIONS },
   sovmestimost: { title: 'Совместимость',        pair: true,  sections: PAIR_SECTIONS.love },
   biznes:       { title: 'Бизнес-совместимость', pair: true,  sections: PAIR_SECTIONS.business },
 };
@@ -660,14 +602,16 @@ export function buildSectionData(matrix, { unlocked = false } = {}) {
     title: section.title,
     lead: section.lead,
     access: section.access,
-    locked: section.access === 'paid' && !unlocked,
+    locked: section.access === 'paid' && !unlocked && !section.slots.some((x) => x.free),
     slots: section.slots.map((slot) => {
       const arcana = resolvePath(matrix, slot.path);
-      // Ежедневные разделы кэшируются по дате, обычные — навсегда.
-      const key = section.daily
+      // Ежедневные тексты кэшируются по дате, остальные — навсегда.
+      const key = (section.daily || slot.daily)
         ? dailyTextKey(arcana, matrix.today.arcana, matrix.today.date)
         : textKey(slot.id, arcana);
-      return { id: slot.id, label: slot.label, arcana, key };
+      // Отдельный вопрос может быть открыт, даже если сфера платная.
+      const locked = section.access === 'paid' && !unlocked && !slot.free;
+      return { id: slot.id, label: slot.label, arcana, key, locked, free: !!slot.free };
     }),
   }));
 }

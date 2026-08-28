@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { calculateMatrix, calculatePair } from "../lib/matrixEngine.js";
-import { buildViewSections, pageView, openCount } from "../lib/pageSections.js";
+import { buildViewSections, pageView, questionsTotal, questionsOpen } from "../lib/pageSections.js";
 import { reportKey, useAccess } from "../lib/access.js";
 import { useAccount } from "../lib/account.js";
 import { rememberGuestCalculation } from "../lib/people.js";
@@ -70,7 +70,10 @@ export function useCalcPage(pageId) {
     urlDates,
     isoDates,
     humanDates: urlDates.map(urlDateToHuman),
-    sectionsTotal: view.sections.length,
-    sectionsOpen: openCount(view.sections, access.unlocked),
+    /* Считаем ВОПРОСЫ, а не сферы: человек читает вопросами, и «15 из 92»
+       говорит ему больше, чем «12 сфер». */
+    spheresTotal: view.sections.length,
+    questionsTotal: questionsTotal(view.sections),
+    questionsOpen: questionsOpen(view.sections, access.unlocked),
   };
 }

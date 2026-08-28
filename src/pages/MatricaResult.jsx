@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
@@ -29,31 +29,22 @@ import { useCalcPage } from "../components/useCalcPage.js";
 export default function MatricaResult() {
   const page = useCalcPage("matrica");
 
-  /* ?section=money_flow — так «Подробнее» с главной попадает сразу в раздел. */
+  /* ?section=money — так «Подробнее» с главной попадает сразу в нужную сферу. */
   const [searchParams] = useSearchParams();
   const requestedSection = searchParams.get("section");
-  const [openSection, setOpenSection] = useState(requestedSection || "character");
 
-  /* Пришли по ссылке с разделом — доводим до него, а не бросаем вверху страницы.
-     Ждём кадр: к моменту эффекта разделы уже в разметке, но ещё не разложены. */
+  /* Пришли по ссылке со сферой — доводим до неё, а не бросаем вверху страницы.
+     Ждём кадр: к моменту эффекта сферы уже в разметке, но ещё не разложены. */
   useEffect(() => {
     if (!requestedSection) return undefined;
     const id = requestAnimationFrame(() => {
       const node = document.getElementById(`section-${requestedSection}`);
-      if (node) node.scrollIntoView({ behavior: "auto", block: "center" });
+      if (node) node.scrollIntoView({ behavior: "auto", block: "start" });
     });
     return () => cancelAnimationFrame(id);
   }, [requestedSection]);
 
   const { matrix } = page;
-
-  /* Аркан дня показан крупно вверху страницы — второй раз тот же текст
-     печатать незачем, оставляем ссылку на верхний блок. */
-  const sections = useMemo(() => page.sections.map((section) =>
-    section.id === "day_arcana"
-      ? { ...section, note: `Ваш аркан на сегодня — ${matrix.today.dayArcana} (${ARCANA_NAMES[matrix.today.dayArcana]}). Он показан целиком в самом верху страницы, вместе с арканом на завтра.` }
-      : section
-  ), [page.sections, matrix]);
 
   if (!page.valid) {
     return (
@@ -65,11 +56,10 @@ export default function MatricaResult() {
     );
   }
 
-  /* Переход из панели точки октаграммы в раздел разбора. */
+  /* Переход из панели точки октаграммы к нужной сфере разбора. */
   const openSectionById = (id) => {
-    setOpenSection(id);
     const node = document.getElementById(`section-${id}`);
-    if (node) node.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const { today } = matrix;
@@ -84,8 +74,8 @@ export default function MatricaResult() {
           lead="Разбор посчитан по дате рождения и не меняется никогда. Этот же разбор открывает страницы «Финансы» и «Прогноз» по той же дате."
           reportKey={page.reportKey}
           isoDates={page.isoDates}
-          sectionsTotal={page.sectionsTotal}
-          sectionsOpen={page.sectionsOpen}
+          questionsTotal={page.questionsTotal}
+          questionsOpen={page.questionsOpen}
           backTo="/matrica"
         />
 
@@ -105,7 +95,7 @@ export default function MatricaResult() {
               <span style={S.demoDate}>{page.humanDates[0]}</span>
             </div>
             <Octagram matrix={matrix} onOpenSection={openSectionById}
-              sectionsUnlocked={page.access.unlocked} />
+              />
           </div>
 
           <div className="card" style={S.demoCard}>
@@ -149,11 +139,10 @@ export default function MatricaResult() {
       </section>
 
       <SectionsBlock
-        sections={sections}
-        total={page.sectionsTotal}
-        open={page.sectionsOpen}
-        openId={openSection}
-        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+        sections={page.sections}
+        spheres={page.spheresTotal}
+        total={page.questionsTotal}
+        open={page.questionsOpen}
       />
     </>
   );

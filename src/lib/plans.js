@@ -31,5 +31,8 @@ export const DEFAULT_PLAN = 'free';
  * Сколько разборов разрешает тариф — то же поле matrices.
  * Что считается одним разбором и как он открывает несколько страниц,
  * описано в src/lib/access.js: платят за дату, а не за калькулятор.
+ *
+ * Сколько вопросов открыто внутри разбора — считает pageSections.js:
+ * это зависит не от тарифа, а от разметки вопросов в карте позиций.
  */
 export const planLabel = (plan) => PLAN_LIMITS[plan]?.label ?? PLAN_LIMITS[DEFAULT_PLAN].label;

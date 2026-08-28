@@ -4,24 +4,30 @@ import { S } from "../theme/styles.js";
 import SectionList from "./SectionList.jsx";
 
 /**
- * БЛОК РАЗДЕЛОВ РАЗБОРА
- * =====================
- * Заголовок со счётчиком и сам список. Набор разделов приходит готовым
+ * БЛОК РАЗБОРА
+ * ============
+ * Заголовок со счётчиком и список сфер. Набор сфер приходит готовым
  * из PAGE_VIEWS — страницы не собирают списки вручную.
+ *
+ * Счётчик считает ВОПРОСЫ, а не сферы: «15 из 92» человеку понятнее,
+ * чем «12 сфер», и честно показывает, сколько ещё не открыто.
  */
 export default function SectionsBlock({
-  sections, total, open, openId, onToggle, title, lead, background = C.bgAlt,
+  sections, spheres, total, open, title, lead, background = C.bgAlt,
 }) {
   return (
     <section style={{ ...S.section, background }}>
       <div style={S.eyebrow}>Разбор</div>
       <h2 style={S.h2}>
-        {title || <>{total} {plural(total, "раздел", "раздела", "разделов")}, {open} <em style={S.h1em}>открыто</em></>}
+        {title || <>
+          {spheres} {plural(spheres, "сфера", "сферы", "сфер")}, {open} из {total}{" "}
+          <em style={S.h1em}>{plural(open, "вопрос открыт", "вопроса открыто", "вопросов открыто")}</em>
+        </>}
       </h2>
       <p style={{ ...S.infoText, maxWidth: 660, margin: "-14px 0 26px" }}>
-        {lead || "Числа посчитаны по всем разделам сразу — они ваши. Под замком только трактовки: они открываются на любом платном тарифе."}
+        {lead || "Нажмите на вопрос — откроется ответ по вашим числам. Числа посчитаны по всем вопросам сразу, под замком только трактовки."}
       </p>
-      <SectionList sections={sections} openId={openId} onToggle={onToggle} />
+      <SectionList sections={sections} />
     </section>
   );
 }

@@ -1,45 +1,63 @@
 /**
- * РАЗДЕЛЫ СТРАНИЦЫ
- * ================
+ * СФЕРЫ И ВОПРОСЫ СТРАНИЦЫ
+ * ========================
  * То же, что buildSectionData() из contentPositions.js, но для любого
- * набора разделов, а не только для общей матрицы.
+ * набора сфер, а не только для полной матрицы.
  *
  * Отдельный файл, потому что contentPositions.js — карта позиций, её
  * переносят как есть и не правят. Правила здесь ровно те же:
- * число берётся по пути, ключ текста — из слота и аркана, ежедневные
- * разделы кэшируются по дате.
+ * число берётся по пути, ключ текста — из вопроса и аркана, ежедневные
+ * тексты кэшируются по дате, а доступ считается ДЛЯ КАЖДОГО ВОПРОСА
+ * отдельно: в платной сфере отдельные вопросы бывают открыты (free).
  */
 
 import { resolvePath, textKey, dailyTextKey, PAGE_VIEWS } from './contentPositions.js';
 
 /**
  * @param {object} matrix — результат calculateMatrix() или calculatePair()
- * @param {Array}  sections — набор разделов, обычно PAGE_VIEWS[id].sections
- * @param {boolean} unlocked — открыт ли платный разбор по этим датам
+ * @param {Array}  sections — набор сфер, обычно PAGE_VIEWS[id].sections
+ * @param {boolean} unlocked — оплачен ли разбор по этим датам
  */
 export function buildViewSections(matrix, sections, { unlocked = false } = {}) {
-  return sections.map((section) => ({
-    id: section.id,
-    title: section.title,
-    lead: section.lead,
-    access: section.access,
-    locked: section.access === 'paid' && !unlocked,
-    slots: section.slots.map((slot) => {
+  return sections.map((section) => {
+    const slots = section.slots.map((slot) => {
       const arcana = resolvePath(matrix, slot.path);
-      // Ежедневные разделы кэшируются по дате, обычные — навсегда.
+      // Ежедневные тексты кэшируются по дате, остальные — навсегда.
       // У матрицы пары своей даты рождения нет и блока today тоже,
-      // поэтому ежедневных разделов в парных наборах не бывает.
-      const key = section.daily && matrix.today
+      // поэтому ежедневных вопросов в парных наборах не бывает.
+      const key = (section.daily || slot.daily) && matrix.today
         ? dailyTextKey(arcana, matrix.today.arcana, matrix.today.date)
         : textKey(slot.id, arcana);
-      return { id: slot.id, label: slot.label, arcana, key };
-    }),
-  }));
+      // Отдельный вопрос может быть открыт, даже если сфера платная.
+      const locked = section.access === 'paid' && !unlocked && !slot.free;
+      return { id: slot.id, label: slot.label, arcana, key, locked, free: Boolean(slot.free) };
+    });
+
+    return {
+      id: section.id,
+      title: section.title,
+      lead: section.lead,
+      access: section.access,
+      // Сфера закрыта целиком только если в ней нет ни одного открытого вопроса.
+      locked: slots.every((slot) => slot.locked),
+      slots,
+    };
+  });
 }
 
 /** Описание страницы по её id из адреса. Неизвестный id → undefined. */
 export const pageView = (id) => PAGE_VIEWS[id];
 
-/** Сколько разделов открыто на странице при текущем доступе. */
-export const openCount = (sections, unlocked) =>
-  unlocked ? sections.length : sections.filter((s) => s.access === 'free').length;
+/** Сколько ВОПРОСОВ всего на странице. */
+export const questionsTotal = (sections) =>
+  sections.reduce((total, section) => total + section.slots.length, 0);
+
+/**
+ * Сколько вопросов открыто при текущем доступе.
+ * Считаем по вопросам, а не по сферам: в платной сфере первый вопрос
+ * открыт всегда — чтобы человек попробовал везде.
+ */
+export const questionsOpen = (sections, unlocked) =>
+  sections.reduce((total, section) => total + section.slots.filter(
+    (slot) => section.access !== 'paid' || unlocked || slot.free
+  ).length, 0);

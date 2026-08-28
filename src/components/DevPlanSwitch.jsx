@@ -18,7 +18,7 @@ import { useAccess, setPlan, unlockReport, lockReport } from "../lib/access.js";
  * Оформлен пунктиром и подписан явно, чтобы его не приняли за элемент сайта.
  * УБРАТЬ вместе с появлением настоящей авторизации и оплаты.
  */
-export default function DevPlanSwitch({ reportKey, dates, sectionsTotal, sectionsOpen }) {
+export default function DevPlanSwitch({ reportKey, dates, questionsTotal, questionsOpen }) {
   const { plan, reports, limit, unlocked, canUnlockMore } = useAccess(reportKey);
   const limitLabel = Number.isFinite(limit) ? limit : "∞";
 
@@ -65,7 +65,7 @@ export default function DevPlanSwitch({ reportKey, dates, sectionsTotal, section
         Разборов открыто: {reports.length} из {limitLabel}. Этот разбор считается
         по {dates.length > 1 ? "датам" : "дате"} {dates.join(" и ")} — на этом же наборе дат
         работают все страницы, которые из него считаются.
-        Разделов видно: {sectionsOpen} из {sectionsTotal}.
+        Вопросов открыто: {questionsOpen} из {questionsTotal}.
       </p>
     </div>
   );

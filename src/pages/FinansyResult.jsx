@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
@@ -20,7 +20,6 @@ import { useCalcPage } from "../components/useCalcPage.js";
  */
 export default function FinansyResult() {
   const page = useCalcPage("finansy");
-  const [openSection, setOpenSection] = useState(page.view.sections[0].id);
 
   if (!page.valid) {
     return (
@@ -49,8 +48,8 @@ export default function FinansyResult() {
           lead="Денежный канал, способ его открыть и место, где он перекрыт. Сумм и сроков здесь нет: матрица показывает механизм, а не прогноз доходов."
           reportKey={page.reportKey}
           isoDates={page.isoDates}
-          sectionsTotal={page.sectionsTotal}
-          sectionsOpen={page.sectionsOpen}
+          questionsTotal={page.questionsTotal}
+          questionsOpen={page.questionsOpen}
           backTo="/finansy"
         />
 
@@ -80,16 +79,15 @@ export default function FinansyResult() {
             <span style={S.infoLabel}>Октаграмма · зона денег</span>
             <span style={S.demoDate}>{page.humanDates[0]}</span>
           </div>
-          <Octagram matrix={matrix} emphasis="SE" sectionsUnlocked={page.access.unlocked} />
+          <Octagram matrix={matrix} emphasis="SE" />
         </div>
       </section>
 
       <SectionsBlock
         sections={page.sections}
-        total={page.sectionsTotal}
-        open={page.sectionsOpen}
-        openId={openSection}
-        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+        spheres={page.spheresTotal}
+        total={page.questionsTotal}
+        open={page.questionsOpen}
         lead="Денежные числа посчитаны целиком — они ваши. Под замком только трактовки. Разбор открывается один раз на дату и действует на всех страницах, которые считаются по ней."
       />
     </>

@@ -13,23 +13,28 @@ import { useCalcPage } from "../components/useCalcPage.js";
 /**
  * ПРОГНОЗ — /prognoz/13-07-1998
  * ============================
- * Три уровня на одном экране, переключаются без перезагрузки:
+ * Четыре масштаба на одном экране, переключаются без перезагрузки:
  *   День          — аркан на сегодня и на завтра
  *   Месяц         — календарь, у каждого дня свой аркан
+ *   Личный год    — аркан текущего календарного года
  *   Период жизни  — возрастная шкала и сколько до смены
  *
  * Считается по той же дате, что и общая матрица, поэтому отдельной оплаты
  * не требует: платят за дату, а не за калькулятор.
  *
- * ВНИМАНИЕ, ТРИ РАЗНЫХ ЧИСЛА:
+ * ВНИМАНИЕ, ЧЕТЫРЕ РАЗНЫХ ЧИСЛА:
  *   today.dayArcana      — сегодня, меняется каждые сутки
  *   today.tomorrowArcana — завтра
+ *   today.yearArcana     — личный год, меняется с календарным годом
  *   today.arcana         — период жизни, держится 2,5 года
  */
 
+/* Четыре временных масштаба, от короткого к длинному:
+   сутки → месяц → календарный год → отрезок жизни в 2,5 года. */
 const LEVELS = [
   { id: "day",    label: "День" },
   { id: "month",  label: "Месяц" },
+  { id: "year",   label: "Личный год" },
   { id: "period", label: "Период жизни" },
 ];
 
@@ -39,7 +44,6 @@ const ru = (n) => String(n).replace(".", ",");
 export default function PrognozResult() {
   const page = useCalcPage("prognoz");
   const [level, setLevel] = useState("day");
-  const [openSection, setOpenSection] = useState(page.view.sections[0].id);
 
   if (!page.valid) {
     return (
@@ -60,11 +64,11 @@ export default function PrognozResult() {
         <ResultHeader
           eyebrow="Прогноз"
           humanDates={page.humanDates}
-          lead="Три уровня: сутки, месяц и период жизни. Аркан дня считается лично — в формулу входит ваш текущий период, поэтому у двух людей в одну дату числа разные."
+          lead="Четыре масштаба: сутки, месяц, календарный год и отрезок жизни в 2,5 года. Все считаются лично — в аркан дня входит ваш текущий период, а в аркан года день и месяц вашего рождения."
           reportKey={page.reportKey}
           isoDates={page.isoDates}
-          sectionsTotal={page.sectionsTotal}
-          sectionsOpen={page.sectionsOpen}
+          questionsTotal={page.questionsTotal}
+          questionsOpen={page.questionsOpen}
           backTo="/prognoz"
         />
 
@@ -95,6 +99,8 @@ export default function PrognozResult() {
           </div>
         )}
 
+        {level === "year" && <PersonalYear today={today} />}
+
         {level === "period" && (
           <div className="card" style={{ ...S.demoCard, padding: "30px 32px 26px" }}>
             <AgeTimeline timeline={matrix.timeline} age={today.age} />
@@ -115,13 +121,56 @@ export default function PrognozResult() {
 
       <SectionsBlock
         sections={page.sections}
-        total={page.sectionsTotal}
-        open={page.sectionsOpen}
-        openId={openSection}
-        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+        spheres={page.spheresTotal}
+        total={page.questionsTotal}
+        open={page.questionsOpen}
         lead="Аркан дня и период открыты бесплатно. Разбор следующего отрезка — на платном тарифе."
       />
     </>
+  );
+}
+
+/**
+ * ЛИЧНЫЙ ГОД
+ * ==========
+ * Аркан года считает движок: день и месяц рождения плюс текущий
+ * календарный год. Значит и меняется он вместе с календарным годом,
+ * первого января, — это видно прямо из формулы.
+ *
+ * Не путать с двумя соседними числами: аркан дня меняется каждые сутки,
+ * аркан периода жизни держится 2,5 года. Здесь третий масштаб.
+ */
+function PersonalYear({ today }) {
+  const nextYear = today.year + 1;
+
+  return (
+    <div className="card" style={S.dayCard}>
+      <div style={S.dayBigWrap}>
+        <span style={S.dayBig}>{today.yearArcana}</span>
+        <div style={S.dayArcName}>{ARCANA_NAMES[today.yearArcana]}</div>
+        <div style={{ ...S.dayPeriod, marginTop: 6 }}>{today.year} год</div>
+      </div>
+
+      <div>
+        <div style={S.infoLabel}>Энергия ближайших двенадцати месяцев</div>
+        <p style={S.slotText}>
+          Аркан {today.yearArcana} ({ARCANA_NAMES[today.yearArcana]}) ведёт вас
+          весь {today.year} год. Он считается от дня и месяца вашего рождения
+          и текущего года, поэтому у каждого человека свой: одна и та же дата
+          в календаре даёт разным людям разные арканы года.
+        </p>
+
+        <div style={S.dayTomorrow}>
+          Разбор года — в сфере «Личный год» ниже на странице
+        </div>
+
+        <p style={S.dayPeriod}>
+          Аркан года сменится вместе с календарным годом: с 1 января {nextYear}
+          {" "}пойдёт следующий. Это третий масштаб рядом с арканом дня, который
+          меняется каждые сутки, и арканом периода жизни, который держится 2,5 года.
+        </p>
+      </div>
+    </div>
   );
 }
 
