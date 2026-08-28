@@ -269,12 +269,12 @@ export function resolvePath(matrix, path) {
 /**
  * ИЛЛЮСТРАЦИИ АРКАНОВ
  * Файлы лежат в public/arcana/ и называются по номеру с ведущим нулём:
- * 01.png … 22.png. Размер 800×1200, формат 2:3.
+ * 01.jpeg … 22.jpeg. Формат JPEG, пропорции близки к 3:4.
  *
  * Если файла нет — интерфейс показывает заглушку, ничего не ломается.
  */
 export const arcanaImage = (arcana) =>
-  `/arcana/${String(arcana).padStart(2, '0')}.png`;
+  `/arcana/${String(arcana).padStart(2, '0')}.jpeg`;
 
 /** Ключ текста в базе: 'money_channel_main_20' */
 export const textKey = (slotId, arcana) => `${slotId}_${arcana}`;

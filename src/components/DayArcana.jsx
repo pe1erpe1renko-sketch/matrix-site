@@ -5,6 +5,7 @@ import { ARCANA_NAMES } from "../lib/prompts.js";
 import { dailyTextKey } from "../lib/contentPositions.js";
 import { useSlotText } from "./useSlotText.js";
 import { useIsPhone, useIsNarrow } from "../theme/responsive.js";
+import ArcanaImage from "./ArcanaImage.jsx";
 
 /**
  * АРКАН ДНЯ
@@ -58,10 +59,14 @@ export default function DayArcana({ today }) {
       ...(isNarrow ? { gridTemplateColumns: "minmax(0, 1fr)", gap: 18 } : null),
       ...(isPhone ? { padding: "22px 18px" } : null),
     }}>
+      {/* Иллюстрация грузится сразу, без lazy: она видна с первого экрана,
+          и ждать её появления после прокрутки нечего. */}
       <div style={S.dayBigWrap}>
-        <span style={{ ...S.dayBig, ...(isPhone ? { fontSize: 74 } : null) }}>{today.dayArcana}</span>
-        <div style={S.dayArcName}>{ARCANA_NAMES[today.dayArcana]}</div>
-        <div style={{ ...S.dayPeriod, marginTop: 6 }}>
+        <ArcanaImage arcana={today.dayArcana} eager badge
+          numberSize={isPhone ? 74 : 96}
+          style={{ maxWidth: isNarrow ? 220 : "none", margin: "0 auto" }} />
+        <div style={{ ...S.dayArcName, marginTop: 12 }}>{ARCANA_NAMES[today.dayArcana]}</div>
+        <div style={{ ...S.dayPeriod, marginTop: 4 }}>
           {weekday}, {humanDate(today.date)}
         </div>
       </div>

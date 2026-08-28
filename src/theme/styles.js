@@ -462,6 +462,14 @@ export const S = {
     background: SURFACE.cardHi, border: `1px solid ${C.borderHi}`,
   },
   dayBigWrap: { textAlign: "center" },
+  /* Номер аркана поверх иллюстрации: в самих файлах цифр нет намеренно. */
+  arcBadge: {
+    position: "absolute", left: 10, bottom: 10,
+    minWidth: 38, padding: "3px 10px", borderRadius: R.pill,
+    background: C.gold, color: C.ink, textAlign: "center",
+    fontFamily: FONT.serif, fontSize: 21, lineHeight: 1.3,
+    boxShadow: "0 8px 22px -10px rgba(0,0,0,0.9)",
+  },
   dayBig: {
     fontFamily: FONT.serif, fontSize: 96, lineHeight: 1,
     color: C.gold, display: "block",
@@ -563,6 +571,8 @@ export const S = {
     borderLeft: `2px solid ${C.gold}`, margin: "8px 0 12px 14px",
   },
   qAnswerTop: { color: C.lilac, fontSize: 12.5, marginBottom: 8 },
+  /* Ответ на вопрос: карта слева, текст справа. */
+  qAnswerBody: { display: "flex", gap: 14, alignItems: "flex-start" },
   sectionItem: {
     border: "1px solid", borderRadius: R.lg, overflow: "hidden",
     transition: "border-color .18s ease, background .18s ease",

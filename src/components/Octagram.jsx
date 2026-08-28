@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useRef } from "react";
-import { C, FONT } from "../theme/tokens.js";
+import { C, R, FONT } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { POINT_SLOTS, findSectionForPoint, resolvePath, textKey } from "../lib/contentPositions.js";
 import { POINT_CODES } from "../lib/matrixEngine.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import { useSlotText } from "./useSlotText.js";
+import ArcanaImage from "./ArcanaImage.jsx";
 import { useIsPhone, useIsTouch, hScrollRow, TAP } from "../theme/responsive.js";
 
 /**
@@ -405,7 +406,7 @@ function PointPanel({ point, onOpenSection }) {
   return (
     <div style={S.octaPanel}>
       <div style={S.octaPanelTop}>
-        <span style={S.octaVal}>{point.arcana}</span>
+        <ArcanaImage arcana={point.arcana} radius={R.md} numberSize={20} style={{ width: 58 }} />
         <div>
           <div style={S.octaTitle}>{point.label}</div>
           <div style={S.octaArc}>Аркан {point.arcana} — {ARCANA_NAMES[point.arcana]}</div>

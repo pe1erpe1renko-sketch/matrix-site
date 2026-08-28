@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { C, SURFACE } from "../theme/tokens.js";
+import { C, R, SURFACE } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import { useIsPhone, TAP } from "../theme/responsive.js";
 import { useSlotText } from "./useSlotText.js";
+import ArcanaImage from "./ArcanaImage.jsx";
 import { stepForSphere } from "../lib/nextSteps.js";
 import { backToReport } from "../lib/returnTo.js";
 import NextStepCard from "./NextStepCard.jsx";
@@ -172,12 +173,20 @@ function Answer({ slot, section, isPhone }) {
 
   return (
     <div style={{ ...S.qAnswer, padding: isPhone ? "12px 14px 16px" : "14px 18px 18px" }}>
-      <div style={S.qAnswerTop}>
-        Аркан {slot.arcana} — {ARCANA_NAMES[slot.arcana]}
+      <div style={S.qAnswerBody}>
+        {/* Картинка внутри раскрытого ответа: в свёрнутых сферах её нет
+            намеренно — двенадцать карт подряд превратились бы в кашу. */}
+        <ArcanaImage arcana={slot.arcana} radius={R.md} numberSize={22}
+          style={{ width: isPhone ? 64 : 84 }} />
+        <div style={{ minWidth: 0 }}>
+          <div style={S.qAnswerTop}>
+            Аркан {slot.arcana} — {ARCANA_NAMES[slot.arcana]}
+          </div>
+          <p style={{ ...S.slotText, opacity: loading ? 0.45 : 1 }}>
+            {loading ? "Загружаем ответ…" : text}
+          </p>
+        </div>
       </div>
-      <p style={{ ...S.slotText, opacity: loading ? 0.45 : 1 }}>
-        {loading ? "Загружаем ответ…" : text}
-      </p>
     </div>
   );
 }
