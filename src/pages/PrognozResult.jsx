@@ -3,6 +3,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import PageStub from "../components/PageStub.jsx";
+import CalcTheatre from "../components/CalcTheatre.jsx";
 import DayArcana from "../components/DayArcana.jsx";
 import MonthCalendar from "../components/MonthCalendar.jsx";
 import AgeTimeline from "../components/AgeTimeline.jsx";
@@ -56,6 +57,11 @@ export default function PrognozResult() {
   }
 
   const { matrix } = page;
+
+  /* Сцена расчёта — только при первом открытии этой матрицы. */
+  if (page.theatre.playing) {
+    return <CalcTheatre matrix={matrix} onDone={page.theatre.finish} />;
+  }
   const { today } = matrix;
 
   return (

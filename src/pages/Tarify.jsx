@@ -8,6 +8,7 @@ import { useConversations, messagesToday } from "../lib/conversations.js";
 import { toISODate } from "../lib/matrixEngine.js";
 import { Meter } from "../components/Controls.jsx";
 import { useIsPhone, TAP } from "../theme/responsive.js";
+import { useState } from "react";
 
 /**
  * ТАРИФЫ И ОПЛАТА — /tarify
@@ -48,6 +49,9 @@ export default function Tarify() {
   const { list } = useConversations();
   const limits = PLAN_LIMITS[plan];
   const isPhone = useIsPhone();
+  /* Какой тариф человек сейчас рассматривает. Это не то же самое, что
+     текущий тариф: выбор карточки — намерение, оплата — действие. */
+  const [selected, setSelected] = useState(plan);
 
   const askedToday = messagesToday(list, toISODate(new Date()));
   const nextPlan = PLAN_ORDER[Math.min(PLAN_ORDER.indexOf(plan) + 1, PLAN_ORDER.length - 1)];
@@ -119,28 +123,48 @@ export default function Tarify() {
           {PLAN_ORDER.map((id) => {
             const item = PLAN_LIMITS[id];
             const current = id === plan;
+            const chosen = id === selected;
+            /* На телефоне подъём и приглушение убраны: на маленьком экране
+               это мешает читать, а наведения там всё равно нет. */
+            const dimmed = !isPhone && !chosen;
+
             return (
-              <div key={id} style={{
-                ...S.block,
-                padding: "16px 18px",
-                borderColor: current ? C.lilac : C.border,
-                background: current ? "rgba(31,24,65,0.8)" : "rgba(10,8,23,0.4)",
-              }}>
-                <div style={{ color: C.white, fontSize: 15, marginBottom: 4 }}>{item.label}</div>
+              <div key={id} className={isPhone ? "planCard" : "planCard planCardLift"}
+                role="button" tabIndex={0}
+                aria-pressed={chosen}
+                onClick={() => setSelected(id)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(id); } }}
+                style={{
+                  ...S.block,
+                  padding: "16px 18px",
+                  borderColor: chosen ? C.lilac : C.border,
+                  background: chosen ? "rgba(31,24,65,0.9)" : "rgba(10,8,23,0.4)",
+                  boxShadow: chosen ? `0 20px 54px -26px ${C.lilac}` : "none",
+                  transform: chosen && !isPhone ? "scale(1.025)" : "none",
+                  opacity: dimmed ? 0.62 : 1,
+                }}>
+                <div style={{ color: C.white, fontSize: 15, marginBottom: 4 }}>
+                  {item.label}
+                  {current && <span style={{ ...S.dimSm, color: C.gold, marginLeft: 8 }}>текущий</span>}
+                </div>
                 <div style={{ color: C.gold, fontSize: 14, marginBottom: 10 }}>{PRICES[id]}</div>
                 <div style={S.dimSm}>
                   Матриц: {Number.isFinite(item.matrices) ? item.matrices : "без счёта"}<br />
                   Наставник: {item.messages ? (Number.isFinite(item.messages) ? `${item.messages} в день` : "без ограничений") : "—"}<br />
                   Telegram: {item.telegram || "—"}
                 </div>
-                <button className={current ? "btnGhost" : "btnOutline"} disabled={current}
+                <button className={`planBtn ${current ? "btnGhost" : chosen ? "btnGold" : "btnOutline"}`}
+                  disabled={current}
                   style={{
                     ...S.btnSm, width: "100%", marginTop: 12,
-                    border: current ? "none" : `1px solid ${C.border}`,
-                    color: current ? C.muted : C.white,
+                    border: current || chosen ? "none" : `1px solid ${C.border}`,
+                    background: chosen && !current ? C.gold : "transparent",
+                    color: current ? C.muted : chosen ? C.ink : C.white,
+                    fontWeight: chosen ? 600 : 500,
+                    boxShadow: chosen && !current ? `0 12px 30px -14px ${C.gold}` : "none",
                   }}
-                  onClick={() => setPlan(id)}>
-                  {current ? "Текущий" : "Выбрать"}
+                  onClick={(e) => { e.stopPropagation(); setPlan(id); }}>
+                  {current ? "Текущий" : chosen ? "Перейти на этот тариф" : "Выбрать"}
                 </button>
               </div>
             );

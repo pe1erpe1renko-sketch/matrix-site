@@ -1,10 +1,11 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { calculateMatrix, calculatePair } from "../lib/matrixEngine.js";
 import { buildViewSections, pageView, questionsTotal, questionsOpen } from "../lib/pageSections.js";
 import { reportKey, useAccess } from "../lib/access.js";
 import { useAccount } from "../lib/account.js";
 import { rememberGuestCalculation } from "../lib/people.js";
+import { wasSeen, markSeen } from "../lib/seenReports.js";
 import { urlDateToISO, urlDateToHuman } from "../lib/urlDate.js";
 
 /**
@@ -60,9 +61,25 @@ export function useCalcPage(pageId) {
     [matrix, view.sections, access.unlocked]
   );
 
+  /**
+   * Сцена расчёта показывается один раз на набор дат. Второй заход
+   * на ту же матрицу должен открываться сразу: красивое ожидание,
+   * которое повторяется, — это уже просто задержка.
+   */
+  const [playing, setPlaying] = useState(() => Boolean(key) && !wasSeen(key));
+  useEffect(() => {
+    setPlaying(Boolean(key) && !wasSeen(key));
+  }, [key]);
+
+  const finishTheatre = useCallback(() => {
+    markSeen(key);
+    setPlaying(false);
+  }, [key]);
+
   return {
     view,
     matrix,
+    theatre: { playing: playing && Boolean(matrix), finish: finishTheatre },
     sections,
     valid: valid && Boolean(matrix),
     reportKey: key,

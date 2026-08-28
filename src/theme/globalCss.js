@@ -75,6 +75,37 @@ a { color: inherit; text-decoration: none; }
 .qRow:hover { border-color: ${C.lilac}; background: rgba(31,24,65,0.72); }
 .sphere:hover { border-color: ${C.borderHi}; }
 
+/* Значок звука зовёт нажать себя первые несколько секунд после загрузки. */
+.soundHint { animation: soundPulse 1.9s ease-in-out infinite; }
+@keyframes soundPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(228,190,114,0); border-color: ${C.border}; }
+  50% { box-shadow: 0 0 0 5px rgba(228,190,114,0.12); border-color: ${C.gold}; }
+}
+@media (prefers-reduced-motion: reduce) { .soundHint { animation: none; } }
+
+/* Карточки тарифов. Подъём и свечение — только там, где есть наведение;
+   на телефоне остаётся одна лишь подсветка выбранной. */
+.planCard {
+  transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s ease,
+              border-color .18s ease, opacity .18s ease, background .18s ease;
+}
+.planCardLift:hover {
+  transform: translateY(-4px);
+  border-color: ${C.borderHi};
+  box-shadow: 0 22px 48px -28px ${C.lilac};
+  opacity: 1;
+}
+.planBtn { transition: transform .1s ease, background .18s ease, box-shadow .18s ease; }
+.planBtn:not(:disabled):active { transform: scale(0.96); }
+@media (prefers-reduced-motion: reduce) {
+  .planCard, .planCardLift:hover, .planBtn { transition: none; transform: none; }
+}
+
+/* Бегущий индикатор у текущей строки сцены расчёта. */
+.theatreRun { animation: theatreRun 700ms linear forwards; }
+@keyframes theatreRun { from { width: 0; } to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .theatreRun { animation: none; width: 100%; } }
+
 /* ---- мобильный режим ---- */
 
 /*

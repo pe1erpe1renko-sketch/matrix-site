@@ -12,7 +12,6 @@ import { isoToUrlDate, urlDateToHuman } from "../lib/urlDate.js";
 import { Ic } from "../components/Icons.jsx";
 import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { Meter, Switch, CopyButton, MiniOcta, Field, Modal } from "../components/Controls.jsx";
-import SupportModal from "../components/SupportModal.jsx";
 import LoginModal from "../components/LoginModal.jsx";
 import PersonModal from "../components/PersonModal.jsx";
 
@@ -32,7 +31,6 @@ export default function Profil() {
   const people = usePeople();
   const { plan } = useAccess();
   const [tab, setTab] = useState("matrices");
-  const [support, setSupport] = useState(false);
   const [login, setLogin] = useState(false);
   const isPhone = useIsPhone();
 
@@ -50,17 +48,8 @@ export default function Profil() {
               : "Расчёты сохраняются в браузере. Войдите — и они переедут в кабинет."}
           </div>
         </div>
-        {!isPhone && (
-        <button className="iconBtn" style={S.iconBtn} onClick={() => setSupport(true)} aria-label="Поддержка">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M9.3 9.2a2.8 2.8 0 1 1 3.5 2.7c-.5.15-.8.6-.8 1.1v.6"
-              stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <circle cx="12" cy="16.6" r="1.05" fill="currentColor" />
-          </svg>
-          <span className="tip" style={S.tip}>Поддержка</span>
-        </button>
-        )}
+        {/* Кнопка поддержки теперь глобальная — она в правом верхнем углу
+            макета и есть на каждой странице, а не только в кабинете. */}
       </div>
 
       {account.signedIn ? (
@@ -88,7 +77,6 @@ export default function Profil() {
         <GuestView people={people} onLogin={() => setLogin(true)} />
       )}
 
-      {support && <SupportModal accountId={account.id} onClose={() => setSupport(false)} />}
       {login && <LoginModal onClose={() => setLogin(false)} />}
     </div>
   );

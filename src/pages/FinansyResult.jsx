@@ -3,6 +3,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import PageStub from "../components/PageStub.jsx";
+import CalcTheatre from "../components/CalcTheatre.jsx";
 import Octagram from "../components/Octagram.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
@@ -32,6 +33,11 @@ export default function FinansyResult() {
   }
 
   const { matrix } = page;
+
+  /* Сцена расчёта — только при первом открытии этой матрицы. */
+  if (page.theatre.playing) {
+    return <CalcTheatre matrix={matrix} onDone={page.theatre.finish} />;
+  }
   const money = [
     { value: matrix.core.SE,            title: "Денежный канал",  hint: "Через что к вам приходят ресурсы." },
     { value: matrix.diagonals.SE.mid,   title: "Как его раскрыть", hint: "Действие, которое открывает канал." },

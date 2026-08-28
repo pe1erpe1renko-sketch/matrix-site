@@ -10,6 +10,7 @@ import Cursor from "./Cursor.jsx";
 import Sky from "./Sky.jsx";
 import LoginModal from "./LoginModal.jsx";
 import SupportModal from "./SupportModal.jsx";
+import SoundButton from "./SoundButton.jsx";
 import { useAccount, signOut } from "../lib/account.js";
 import { useAccess } from "../lib/access.js";
 import { PLAN_LIMITS } from "../lib/plans.js";
@@ -163,6 +164,8 @@ export default function Layout() {
           <Drawer open={drawer} onClose={() => setDrawer(false)}>{menuBody}</Drawer>
         </>
       ) : (
+        <>
+        <TopActions onSupport={() => setSupport(true)} />
         <aside style={{ ...S.side, width: collapsed ? 76 : 262 }}>
           <div style={{ ...S.sideTop, justifyContent: collapsed ? "center" : "space-between" }}>
             {!collapsed && (
@@ -183,9 +186,19 @@ export default function Layout() {
           </div>
           {menuBody}
         </aside>
+        </>
       )}
 
-      <main style={S.main}>
+      {/* Меню вынуто из потока (position: fixed), поэтому содержимое
+          отодвигаем сами — и той же длительностью, что и анимация ширины,
+          иначе при сворачивании текст дёргается. */}
+      <main style={{
+        ...S.main,
+        ...(isPhone ? null : {
+          marginLeft: collapsed ? 76 : 262,
+          transition: "margin-left .24s cubic-bezier(.4,0,.2,1)",
+        }),
+      }}>
         <Outlet />
         {!fullHeight && <Footer />}
       </main>
@@ -212,15 +225,39 @@ function TopBar({ onMenu, onSupport }) {
         <span style={{ ...S.logoText, fontSize: 17 }}>MATRIX</span>
       </Link>
 
-      <button style={S.topBtn} onClick={onSupport} aria-label="Поддержка">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M9.3 9.2a2.8 2.8 0 1 1 3.5 2.7c-.5.15-.8.6-.8 1.1v.6"
-            stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="12" cy="16.6" r="1.05" fill="currentColor" />
-        </svg>
-      </button>
+      <div style={S.topActions}>
+        <SoundButton />
+        <SupportButton onClick={onSupport} />
+      </div>
     </header>
+  );
+}
+
+/**
+ * Звук и поддержка справа вверху — одинаково на всех экранах.
+ * На телефоне блок стоит в шапке, на десктопе висит поверх содержимого:
+ * своей шапки там нет, а место справа вверху ожидаемо для таких кнопок.
+ */
+function TopActions({ onSupport }) {
+  return (
+    <div style={S.topFloat}>
+      <SoundButton />
+      <SupportButton onClick={onSupport} />
+    </div>
+  );
+}
+
+function SupportButton({ onClick }) {
+  return (
+    <button className="iconBtn" style={S.iconBtn} onClick={onClick} aria-label="Поддержка">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M9.3 9.2a2.8 2.8 0 1 1 3.5 2.7c-.5.15-.8.6-.8 1.1v.6"
+          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="12" cy="16.6" r="1.05" fill="currentColor" />
+      </svg>
+      <span className="tip" style={S.tip}>Поддержка</span>
+    </button>
   );
 }
 

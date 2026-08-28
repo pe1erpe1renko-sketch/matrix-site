@@ -19,11 +19,14 @@ export default function Cursor() {
     if (window.matchMedia("(pointer: coarse)").matches) return;
     let mx = -100, my = -100, rx = -100, ry = -100, sc = 1, target = 1, raf;
     const move = (e) => { mx = e.clientX; my = e.clientY; };
-    const down = () => { target = 0.45; };
+    const down = () => { target = 0.42; };
     const up = () => { target = 1; };
     const loop = () => {
-      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
-      sc += (target - sc) * 0.18;
+      // Коэффициенты сглаживания вдвое выше прежних (были .16 и .18):
+      // кольцо идёт почти вплотную за точкой, лёгкая инерция остаётся,
+      // но торможения больше не чувствуется.
+      rx += (mx - rx) * 0.34; ry += (my - ry) * 0.34;
+      sc += (target - sc) * 0.4;
       if (dot.current) dot.current.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
       if (ring.current) ring.current.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%) scale(${sc})`;
       raf = requestAnimationFrame(loop);

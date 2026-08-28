@@ -41,15 +41,25 @@ export const S = {
     filter: "blur(26px)", zIndex: 1,
   },
 
+  /**
+   * Меню закреплено намертво: position: fixed, а не sticky.
+   * Sticky здесь не работает — у body стоит overflow-x: hidden (страховка
+   * от горизонтальной прокрутки на телефоне), а это делает body
+   * прокручиваемым контейнером и ломает прилипание к окну.
+   *
+   * Содержимое справа отодвигается на ширину меню (S.main → marginLeft).
+   */
   side: {
     background: "rgba(13,10,30,0.9)", backdropFilter: "blur(12px)",
     borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column",
-    position: "sticky", top: 0, height: "100vh",
+    position: "fixed", left: 0, top: 0, bottom: 0,
     transition: "width .24s cubic-bezier(.4,0,.2,1)", flexShrink: 0, zIndex: 5,
   },
+  /* Логотип приклеен сверху, карточка пользователя снизу: прокручивается
+     только список пунктов между ними (S.nav с overflowY: auto). */
   sideTop: {
     display: "flex", alignItems: "center", padding: "0 16px",
-    borderBottom: `1px solid ${C.border}`, height: 74,
+    borderBottom: `1px solid ${C.border}`, height: 74, flexShrink: 0,
   },
   logo: { display: "flex", alignItems: "center", gap: 11, minHeight: 44 },
   logoText: { fontSize: 19, fontWeight: 600, color: C.white, letterSpacing: "0.24em", lineHeight: 1 },
@@ -68,7 +78,7 @@ export const S = {
   },
   navLbl: { whiteSpace: "nowrap", overflow: "hidden" },
   divider: { height: 1, background: C.border, margin: "14px 12px" },
-  sideBottom: { padding: 14, borderTop: `1px solid ${C.border}` },
+  sideBottom: { padding: 14, borderTop: `1px solid ${C.border}`, flexShrink: 0 },
   loginBtn: {
     width: "100%", padding: "12px 14px", borderRadius: R.md,
     fontSize: 14.5, fontFamily: "inherit", border: "none",
@@ -940,6 +950,27 @@ export const S = {
   checkRow: { display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13, color: C.text, marginTop: 12, textAlign: "left", background: "none", border: "none", fontFamily: "inherit", padding: 0, width: "100%" },
   checkBox: { width: 18, height: 18, borderRadius: 5, border: "1px solid", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 },
 
+  /* ---------- сцена расчёта ---------- */
+
+  theatre: {
+    display: "flex", alignItems: "center", gap: 36, flexWrap: "wrap",
+    justifyContent: "center", width: "100%", maxWidth: 820, margin: "0 auto",
+  },
+  theatreSteps: { display: "flex", flexDirection: "column", gap: 16, minWidth: 240 },
+  theatreStep: {
+    display: "flex", alignItems: "flex-start", gap: 12,
+    fontSize: 15, lineHeight: 1.4, transition: "opacity .4s ease, color .4s ease",
+  },
+  theatreDot: {
+    width: 9, height: 9, borderRadius: "50%", border: "1px solid",
+    flexShrink: 0, marginTop: 6, transition: "all .3s ease",
+  },
+  theatreTrack: {
+    display: "block", height: 2, marginTop: 8, borderRadius: 2,
+    background: "rgba(183,156,232,0.16)", overflow: "hidden",
+  },
+  theatreFill: { display: "block", height: "100%", borderRadius: 2, background: C.gold },
+
   /* ═══════════ ТЕЛЕФОН ═══════════ */
 
   /* На телефоне макет колонкой: шапка сверху, содержимое под ней.
@@ -951,7 +982,7 @@ export const S = {
     width: "100%", overflowX: "hidden",
   },
   topBar: {
-    display: "grid", gridTemplateColumns: "44px 1fr 44px", alignItems: "center",
+    display: "grid", gridTemplateColumns: "44px 1fr auto", alignItems: "center",
     gap: 8, height: 56, padding: "0 10px", position: "sticky", top: 0, zIndex: 20,
     background: "rgba(13,10,30,0.94)", backdropFilter: "blur(12px)",
     borderBottom: `1px solid ${C.border}`,
@@ -960,6 +991,19 @@ export const S = {
     width: 44, height: 44, borderRadius: R.md, border: "none",
     background: "transparent", color: C.text,
     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  topActions: { display: "flex", alignItems: "center", gap: 6 },
+  /**
+   * Десктоп: своей шапки нет, поэтому блок висит поверх содержимого.
+   * Подложка обязательна: при прокрутке под кнопками проезжает текст,
+   * и без неё они читаются как случайно наложенные, а не как накладные.
+   */
+  topFloat: {
+    position: "fixed", top: 14, right: 16, zIndex: 15,
+    display: "flex", alignItems: "center", gap: 6,
+    padding: 5, borderRadius: R.pill,
+    background: "rgba(13,10,30,0.86)", backdropFilter: "blur(10px)",
+    border: `1px solid ${C.border}`,
   },
   backdrop: {
     position: "fixed", inset: 0, zIndex: 40,

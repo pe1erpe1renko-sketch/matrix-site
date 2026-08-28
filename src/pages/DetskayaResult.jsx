@@ -3,6 +3,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import PageStub from "../components/PageStub.jsx";
+import CalcTheatre from "../components/CalcTheatre.jsx";
 import Octagram from "../components/Octagram.jsx";
 import ChakraTable from "../components/ChakraTable.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
@@ -37,6 +38,11 @@ export default function DetskayaResult() {
   }
 
   const { matrix } = page;
+
+  /* Сцена расчёта — только при первом открытии этой матрицы. */
+  if (page.theatre.playing) {
+    return <CalcTheatre matrix={matrix} onDone={page.theatre.finish} />;
+  }
   const nature = [
     { value: matrix.core.N, title: "Главный талант",   hint: "С чем ребёнок родился, до всякого воспитания." },
     { value: matrix.core.W, title: "Как проявляется",  hint: "Каким его видят другие дети и взрослые." },

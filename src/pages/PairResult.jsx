@@ -3,6 +3,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { ARCANA_NAMES } from "../lib/prompts.js";
 import PageStub from "../components/PageStub.jsx";
+import CalcTheatre from "../components/CalcTheatre.jsx";
 import Octagram from "../components/Octagram.jsx";
 import ChakraTable from "../components/ChakraTable.jsx";
 import PartnerCores from "../components/PartnerCores.jsx";
@@ -37,6 +38,11 @@ export default function PairResult({ pageId }) {
   }
 
   const { matrix, view } = page;
+
+  /* Сцена расчёта — только при первом открытии этой матрицы. */
+  if (page.theatre.playing) {
+    return <CalcTheatre matrix={matrix} onDone={page.theatre.finish} />;
+  }
   const isLove = pageId === "sovmestimost";
   const labels = isLove ? ["Первый", "Второй"] : ["Первый партнёр", "Второй партнёр"];
 
