@@ -53,19 +53,26 @@ const toNav = (type) => ({
 export const CALC_NAV = [...CALC_TYPES.map(toNav), toNav(FORECAST_VIEW)];
 
 /**
- * Меню слева. Одиннадцать пунктов туда не помещаются, поэтому в меню
- * шесть главных, а остальные открываются из карусели и из блока
- * «кого посмотрим дальше» в конце разбора.
+ * МЕНЮ СЛЕВА
+ * Десять типов разбора в столбец не помещаются, поэтому видны первые
+ * пять — порядок CALC_TYPES выстроен по спросу, — а остальные пять
+ * раскрываются кнопкой «Ещё разборы». Прятать их совсем нельзя:
+ * человек не найдёт карму и здоровье, если не догадается про карусель.
  */
-const MENU_IDS = ["matrica", "sovmestimost", "dengi", "detskaya", "prognoz", "rod"];
+export const MENU_NAV = CALC_TYPES.slice(0, 5).map(toNav);
 
-export const MENU_NAV = MENU_IDS.map((id) => CALC_NAV.find((c) => c.id === id)).filter(Boolean);
+/** Спрятанная половина списка. Раскрывается кнопкой и запоминается. */
+export const MENU_MORE = CALC_TYPES.slice(5).map(toNav);
 
-/** Нижняя группа меню — кабинет. Формы расчёта у этих страниц нет. */
+/**
+ * Нижняя группа меню. Прогноз стоит здесь, а не среди разборов:
+ * это не разбор, а ежедневный возврат.
+ */
 export const ACCOUNT_NAV = [
-  { id: "chat",   path: "/chat",   label: "ИИ-наставник" },
-  { id: "tarify", path: "/tarify", label: "Тарифы и оплата" },
-  { id: "profil", path: "/profil", label: "Профиль" },
+  { id: "chat",    path: "/chat",    label: "ИИ-наставник" },
+  { id: "prognoz", path: "/prognoz", label: "Прогноз" },
+  { id: "tarify",  path: "/tarify",  label: "Тарифы и оплата" },
+  { id: "profil",  path: "/profil",  label: "Профиль" },
 ];
 
 /** Вкладка по умолчанию: её видит человек, зашедший на «/». */

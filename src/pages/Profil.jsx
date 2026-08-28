@@ -14,6 +14,7 @@ import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { Meter, Switch, CopyButton, MiniOcta, Field, Modal } from "../components/Controls.jsx";
 import LoginModal from "../components/LoginModal.jsx";
 import { backToPage, useBackPoint } from "../lib/returnTo.js";
+import { useHintState, setHintsOff } from "../lib/hints.js";
 import BackToReport from "../components/BackToReport.jsx";
 import PersonModal from "../components/PersonModal.jsx";
 
@@ -263,7 +264,7 @@ function PersonCard({ person, plan, tgOn = 0, onEdit, guest = false }) {
  */
 function TelegramBox({ person, limitReached, limit }) {
   const { on, status, username, code } = person.telegram;
-  const link = `t.me/matrix_bot?start=${code}`;
+  const link = `t.me/matrika_bot?start=${code}`;
 
   return (
     <div style={S.tgBox}>
@@ -415,6 +416,7 @@ function FeedTab({ people }) {
 
 function DataTab({ account }) {
   const [receipt, setReceipt] = useState(account.receiptEmail || "");
+  const { off: hintsOff } = useHintState();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const link = referralLink(account.id);
 
@@ -486,6 +488,19 @@ function DataTab({ account }) {
                 <button className="inAct" style={S.inAct}>Активировать</button>
               </div>
             </div>
+          </div>
+
+          <div className="card" style={S.block}>
+            <div style={S.blockHead}>
+              <div style={{ ...S.blockTitle, marginBottom: 0 }}>Подсказки</div>
+              <Switch on={!hintsOff} label="Показывать подсказки"
+                onClick={() => setHintsOff(!hintsOff)} />
+            </div>
+            <p style={S.hint}>
+              Небольшая карточка справа внизу с мыслью по вашей матрице.
+              Появляется на страницах разбора, не чаще трёх раз в день,
+              и только когда вы остановились читать. Выключите — не будет вовсе.
+            </p>
           </div>
 
           <div className="card" style={S.block}>

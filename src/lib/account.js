@@ -92,4 +92,4 @@ function guessName(email) {
 }
 
 /** Реферальная ссылка строится из ID — отдельный код заводить незачем. */
-export const referralLink = (id) => `matrix.ru/?ref=${id || 'M-000000'}`;
+export const referralLink = (id) => `matrika.ru/?ref=${id || 'M-000000'}`;

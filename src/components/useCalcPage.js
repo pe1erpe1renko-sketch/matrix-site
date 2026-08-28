@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { calculateMatrix, calculatePair } from "../lib/matrixEngine.js";
 import { buildViewSections, pageView, questionsTotal, questionsOpen } from "../lib/pageSections.js";
@@ -7,7 +7,8 @@ import { useAccount } from "../lib/account.js";
 import { rememberGuestCalculation } from "../lib/people.js";
 import { wasSeen, markSeen } from "../lib/seenReports.js";
 import { urlDateToISO, urlDateToHuman } from "../lib/urlDate.js";
-import { rememberReport } from "../lib/recent.js";
+import { rememberReport, isNewReport } from "../lib/recent.js";
+import { setHintContext } from "../lib/hints.js";
 
 /**
  * ОБЩАЯ ПОДГОТОВКА СТРАНИЦЫ РАСЧЁТА
@@ -62,7 +63,28 @@ export function useCalcPage(pageId) {
   /* Посчитанное попадает в список недавних на главной: человек вернётся
      через день и не будет вводить ту же дату заново. */
   const calculated = valid && matrix ? pathname : null;
-  useEffect(() => { rememberReport(calculated); }, [calculated]);
+  const firstOpen = useRef(false);
+  useEffect(() => {
+    if (!calculated) return;
+    firstOpen.current = isNewReport(calculated);
+    rememberReport(calculated);
+  }, [calculated]);
+
+  /* Рассказываем облачку-подсказке, что здесь посчитано. Уходим со
+     страницы — забираем контекст, иначе подсказка утечёт в кабинет. */
+  useEffect(() => {
+    if (!calculated || !matrix) return undefined;
+    setHintContext({
+      kind: "report",
+      key: calculated,
+      path: calculated,
+      matrix,
+      urlDate: urlDates[0],
+      unlocked: access.unlocked,
+      firstOpen: firstOpen.current,
+    });
+    return () => setHintContext(null);
+  }, [calculated, matrix, access.unlocked, urlDates[0]]);
 
   const sections = useMemo(
     () => (matrix ? buildViewSections(matrix, view.sections, { unlocked: access.unlocked }) : []),

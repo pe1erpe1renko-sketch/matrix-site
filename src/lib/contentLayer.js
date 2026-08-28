@@ -26,7 +26,7 @@ export const CONTENT_MODE = 'stub';
 
 /**
  * Интерфейс базы. В макете — память процесса.
- * ТОЧКА ПОДКЛЮЧЕНИЯ: замените на таблицу Supabase `matrix_texts`
+ * ТОЧКА ПОДКЛЮЧЕНИЯ: замените на таблицу Supabase `matrika_texts`
  *   колонки: key (PK, text), body (text), version (int), created_at (timestamptz)
  */
 export const textStore = {

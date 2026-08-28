@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { C, SURFACE } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
@@ -9,6 +9,7 @@ import { useIsPhone, hScrollRow, TAP } from "../theme/responsive.js";
 import { PlanCard } from "../components/PlanCard.jsx";
 import DateFields from "../components/DateFields.jsx";
 import RecentReports from "../components/RecentReports.jsx";
+import { setHintContext } from "../lib/hints.js";
 import CalcCarousel from "../components/CalcCarousel.jsx";
 import { SUBSCRIPTION_PLANS } from "../lib/plans.js";
 import { calculateMatrix } from "../lib/matrixEngine.js";
@@ -18,7 +19,7 @@ import ChakraTable from "../components/ChakraTable.jsx";
 import AgeTimeline from "../components/AgeTimeline.jsx";
 
 /* ============================================================
-   MATRIX — главная страница
+   MATRIKA — главная страница
    ============================================================
 
    Меню слева и подвал живут в макете (components/Layout.jsx),
@@ -255,6 +256,15 @@ export default function Home() {
   const filled = (p) => p.name.trim() && p.d && p.m && p.y && p.g;
   const ready = filled(a) && (!calc.pairs || filled(b));
 
+  /* Единственный случай, когда подсказка появляется вне разбора: человек
+     открыл форму и две минуты ничего в неё не ввёл. Как только начал
+     вводить — подсказка отменяется, мешать заполнению нельзя. */
+  const touched = Boolean(a.name || a.d || a.m || a.y || a.g);
+  useEffect(() => {
+    setHintContext({ kind: "form", key: "form", touched });
+    return () => setHintContext(null);
+  }, [touched]);
+
   /**
    * Переход к разбору. Адрес собирается из введённых дат:
    * /matrica/13-07-1998, /sovmestimost/13-07-1998/09-04-1992.
@@ -284,7 +294,7 @@ export default function Home() {
               Прочитайте свою жизнь по <em style={S.h1em}>дате рождения</em>
             </h1>
             <p style={S.heroLead}>
-              MATRIX строит персональную матрицу из 22 арканов за пару секунд —
+              MATRIKA строит персональную матрицу из 22 арканов за пару секунд —
               характер, предназначение, денежный канал и отношения. Первый расчёт
               бесплатно, без установки.
             </p>

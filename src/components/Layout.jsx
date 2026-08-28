@@ -4,16 +4,18 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { GLOBAL_CSS } from "../theme/globalCss.js";
 import { useBreakpoint, useIsTouch, TAP } from "../theme/responsive.js";
-import { CALC_NAV, MENU_NAV, ACCOUNT_NAV, activeNavId, calcById } from "../routes.js";
+import { CALC_NAV, MENU_NAV, MENU_MORE, ACCOUNT_NAV, activeNavId, calcById } from "../routes.js";
 import { Ic, Spark } from "./Icons.jsx";
 import Cursor from "./Cursor.jsx";
 import Sky from "./Sky.jsx";
 import LoginModal from "./LoginModal.jsx";
 import SupportModal from "./SupportModal.jsx";
 import SoundButton from "./SoundButton.jsx";
+import HintBubble from "./HintBubble.jsx";
 import { useAccount, signOut } from "../lib/account.js";
 import { useAccess } from "../lib/access.js";
 import { PLAN_LIMITS } from "../lib/plans.js";
+import { useMenuOpen, setMenuOpen } from "../lib/menuState.js";
 import { BackProvider, useResolveBackPoint } from "../lib/returnTo.js";
 
 /**
@@ -32,6 +34,11 @@ import { BackProvider, useResolveBackPoint } from "../lib/returnTo.js";
  */
 export default function Layout() {
   const [collapsed, setCollapsed] = useState(false);
+  /* Раскрыт ли список «Ещё разборы». Запоминается между заходами:
+     человек, которому нужна карма, не должен раскрывать список каждый раз. */
+  const moreOpen = useMenuOpen();
+  const [flyout, setFlyout] = useState(null);
+  const moreRef = useRef(null);
   const [drawer, setDrawer] = useState(false);
   const [hover, setHover] = useState(null);
   const [login, setLogin] = useState(false);
@@ -113,13 +120,90 @@ export default function Layout() {
     );
   };
 
+  const openFlyout = () => {
+    const node = moreRef.current;
+    if (!node) return;
+    const r = node.getBoundingClientRect();
+    const side = node.closest("aside");
+    const left = (side ? side.getBoundingClientRect().right : r.right) + 8;
+    setFlyout({ left: Math.round(left), top: Math.round(Math.max(8, r.top - 6)) });
+  };
+
+  /* Человек стоит на странице из спрятанной половины — список раскрыт
+     сам. Иначе подсвечивать нечего и непонятно, где он находится. */
+  const activeInMore = MENU_MORE.some((item) => item.id === active);
+  const showMore = moreOpen || activeInMore;
+  const showLabels = isPhone || !collapsed;
+
   const menuBody = (
     <>
       <nav style={S.nav}>
-        {/* В меню шесть главных типов: одиннадцать в столбец не влезают.
-            Остальные открываются из карусели в форме и из блока
-            «кого посмотрим дальше» в конце разбора. */}
+        {/* Видны первые пять типов, остальные пять — под кнопкой:
+            десять пунктов в столбец не помещаются. */}
         {MENU_NAV.map(navLink)}
+
+        {/* Высота анимируется по максимуму, а не по auto: auto браузер
+            не анимирует, а пунктов ровно столько, сколько мы знаем. */}
+        <div style={{
+          overflow: "hidden",
+          maxHeight: showMore ? MENU_MORE.length * (TAP + 4) + 4 : 0,
+          opacity: showMore ? 1 : 0,
+          transition: "max-height .26s cubic-bezier(.4,0,.2,1), opacity .2s ease",
+        }}>
+          {MENU_MORE.map(navLink)}
+        </div>
+
+        {showLabels ? (
+          <button className="moreBtn" aria-expanded={showMore}
+            onClick={() => setMenuOpen(!showMore)}
+            style={{ ...S.navItem, ...S.moreBtn, minHeight: TAP }}>
+            <span style={{ ...S.moreDots, color: showMore ? C.gold : C.muted }}>···</span>
+            <span style={S.navLbl}>{showMore ? "Скрыть разборы" : "Ещё разборы"}</span>
+            <span style={{
+              ...S.sphereChevron, marginLeft: "auto",
+              transform: showMore ? "rotate(180deg)" : "none",
+              color: showMore ? C.gold : C.muted,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9.5 L12 15.5 L18 9.5" stroke="currentColor" strokeWidth="2"
+                  strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </button>
+        ) : (
+          /* Свёрнутое меню: вместо надписи многоточие, список выезжает сбоку.
+             Список позиционируется от окна, а не от меню: у меню включена
+             горизонтальная обрезка ради вертикальной прокрутки, и выезжающая
+             панель обрезалась бы по ширине столбца. */
+          <div ref={moreRef} style={{ position: "relative" }}
+            onMouseEnter={openFlyout} onMouseLeave={() => setFlyout(null)}>
+            {/* Наведение открывает, уход закрывает; нажатие только
+                открывает — иначе клик по уже открытому списку закрывал бы
+                его прямо под курсором. */}
+            <button className="moreBtn" aria-expanded={Boolean(flyout)}
+              aria-label="Ещё разборы" title="Ещё разборы"
+              onClick={openFlyout}
+              style={{ ...S.navItem, ...S.moreBtn, minHeight: TAP, justifyContent: "center" }}>
+              <span style={{ ...S.moreDots, color: flyout || activeInMore ? C.gold : C.muted }}>···</span>
+            </button>
+            {flyout && (
+              <div style={{ ...S.moreFlyout, left: flyout.left, top: flyout.top }}>
+                {MENU_MORE.map((item) => (
+                  <Link key={item.id} to={item.path} onClick={() => setFlyout(false)}
+                    style={{
+                      ...S.navItem, minHeight: TAP, whiteSpace: "nowrap",
+                      background: active === item.id ? C.cardHi : "transparent",
+                      color: active === item.id ? C.gold : C.text,
+                    }}>
+                    {React.createElement(Ic[item.id], { width: 18, height: 18, style: { flexShrink: 0 } })}
+                    <span style={S.navLbl}>{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         <div style={S.divider} />
         {ACCOUNT_NAV.map(navLink)}
       </nav>
@@ -180,7 +264,7 @@ export default function Layout() {
             {!collapsed && (
               <Link to="/" style={S.logo}>
                 <Spark size={19} />
-                <span style={S.logoText}>MATRIX</span>
+                <span style={S.logoText}>MATRIKA</span>
               </Link>
             )}
             <button className="collapseBtn" style={S.collapse}
@@ -214,6 +298,10 @@ export default function Layout() {
         {!fullHeight && <Footer />}
       </main>
 
+      {/* Облачко появляется только там, где страница сообщила о расчёте.
+          Кабинет, чат и тарифы не сообщают — там его не бывает. */}
+      <HintBubble />
+
       {login && <LoginModal back={backPoint} onClose={() => setLogin(false)} />}
       {support && <SupportModal accountId={account.id} onClose={() => setSupport(false)} />}
     </div>
@@ -233,7 +321,7 @@ function TopBar({ onMenu, onSupport }) {
 
       <Link to="/" style={{ ...S.logo, justifyContent: "center" }}>
         <Spark size={17} />
-        <span style={{ ...S.logoText, fontSize: 17 }}>MATRIX</span>
+        <span style={{ ...S.logoText, fontSize: 17 }}>MATRIKA</span>
       </Link>
 
       <div style={S.topActions}>
@@ -308,7 +396,7 @@ function Drawer({ open, onClose, children }) {
         <div style={S.drawerTop}>
           <Link to="/" style={S.logo}>
             <Spark size={19} />
-            <span style={S.logoText}>MATRIX</span>
+            <span style={S.logoText}>MATRIKA</span>
           </Link>
           <button style={S.topBtn} onClick={onClose} aria-label="Закрыть меню">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -348,7 +436,8 @@ function Footer() {
     <footer style={S.footer}>
       <div style={S.footGrid}>
         <div>
-          <Link to="/" style={S.logo}><Spark size={19} /><span style={S.logoText}>MATRIX</span></Link>
+          <Link to="/" style={S.logo}><Spark size={19} /><span style={S.logoText}>MATRIKA</span></Link>
+          <div style={S.tagline}>Код твоей души</div>
           <p style={{ ...S.infoText, marginTop: 14, maxWidth: 300 }}>
             Онлайн-калькулятор матрицы судьбы по методу 22 арканов.
           </p>
@@ -357,7 +446,7 @@ function Footer() {
         <FootCol title="Кабинет" items={ACCOUNT_CABINET} />
       </div>
       <div style={S.footBottom}>
-        © 2026 MATRIX. Сервис носит развлекательный характер и не заменяет
+        © 2026 MATRIKA. Сервис носит развлекательный характер и не заменяет
         консультацию специалиста.
       </div>
     </footer>

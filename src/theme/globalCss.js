@@ -91,6 +91,13 @@ a { color: inherit; text-decoration: none; }
 .planBtn:not(:disabled):active { transform: scale(0.96); }
 @media (prefers-reduced-motion: reduce) { .planBtn:not(:disabled):active { transform: none; } }
 
+/* Облачко-подсказка. */
+.hintClose:hover { color: ${C.white}; }
+@media (prefers-reduced-motion: reduce) { .hintCard { transition: none; } }
+
+/* Кнопка «Ещё разборы» в меню. */
+.moreBtn:hover { background: ${C.navHover}; color: ${C.white}; }
+
 /* Карусель типов разбора. */
 .calcTab:hover { border-color: ${C.borderHi}; }
 .calcArrow:hover { border-color: ${C.lilac}; color: ${C.lilac}; }

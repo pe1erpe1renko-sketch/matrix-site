@@ -8,6 +8,7 @@ import { useSlotText } from "./useSlotText.js";
 import ArcanaImage from "./ArcanaImage.jsx";
 import { stepForSphere } from "../lib/nextSteps.js";
 import { backToReport } from "../lib/returnTo.js";
+import { noteLockHit } from "../lib/hints.js";
 import NextStepCard from "./NextStepCard.jsx";
 
 /**
@@ -126,6 +127,7 @@ function Question({ slot, section, sectionId, open, onToggle, isPhone }) {
        в эту же сферу, а не в начало разбора. */
     return (
       <Link to="/tarify" state={backToReport(location, sectionId)}
+        onClick={noteLockHit}
         className="qRow" style={{ ...S.qRow, ...S.qLocked, minHeight: TAP }}>
         <span style={{ ...S.qArcana, color: C.muted, borderColor: C.border }}>{slot.arcana}</span>
         <span style={{ ...S.qLabel, color: C.text }}>{slot.label}</span>

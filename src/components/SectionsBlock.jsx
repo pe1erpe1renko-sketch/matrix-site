@@ -4,6 +4,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import SectionList from "./SectionList.jsx";
 import { backToReport } from "../lib/returnTo.js";
+import { noteSphere } from "../lib/hints.js";
 import { TAP } from "../theme/responsive.js";
 
 /**
@@ -55,6 +56,8 @@ export default function SectionsBlock({
   const toggle = (id) => {
     const next = openId === id ? null : id;
     setOpenId(next);
+    /* Подсказке важно, сколько человек сидит в одной теме. */
+    noteSphere(next);
     if (next) scrollToSphere(next);
   };
 

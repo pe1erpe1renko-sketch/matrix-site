@@ -45,7 +45,7 @@ export default function NextStepsBlock({ selfDate, background = C.bgAlt }) {
   };
 
   return (
-    <section style={{ ...S.section, background }}>
+    <section id="next-people" style={{ ...S.section, background }}>
       <div style={S.eyebrow}>Конец разбора</div>
       <h2 style={S.h2}>Кого посмотрим <em style={S.h1em}>дальше?</em></h2>
       <p style={{ ...S.infoText, maxWidth: 660, margin: "-14px 0 26px" }}>

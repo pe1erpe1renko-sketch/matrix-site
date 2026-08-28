@@ -1069,6 +1069,50 @@ export const S = {
     marginTop: 14, padding: "18px 20px", borderRadius: R.lg,
     border: `1px solid ${C.borderHi}`, background: SURFACE.cardHi,
   },
+  /* Облачко-подсказка справа внизу. */
+  hintCard: {
+    position: "fixed", right: 24, bottom: 24, zIndex: 35, width: 340,
+    padding: "18px 20px", borderRadius: R.lg,
+    background: "rgba(23,18,47,0.92)", backdropFilter: "blur(18px)",
+    border: `1px solid ${C.borderHi}`,
+    boxShadow: "0 28px 70px -30px rgba(0,0,0,0.95)",
+    transition: "opacity .32s ease, transform .32s cubic-bezier(.4,0,.2,1)",
+  },
+  hintBody: { display: "flex", gap: 14, alignItems: "flex-start" },
+  hintIcon: {
+    width: 40, height: 40, flexShrink: 0, borderRadius: "50%",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    background: "rgba(228,190,114,0.12)", border: `1px solid rgba(228,190,114,0.35)`,
+  },
+  hintNum: { fontFamily: FONT.serif, fontSize: 18, color: C.gold, lineHeight: 1 },
+  hintText: { margin: 0, fontSize: 14, lineHeight: 1.6, color: C.text },
+  hintClose: {
+    position: "absolute", top: 6, right: 8, width: 28, height: 28,
+    background: "none", border: "none", color: C.faint,
+    fontSize: 19, lineHeight: 1, fontFamily: "inherit", padding: 0,
+    transition: "color .16s ease",
+  },
+
+  /* Кнопка «Ещё разборы» и выезжающий список в свёрнутом меню. */
+  moreBtn: {
+    width: "100%", background: "transparent", border: "none",
+    fontFamily: "inherit", fontSize: 14, color: C.text, cursor: "pointer",
+    textAlign: "left",
+  },
+  moreDots: { fontSize: 17, lineHeight: 1, width: 19, textAlign: "center", flexShrink: 0 },
+  moreFlyout: {
+    position: "fixed", zIndex: 30,
+    minWidth: 210, padding: 6, borderRadius: R.lg,
+    background: "rgba(13,10,30,0.98)", border: `1px solid ${C.borderHi}`,
+    boxShadow: "0 24px 60px -28px rgba(0,0,0,0.9)",
+  },
+
+  /* Подзаголовок бренда под логотипом в подвале. */
+  tagline: {
+    marginTop: 8, fontSize: 12.5, letterSpacing: "0.18em",
+    textTransform: "uppercase", color: C.gold, opacity: 0.85,
+  },
+
   /* Кнопка возврата к разбору вверху страницы, куда человека увели. */
   backLink: {
     display: "inline-flex", alignItems: "center", gap: 10,

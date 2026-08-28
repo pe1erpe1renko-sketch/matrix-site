@@ -11,9 +11,9 @@ import { Modal } from "./Controls.jsx";
  * регистрировались».
  */
 const WAYS = [
-  { name: "Telegram", value: "@matrix_support", note: "отвечаем быстрее всего", href: "https://t.me/matrix_support" },
-  { name: "MAX", value: "@matrix", note: "", href: null },
-  { name: "Почта", value: "help@matrix.ru", note: "для чеков и возвратов", href: "mailto:help@matrix.ru" },
+  { name: "Telegram", value: "@matrika_support", note: "отвечаем быстрее всего", href: "https://t.me/matrika_support" },
+  { name: "MAX", value: "@matrika", note: "", href: null },
+  { name: "Почта", value: "help@matrika.ru", note: "для чеков и возвратов", href: "mailto:help@matrika.ru" },
 ];
 
 export default function SupportModal({ accountId, onClose }) {

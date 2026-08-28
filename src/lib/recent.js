@@ -40,6 +40,12 @@ export function rememberReport(to) {
   store.set({ list: [{ to, label }, ...list.filter((item) => item.label !== label)].slice(0, LIMIT) });
 }
 
+/** Открыт ли этот разбор впервые. Спрашивать ДО rememberReport(). */
+export function isNewReport(to) {
+  const label = datesFromPath(to);
+  return Boolean(label) && !store.get().list.some((item) => item.label === label);
+}
+
 /** Убрать одну запись — крестиком в строке «Недавние». */
 export function forgetReport(to) {
   const { list } = store.get();
