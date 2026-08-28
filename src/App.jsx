@@ -9,6 +9,8 @@ import PrognozResult from "./pages/PrognozResult.jsx";
 import PairResult from "./pages/PairResult.jsx";
 import TypeResult from "./pages/TypeResult.jsx";
 import Chat from "./pages/Chat.jsx";
+import Obrazy from "./pages/Obrazy.jsx";
+import ObrazShare from "./pages/ObrazShare.jsx";
 import Tarify from "./pages/Tarify.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import CheckoutSuccess from "./pages/CheckoutSuccess.jsx";
@@ -74,6 +76,9 @@ export default function App() {
 
           {/* кабинет */}
           <Route path="/chat" element={<Chat />} />
+          <Route path="/obrazy" element={<Obrazy />} />
+          {/* Чужой образ по пересланной ссылке — точка входа новых людей. */}
+          <Route path="/obraz/:id" element={<ObrazShare />} />
           <Route path="/tarify" element={<Tarify />} />
           {/* оформление: тариф, разбор или пакет молний — товар в адресе */}
           <Route path="/checkout" element={<Checkout />} />

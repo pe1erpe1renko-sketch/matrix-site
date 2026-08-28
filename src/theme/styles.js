@@ -1418,4 +1418,45 @@ export const S = {
     borderRadius: R.md, background: "rgba(228,190,114,0.08)",
     border: "1px solid rgba(228,190,114,0.3)", marginBottom: 14,
   },
+  /* ---- AI-образы ---- */
+  obrazGrid: {
+    display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 330px), 1fr))", gap: 15,
+  },
+  obrazTile: {
+    display: "flex", gap: 16, alignItems: "flex-start", padding: "18px 20px",
+    borderRadius: R.lg, background: SURFACE.card, border: `1px solid ${C.border}`,
+    fontFamily: "inherit", textAlign: "left", width: "100%",
+    transition: "border-color .2s ease, background .2s ease, transform .2s ease",
+  },
+  obrazName: { fontFamily: FONT.serif, fontSize: 19, color: C.white },
+  obrazFrom: {
+    fontSize: 11.5, letterSpacing: "0.1em", textTransform: "uppercase",
+    color: C.muted, margin: "5px 0 9px",
+  },
+  obrazDetail: {
+    display: "flex", gap: 28, padding: "26px 28px", borderRadius: R.xl,
+    background: SURFACE.card, border: "1px solid", flexWrap: "wrap",
+  },
+  obrazFree: {
+    display: "inline-flex", alignItems: "center", gap: 10,
+    padding: "10px 18px", borderRadius: R.pill, marginBottom: 22,
+    background: "rgba(95,192,140,0.1)", border: "1px solid rgba(95,192,140,0.4)",
+    fontSize: 13.5, color: C.text,
+  },
+  obrazGen: {
+    display: "flex", flexDirection: "column", alignItems: "center",
+    gap: 26, padding: "40px 0",
+  },
+  genLine: {
+    display: "flex", alignItems: "center", gap: 10, fontSize: 14.5,
+    transition: "opacity .3s ease, color .3s ease",
+  },
+  genDot: { width: 7, height: 7, borderRadius: 4, background: C.lilac, display: "block" },
+  obrazDone: { display: "flex", gap: 34, flexWrap: "wrap", alignItems: "flex-start" },
+  obrazBtns: { display: "flex", flexDirection: "column", gap: 10, marginTop: 20, maxWidth: 300 },
+  priceTag: {
+    display: "inline-flex", alignItems: "center", gap: 4,
+    fontSize: 13, padding: "3px 9px", borderRadius: R.pill,
+    background: "rgba(20,15,43,0.18)",
+  },
 };

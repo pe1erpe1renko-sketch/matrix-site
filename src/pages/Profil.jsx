@@ -177,6 +177,17 @@ function MatricesTab({ people, plan }) {
               onClick={() => setModal("new")}>+ Добавить матрицу</button>}
       </div>
 
+      {/* Вход в образы стоит там, где человек смотрит на свои матрицы:
+          картинку собирают по ним же. */}
+      <Link to="/obrazy" className="supRow" style={{ ...S.supRow, marginBottom: 16 }}>
+        <span style={{ ...S.addPlus, color: C.lilac }}>◆</span>
+        <span style={{ minWidth: 0, flex: 1 }}>
+          <span style={{ color: C.white, display: "block" }}>AI-образ по матрице</span>
+          <span style={S.dimSm}>Картинка-талисман по вашим числам. Первый образ бесплатно.</span>
+        </span>
+        <span style={{ color: C.lilac }}>→</span>
+      </Link>
+
       <div style={S.pGrid}>
         {people.map((person) => (
           <PersonCard key={person.id} person={person} plan={plan}

@@ -116,6 +116,15 @@ export const Ic = {
  * Деньги — бывшие «Финансы», род — две фигуры, как у «двух человек».
  */
 Ic.dengi = Ic.finansy;
+/* AI-образы: картинка в рамке. */
+Ic.obrazy = (p) => (
+  <svg {...p} viewBox="0 0 24 24" fill="none">
+    <rect x="3.2" y="4.5" width="17.6" height="15" rx="2.6" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="9" cy="10" r="1.8" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M4 16.5 L9.5 12.5 L13 15 L16.5 12 L20 15.5" stroke="currentColor"
+      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 Ic.rod = Ic.people;
 Ic["mama-rebenok"] = Ic.detskaya;
 Ic.karma = Ic.prognoz;

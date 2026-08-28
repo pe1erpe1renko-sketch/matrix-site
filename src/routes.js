@@ -69,6 +69,7 @@ export const MENU_MORE = CALC_TYPES.slice(5).map(toNav);
  * это не разбор, а ежедневный возврат.
  */
 export const ACCOUNT_NAV = [
+  { id: "obrazy",  path: "/obrazy",  label: "AI-образы" },
   { id: "chat",    path: "/chat",    label: "ИИ-наставник" },
   { id: "prognoz", path: "/prognoz", label: "Прогноз" },
   { id: "tarify",  path: "/tarify",  label: "Тарифы и оплата" },

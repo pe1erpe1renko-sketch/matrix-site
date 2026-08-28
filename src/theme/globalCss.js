@@ -110,6 +110,15 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 860px) { .sumWrap { position: static !important; } }
 
+/* Плитки тем в AI-образах. */
+.obrazTile:hover { border-color: ${C.borderHi}; background: rgba(31,24,65,0.88); transform: translateY(-2px); }
+.obrazTile:hover .obrazArrow { transform: translateX(4px); }
+.pulseCard { animation: pulseCard 1.6s ease-in-out infinite; }
+@keyframes pulseCard { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+.appearCard { animation: appearCard .6s cubic-bezier(.2,1.2,.4,1); }
+@keyframes appearCard { from { transform: scale(.92) translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pulseCard, .appearCard { animation: none; } }
+
 /* Строка таблицы сравнения тарифов. */
 .cmpRow:hover { background: rgba(183,156,232,0.05); }
 

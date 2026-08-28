@@ -56,32 +56,32 @@ export const boltPack = (id) => BOLT_PACKS.find((p) => p.id === String(id)) || n
 export const PLAN_LIMITS = {
   free: {
     label: 'Бесплатно', kind: 'free',
-    matrices: 0, telegram: 0, bolts: 0,
+    matrices: 0, telegram: 0, bolts: 0, images: 0,
     archive: false, pdf: false, pdfNoLogo: false, priority: false,
   },
   once: {
     label: 'Разовый разбор', kind: 'once',
-    matrices: 1, telegram: 0, bolts: 20,
+    matrices: 1, telegram: 0, bolts: 20, images: 1,
     archive: false, pdf: true, pdfNoLogo: false, priority: false,
   },
   path: {
     label: 'Путь', kind: 'sub',
-    matrices: 2, telegram: 1, bolts: 50,
+    matrices: 2, telegram: 1, bolts: 50, images: 3,
     archive: true, pdf: true, pdfNoLogo: false, priority: false,
   },
   circle: {
     label: 'Круг', kind: 'sub',
-    matrices: Infinity, telegram: 5, bolts: 150,
+    matrices: Infinity, telegram: 5, bolts: 150, images: 10,
     archive: true, pdf: true, pdfNoLogo: false, priority: false,
   },
   pro: {
     label: 'Практика', kind: 'sub',
-    matrices: Infinity, telegram: 15, bolts: 400,
+    matrices: Infinity, telegram: 15, bolts: 400, images: Infinity,
     archive: true, pdf: true, pdfNoLogo: true, priority: true,
   },
   forever: {
     label: 'Навсегда', kind: 'once',
-    matrices: Infinity, telegram: 5, bolts: 50,
+    matrices: Infinity, telegram: 5, bolts: 50, images: 10,
     archive: true, pdf: true, pdfNoLogo: false, priority: false,
   },
 };
@@ -215,6 +215,7 @@ export const COMPARE_ROWS = [
   ['Прогнозы близким в Telegram', '—', '—', 'до 5', 'до 15'],
   ['Архив прогнозов', '—', '✓', '✓', '✓'],
   ['Молний в месяц', '20 разово', '50', '150', '400'],
+  ['AI-образов в месяц', '1', '3', '10', 'без счёта'],
   ['Приоритетная очередь', '—', '—', '—', '✓'],
 ];
 
