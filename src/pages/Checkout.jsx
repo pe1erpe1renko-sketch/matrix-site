@@ -8,6 +8,7 @@ import { useDraft, saveDraft } from "../lib/checkoutDraft.js";
 import { useAccount, updateProfile } from "../lib/account.js";
 import { useBackPoint, backToPage } from "../lib/returnTo.js";
 import { useIsPhone, useIsNarrow, TAP } from "../theme/responsive.js";
+import { legalDoc } from "../lib/legal.js";
 
 /**
  * ОФОРМЛЕНИЕ ПОКУПКИ — /checkout
@@ -177,8 +178,19 @@ export default function Checkout() {
             {!agree && (
               <div style={S.needTag}><span style={S.needDot} /> Нужно принять, чтобы оплатить</div>
             )}
-            <button className="agreeRow" style={S.agreeRow} onClick={() => setAgree(!agree)}
-              aria-pressed={agree}>
+            {/*
+              Строка согласия — не кнопка, а обычный блок с ролью галочки:
+              внутри живут ссылки на документы, а ссылка внутри кнопки —
+              недопустимая вёрстка, и нажатие на неё переключало бы галочку.
+              Нажатие по строке переключает, нажатие по ссылке — открывает
+              документ (stopPropagation в DocLink).
+            */}
+            <div className="agreeRow" style={{ ...S.agreeRow, cursor: "pointer" }}
+              role="checkbox" aria-checked={agree} tabIndex={0}
+              onClick={() => setAgree(!agree)}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") { e.preventDefault(); setAgree(!agree); }
+              }}>
               <span style={{
                 ...S.agreeBox,
                 background: agree ? C.lilacBtn : "transparent",
@@ -188,9 +200,8 @@ export default function Checkout() {
                 {agree && <span style={{ color: C.ink, fontSize: 13, fontWeight: 700 }}>✓</span>}
               </span>
               <span style={S.agreeText}>
-                Я принимаю <span style={S.link}>оферту</span>,{" "}
-                <span style={S.link}>пользовательское соглашение</span> и{" "}
-                <span style={S.link}>политику обработки данных</span>.
+                Я принимаю <DocLink id="offer" />, <DocLink id="terms" /> и{" "}
+                <DocLink id="privacy" />, а также даю <DocLink id="consent" />.
                 {order.recurrent ? (
                   <> Понимаю, что подписка «{order.title}» продлевается автоматически
                     и {money(total)} ₽ будут списываться ежемесячно, пока я не отменю
@@ -200,7 +211,7 @@ export default function Checkout() {
                     и автопродление не подключается.</>
                 )}
               </span>
-            </button>
+            </div>
           </div>
 
           {order.recurrent && (
@@ -308,4 +319,25 @@ function AnimatedPrice({ value }) {
   }, [value]);
 
   return <span style={S.totalValue}>{money(shown)} ₽</span>;
+}
+
+/**
+ * Ссылка на юридический документ в строке согласия.
+ *
+ * Открывается в новой вкладке: человек уже заполнил форму и выбрал способ
+ * оплаты, уводить его со страницы ради чтения оферты — терять оплату.
+ * stopPropagation нужен, чтобы нажатие на ссылку не переключало галочку.
+ *
+ * Названия и адреса документов — в src/lib/legal.js, там же их берёт подвал.
+ */
+function DocLink({ id }) {
+  const doc = legalDoc(id);
+  if (!doc) return null;
+  return (
+    <Link to={doc.path} className="docLink" style={S.docLink}
+      target="_blank" rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}>
+      {doc.short}
+    </Link>
+  );
 }

@@ -15,6 +15,7 @@ import Tarify from "./pages/Tarify.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import CheckoutSuccess from "./pages/CheckoutSuccess.jsx";
 import Profil from "./pages/Profil.jsx";
+import Docs from "./pages/Docs.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { CALC_NAV } from "./routes.js";
 
@@ -84,6 +85,9 @@ export default function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/success" element={<CheckoutSuccess />} />
           <Route path="/profil" element={<Profil />} />
+
+          {/* юридические документы: соглашение, политика, согласие, оферта */}
+          <Route path="/docs/:doc" element={<Docs />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>

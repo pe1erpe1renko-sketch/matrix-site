@@ -100,6 +100,7 @@ a { color: inherit; text-decoration: none; }
   50% { box-shadow: 0 0 26px -6px rgba(228,190,114,0.45); }
 }
 .agreeRow:hover span:first-child { border-color: ${C.lilac}; }
+.docLink:hover { color: ${C.goldHi}; }
 .spin { animation: spinTurn .7s linear infinite; }
 @keyframes spinTurn { to { transform: rotate(360deg); } }
 .okIcon { animation: okPop .5s cubic-bezier(.2,1.4,.4,1); }

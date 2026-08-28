@@ -9,7 +9,7 @@ import { Ic, Spark } from "./Icons.jsx";
 import Cursor from "./Cursor.jsx";
 import Sky from "./Sky.jsx";
 import LoginModal from "./LoginModal.jsx";
-import SupportModal from "./SupportModal.jsx";
+import SupportButton from "./SupportButton.jsx";
 import SoundButton from "./SoundButton.jsx";
 import BoltBalance from "./BoltBalance.jsx";
 import HintBubble from "./HintBubble.jsx";
@@ -18,6 +18,7 @@ import { useAccess } from "../lib/access.js";
 import { PLAN_LIMITS } from "../lib/plans.js";
 import { useMenuOpen, setMenuOpen } from "../lib/menuState.js";
 import { BackProvider, useResolveBackPoint } from "../lib/returnTo.js";
+import { LEGAL_DOCS } from "../lib/legal.js";
 
 /**
  * ОБЩИЙ МАКЕТ
@@ -43,7 +44,6 @@ export default function Layout() {
   const [drawer, setDrawer] = useState(false);
   const [hover, setHover] = useState(null);
   const [login, setLogin] = useState(false);
-  const [support, setSupport] = useState(false);
   const { pathname } = useLocation();
   const active = activeNavId(pathname);
 
@@ -251,15 +251,12 @@ export default function Layout() {
 
       {isPhone ? (
         <>
-          <TopBar
-            onMenu={() => setDrawer(true)}
-            onSupport={() => setSupport(true)}
-          />
+          <TopBar onMenu={() => setDrawer(true)} />
           <Drawer open={drawer} onClose={() => setDrawer(false)}>{menuBody}</Drawer>
         </>
       ) : (
         <>
-        <TopActions onSupport={() => setSupport(true)} />
+        <TopActions />
         <aside style={{ ...S.side, width: collapsed ? 76 : 262 }}>
           <div style={{ ...S.sideTop, justifyContent: collapsed ? "center" : "space-between" }}>
             {!collapsed && (
@@ -304,14 +301,13 @@ export default function Layout() {
       <HintBubble />
 
       {login && <LoginModal back={backPoint} onClose={() => setLogin(false)} />}
-      {support && <SupportModal accountId={account.id} onClose={() => setSupport(false)} />}
     </div>
   );
 }
 
 /* ---------------- Телефон: шапка и выезжающее меню ---------------- */
 
-function TopBar({ onMenu, onSupport }) {
+function TopBar({ onMenu }) {
   return (
     <header style={S.topBar}>
       <button style={S.topBtn} onClick={onMenu} aria-label="Меню">
@@ -328,7 +324,7 @@ function TopBar({ onMenu, onSupport }) {
       <div style={S.topActions}>
         <BoltBalance />
         <SoundButton />
-        <SupportButton onClick={onSupport} />
+        <SupportButton />
       </div>
     </header>
   );
@@ -339,28 +335,14 @@ function TopBar({ onMenu, onSupport }) {
  * На телефоне блок стоит в шапке, на десктопе висит поверх содержимого:
  * своей шапки там нет, а место справа вверху ожидаемо для таких кнопок.
  */
-function TopActions({ onSupport }) {
+function TopActions() {
   return (
     <div style={S.topFloat}>
       {/* Баланс молний виден всегда: списания без видимого баланса пугают. */}
       <BoltBalance />
       <SoundButton />
-      <SupportButton onClick={onSupport} />
+      <SupportButton />
     </div>
-  );
-}
-
-function SupportButton({ onClick }) {
-  return (
-    <button className="iconBtn" style={S.iconBtn} onClick={onClick} aria-label="Поддержка">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M9.3 9.2a2.8 2.8 0 1 1 3.5 2.7c-.5.15-.8.6-.8 1.1v.6"
-          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="12" cy="16.6" r="1.05" fill="currentColor" />
-      </svg>
-      <span className="tip" style={S.tip}>Поддержка</span>
-    </button>
   );
 }
 
@@ -448,6 +430,7 @@ function Footer() {
         </div>
         <FootCol title="Расчёты" items={CALC_NAV} />
         <FootCol title="Кабинет" items={ACCOUNT_CABINET} />
+        <FootCol title="Юридическая информация" items={LEGAL_DOCS} />
       </div>
       <div style={S.footBottom}>
         © 2026 MATRIKA. Сервис носит развлекательный характер и не заменяет

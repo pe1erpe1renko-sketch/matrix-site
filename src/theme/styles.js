@@ -413,7 +413,9 @@ export const S = {
     borderTop: `1px solid ${C.border}`, padding: "44px var(--secX) 32px",
     background: "rgba(15,11,32,0.92)",
   },
-  footGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 36 },
+  /* Четыре колонки: бренд, расчёты, кабинет, документы. Минимум 190 —
+     при 220 четвёртая колонка не помещалась и уезжала на вторую строку. */
+  footGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 190px), 1fr))", gap: 30 },
   footTitle: {
     fontSize: 11.5, letterSpacing: "0.15em", textTransform: "uppercase",
     color: C.gold, marginBottom: 15,
@@ -1310,6 +1312,12 @@ export const S = {
     marginTop: 1, transition: "all .16s ease",
   },
   agreeText: { fontSize: 13.5, lineHeight: 1.6, color: C.text },
+  /* Ссылка на документ внутри строки согласия. Отдельно от .link:
+     та на телефоне становится блоком в 44 пикселя и рвёт предложение. */
+  docLink: {
+    color: C.lilac, textDecoration: "underline", textUnderlineOffset: 3,
+    transition: "color .15s ease",
+  },
   calmBox: {
     display: "flex", gap: 12, alignItems: "flex-start", padding: "14px 18px",
     borderRadius: R.md, background: "rgba(183,156,232,0.07)",
@@ -1458,5 +1466,14 @@ export const S = {
     display: "inline-flex", alignItems: "center", gap: 4,
     fontSize: 13, padding: "3px 9px", borderRadius: R.pill,
     background: "rgba(20,15,43,0.18)",
+  },
+  /* Выпадающая панель поддержки под значком в шапке. */
+  supPanel: {
+    position: "absolute", right: 0, top: "calc(100% + 10px)", zIndex: 41,
+    width: "min(300px, calc(100vw - 32px))", padding: "16px 18px",
+    borderRadius: R.lg, background: "rgba(13,10,30,0.98)",
+    border: `1px solid ${C.borderHi}`, boxShadow: "0 28px 70px -30px rgba(0,0,0,0.95)",
+    textAlign: "left",
+    transition: "opacity .2s ease, transform .2s cubic-bezier(.4,0,.2,1)",
   },
 };
