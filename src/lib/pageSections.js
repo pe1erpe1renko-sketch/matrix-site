@@ -11,11 +11,11 @@
  * отдельно: в платной сфере отдельные вопросы бывают открыты (free).
  */
 
-import { resolvePath, textKey, dailyTextKey, PAGE_VIEWS } from './contentPositions.js';
+import { resolvePath, textKey, dailyTextKey, calcTypeBySlug, FORECAST_VIEW } from './contentPositions.js';
 
 /**
  * @param {object} matrix — результат calculateMatrix() или calculatePair()
- * @param {Array}  sections — набор сфер, обычно PAGE_VIEWS[id].sections
+ * @param {Array}  sections — набор сфер, обычно calcType.sections
  * @param {boolean} unlocked — оплачен ли разбор по этим датам
  */
 export function buildViewSections(matrix, sections, { unlocked = false } = {}) {
@@ -45,8 +45,18 @@ export function buildViewSections(matrix, sections, { unlocked = false } = {}) {
   });
 }
 
-/** Описание страницы по её id из адреса. Неизвестный id → undefined. */
-export const pageView = (id) => PAGE_VIEWS[id];
+/**
+ * Описание типа разбора по адресу страницы.
+ *
+ * Тип разбора — это НЕ отдельный расчёт, а фильтр: какие из 92 вопросов
+ * показать. Числа считаются одним движком, поэтому десять типов стоят
+ * ровно столько же, сколько один.
+ *
+ * Прогноз лежит отдельно от десяти типов: это не разбор, а ежедневный
+ * возврат, и продавать его отдельно нечего.
+ */
+export const pageView = (slug) =>
+  (slug === FORECAST_VIEW.slug ? FORECAST_VIEW : calcTypeBySlug(slug)) || undefined;
 
 /** Сколько ВОПРОСОВ всего на странице. */
 export const questionsTotal = (sections) =>

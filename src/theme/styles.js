@@ -1090,4 +1090,62 @@ export const S = {
     fontSize: 15, lineHeight: 1, fontFamily: "inherit",
     transition: "color .16s ease",
   },
+  /* Плашка-предупреждение вверху разбора: детская, здоровье, мама и ребёнок. */
+  typeNote: {
+    display: "flex", gap: 12, alignItems: "flex-start",
+    padding: "13px 16px", borderRadius: R.md, margin: "0 0 20px",
+    border: `1px solid rgba(230,138,176,0.4)`, background: "rgba(230,138,176,0.08)",
+    color: C.text, fontSize: 13.5, lineHeight: 1.55, maxWidth: 760,
+  },
+  typeNoteMark: {
+    width: 20, height: 20, flexShrink: 0, borderRadius: "50%",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    background: C.pink, color: C.ink, fontSize: 13, fontWeight: 700,
+  },
+
+  /* «Показать всю матрицу» — внизу каждого разбора, кроме самой матрицы. */
+  fullMatrix: {
+    display: "flex", flexWrap: "wrap", gap: 26, alignItems: "center",
+    padding: "28px 30px", borderRadius: R.xl,
+    border: `1px solid ${C.gold}`, background: "rgba(228,190,114,0.07)",
+  },
+  fullMatrixCta: {
+    display: "flex", flexDirection: "column", gap: 10,
+    marginLeft: "auto", minWidth: 240,
+  },
+  /* Карусель типов разбора в форме расчёта. */
+  calcCarousel: { position: "relative", margin: "0 -4px 4px" },
+  calcTrack: {
+    display: "flex", flexWrap: "nowrap", gap: 8,
+    overflowX: "auto", overflowY: "hidden",
+    padding: "2px 4px 8px",
+    scrollbarWidth: "none", WebkitOverflowScrolling: "touch",
+    scrollSnapType: "x proximity", scrollPaddingLeft: 4,
+  },
+  calcTab: {
+    display: "inline-flex", alignItems: "center", flexShrink: 0,
+    padding: "9px 17px", borderRadius: R.pill, border: "1px solid",
+    fontSize: 15, fontFamily: "inherit", whiteSpace: "nowrap",
+    scrollSnapAlign: "start",
+    transition: "background .16s ease, border-color .16s ease, color .16s ease",
+  },
+  calcFade: {
+    position: "absolute", top: 0, bottom: 8, width: 42,
+    pointerEvents: "none", transition: "opacity .2s ease",
+  },
+  calcArrow: {
+    position: "absolute", top: "50%", marginTop: -20,
+    width: 32, height: 32, borderRadius: "50%",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    background: "rgba(13,10,30,0.92)", border: `1px solid ${C.border}`,
+    color: C.white, fontFamily: "inherit", padding: 0,
+    transition: "opacity .18s ease, border-color .16s ease",
+  },
+  /* Пейволл под списком сфер: говорит про дату, а не про раздел. */
+  paywall: {
+    display: "flex", flexWrap: "wrap", gap: 22, alignItems: "center",
+    marginTop: 18, padding: "22px 24px", borderRadius: R.xl,
+    border: `1px solid ${C.borderHi}`, background: SURFACE.cardHi,
+  },
+  paywallTitle: { fontFamily: FONT.serif, fontSize: 20, color: C.white, lineHeight: 1.3 },
 };

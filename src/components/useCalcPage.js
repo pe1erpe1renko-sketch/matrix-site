@@ -13,15 +13,16 @@ import { rememberReport } from "../lib/recent.js";
  * ОБЩАЯ ПОДГОТОВКА СТРАНИЦЫ РАСЧЁТА
  * =================================
  * Всё, что одинаково у шести калькуляторов: разобрать даты из адреса,
- * посчитать матрицу, взять набор разделов из PAGE_VIEWS и спросить,
+ * посчитать матрицу, взять набор разделов у типа разбора и спросить,
  * открыт ли разбор по этим датам.
  *
  * Ключ доступа считается от НАБОРА ДАТ, а не от страницы: платят за дату,
  * а не за калькулятор. Поэтому /matrica/13-07-1998, /finansy/13-07-1998
  * и /prognoz/13-07-1998 открываются одной покупкой.
  *
- * @param {string} pageId — ключ PAGE_VIEWS: matrica, finansy, detskaya,
- *                          prognoz, sovmestimost, biznes
+ * @param {string} pageId — slug типа разбора: matrica, dengi, detskaya,
+ *                          karma, zdorovie, rod, prednaznachenie,
+ *                          sovmestimost, mama-rebenok, biznes, prognoz
  */
 export function useCalcPage(pageId) {
   const params = useParams();

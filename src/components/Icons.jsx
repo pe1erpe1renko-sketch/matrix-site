@@ -111,6 +111,17 @@ export const Ic = {
   ),
 };
 
+/*
+ * Псевдонимы: у типа разбора свой id, а рисунок тот же.
+ * Деньги — бывшие «Финансы», род — две фигуры, как у «двух человек».
+ */
+Ic.dengi = Ic.finansy;
+Ic.rod = Ic.people;
+Ic["mama-rebenok"] = Ic.detskaya;
+Ic.karma = Ic.prognoz;
+Ic.zdorovie = Ic.matrica;
+Ic.prednaznachenie = Ic.matrica;
+
 /**
  * Круглый значок в цвете акцента: исследовательские карточки и плитки
  * «кого посмотрим дальше». Цвет один на обводку, фон и саму иконку —

@@ -1,4 +1,8 @@
 {
+  "redirects": [
+    { "source": "/finansy", "destination": "/dengi", "permanent": true },
+    { "source": "/finansy/:date", "destination": "/dengi/:date", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

@@ -9,20 +9,24 @@ import ChakraTable from "../components/ChakraTable.jsx";
 import PartnerCores from "../components/PartnerCores.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
+import NextStepsBlock from "../components/NextStepsBlock.jsx";
+import FullMatrixBlock from "../components/FullMatrixBlock.jsx";
+import TypeNote from "../components/TypeNote.jsx";
 import { useCalcPage } from "../components/useCalcPage.js";
 
 /**
- * СОВМЕСТИМОСТЬ И БИЗНЕС-СОВМЕСТИМОСТЬ
- * ====================================
- * Одна страница на два адреса: /sovmestimost/дата/дата и /biznes/дата/дата.
- * Числа у них ОДИНАКОВЫЕ — обе считаются одной calculatePair(). Различаются
- * только наборы разделов, они приходят из PAGE_VIEWS.
+ * ПАРНЫЕ РАЗБОРЫ
+ * ==============
+ * Одна страница на три адреса: /sovmestimost, /mama-rebenok и /biznes,
+ * каждый по двум датам. Числа у них ОДИНАКОВЫЕ — все считаются одной
+ * calculatePair(). Различаются только наборы вопросов: тип разбора —
+ * это фильтр, а не отдельный расчёт.
  *
  * Матрица пары — сумма одноимённых точек двух личных матриц. Своей даты
  * рождения у пары нет, поэтому здесь нет ни аркана дня, ни возрастной шкалы:
- * то и другое остаётся личным и живёт на /matrica каждого партнёра.
+ * то и другое остаётся личным и живёт на /matrica каждого человека.
  *
- * @param {string} pageId — 'sovmestimost' или 'biznes'
+ * @param {string} pageId — 'sovmestimost', 'mama-rebenok' или 'biznes'
  */
 export default function PairResult({ pageId }) {
   const page = useCalcPage(pageId);
@@ -44,17 +48,22 @@ export default function PairResult({ pageId }) {
     return <CalcTheatre matrix={matrix} onDone={page.theatre.finish} />;
   }
   const isLove = pageId === "sovmestimost";
-  const labels = isLove ? ["Первый", "Второй"] : ["Первый партнёр", "Второй партнёр"];
+  const isChild = pageId === "mama-rebenok";
+  const labels = isLove ? ["Первый", "Второй"]
+    : isChild ? ["Родитель", "Ребёнок"]
+      : ["Первый партнёр", "Второй партнёр"];
 
   /* Три числа пары. У пары те же формулы, но читаются они иначе,
      чем в личной матрице, поэтому и подписи здесь свои. */
   const summary = [
     {
       value: matrix.purpose.personal.result,
-      title: isLove ? "Отношения" : "Задача связки",
+      title: isLove ? "Отношения" : isChild ? "Ваша связь" : "Задача связки",
       hint: isLove
         ? "Ради чего вас свело и что вы отрабатываете вдвоём."
-        : "Зачем вам общее дело и на чём оно держится.",
+        : isChild
+          ? "Что между вами происходит и какая задача у вас общая."
+          : "Зачем вам общее дело и на чём оно держится.",
     },
     {
       value: matrix.purpose.social.result,
@@ -80,13 +89,17 @@ export default function PairResult({ pageId }) {
           humanDates={page.humanDates}
           lead={isLove
             ? "Расчёт по двум датам. Матрица пары складывается из двух личных: одноимённые точки суммируются."
-            : "Расчёт по двум датам. Это карта связки, а не оценка человека: она показывает, как складывается работа двоих."}
+            : isChild
+              ? "Расчёт по двум датам: вашей и ребёнка. Показывает, что между вами происходит и какой подход работает."
+              : "Расчёт по двум датам. Это карта связки, а не оценка человека: она показывает, как складывается работа двоих."}
           reportKey={page.reportKey}
           isoDates={page.isoDates}
           questionsTotal={page.questionsTotal}
           questionsOpen={page.questionsOpen}
-          backTo={isLove ? "/sovmestimost" : "/biznes"}
+          backTo={`/${view.slug}`}
         />
+
+        <TypeNote note={view.note} />
 
         <div style={S.purposeGrid}>
           {summary.map((item) => (
@@ -148,10 +161,26 @@ export default function PairResult({ pageId }) {
         spheres={page.spheresTotal}
         total={page.questionsTotal}
         open={page.questionsOpen}
+        selfDate={page.urlDates[0]}
+        humanDates={page.humanDates}
+        unlocked={page.access.unlocked}
         lead={isLove
           ? "Числа пары посчитаны целиком. Под замком только трактовки."
-          : "Числа связки посчитаны целиком. Под замком только трактовки."}
+          : isChild
+            ? "Числа посчитаны целиком по обеим датам. Под замком только трактовки."
+            : "Числа связки посчитаны целиком. Под замком только трактовки."}
       />
+
+      {/* Полная матрица считается по одной дате, поэтому кнопок две:
+          своя и второго человека. Это разные наборы дат, то есть
+          разные разборы. */}
+      <FullMatrixBlock
+        urlDates={page.urlDates}
+        secondTo={isChild ? `/detskaya/${page.urlDates[1]}` : `/matrica/${page.urlDates[1]}`}
+        secondLabel={isChild ? "Матрица ребёнка" : "Матрица партнёра"}
+      />
+
+      <NextStepsBlock selfDate={page.urlDates[0]} background={C.bg} />
     </>
   );
 }

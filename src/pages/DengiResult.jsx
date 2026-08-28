@@ -8,20 +8,24 @@ import Octagram from "../components/Octagram.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
 import NextStepsBlock from "../components/NextStepsBlock.jsx";
+import FullMatrixBlock from "../components/FullMatrixBlock.jsx";
 import { useCalcPage } from "../components/useCalcPage.js";
 
 /**
- * ФИНАНСЫ — /finansy/13-07-1998
- * ============================
- * Тот же расчёт, что и на /matrica, прочитанный с денежной стороны.
- * Отдельной оплаты не требует: платят за дату, а не за калькулятор —
+ * ДЕНЬГИ — /dengi/13-07-1998
+ * =========================
+ * Тот же расчёт, что и на /matrica, прочитанный с денежной стороны:
+ * тип разбора — это фильтр вопросов, а не отдельный расчёт.
+ * Отдельной оплаты не требует: платят за дату, а не за тип —
  * купленный разбор по этой дате открывает и эту страницу.
+ *
+ * Старый адрес /finansy переадресуется сюда: ссылки на него уже разошлись.
  *
  * Октаграмма показана с акцентом на диагонали SE: это денежный канал,
  * вокруг него собрана вся страница.
  */
-export default function FinansyResult() {
-  const page = useCalcPage("finansy");
+export default function DengiResult() {
+  const page = useCalcPage("dengi");
 
   if (!page.valid) {
     return (
@@ -50,14 +54,14 @@ export default function FinansyResult() {
     <>
       <section style={{ ...S.section, paddingTop: 34, paddingBottom: 26 }}>
         <ResultHeader
-          eyebrow="Финансы"
+          eyebrow="Деньги"
           humanDates={page.humanDates}
           lead="Денежный канал, способ его открыть и место, где он перекрыт. Сумм и сроков здесь нет: матрица показывает механизм, а не прогноз доходов."
           reportKey={page.reportKey}
           isoDates={page.isoDates}
           questionsTotal={page.questionsTotal}
           questionsOpen={page.questionsOpen}
-          backTo="/finansy"
+          backTo="/dengi"
         />
 
         <div style={S.purposeGrid}>
@@ -96,8 +100,12 @@ export default function FinansyResult() {
         total={page.questionsTotal}
         open={page.questionsOpen}
         selfDate={page.urlDates[0]}
+        humanDates={page.humanDates}
+        unlocked={page.access.unlocked}
         lead="Денежные числа посчитаны целиком — они ваши. Под замком только трактовки. Разбор открывается один раз на дату и действует на всех страницах, которые считаются по ней."
       />
+
+      <FullMatrixBlock urlDates={page.urlDates} />
 
       <NextStepsBlock selfDate={page.urlDates[0]} background={C.bg} />
     </>

@@ -8,6 +8,8 @@ import Octagram from "../components/Octagram.jsx";
 import ChakraTable from "../components/ChakraTable.jsx";
 import ResultHeader from "../components/ResultHeader.jsx";
 import SectionsBlock from "../components/SectionsBlock.jsx";
+import FullMatrixBlock from "../components/FullMatrixBlock.jsx";
+import TypeNote from "../components/TypeNote.jsx";
 import { useCalcPage } from "../components/useCalcPage.js";
 
 /**
@@ -15,7 +17,7 @@ import { useCalcPage } from "../components/useCalcPage.js";
  * =====================================
  * Обычный расчёт по дате ребёнка. Формула одна и та же — детской матрицу
  * делает не расчёт, а тон разделов: их читает родитель про ребёнка,
- * а не взрослый про себя. Набор разделов приходит из PAGE_VIEWS.detskaya.
+ * а не взрослый про себя. Набор вопросов приходит от типа разбора.
  *
  * Это отдельный разбор: считается по дате ребёнка, а не по вашей,
  * поэтому списывает свою единицу лимита.
@@ -37,7 +39,7 @@ export default function DetskayaResult() {
     );
   }
 
-  const { matrix } = page;
+  const { matrix, view } = page;
 
   /* Сцена расчёта — только при первом открытии этой матрицы. */
   if (page.theatre.playing) {
@@ -63,15 +65,12 @@ export default function DetskayaResult() {
           backTo="/detskaya"
         />
 
-        <div style={S.notice}>
-          <Warn />
-          <p style={S.noticeText}>
-            <b style={{ color: C.white }}>Это карта особенностей, а не заключение о развитии.</b>{" "}
-            Мы не ставим диагнозов и не заменяем специалиста. Если что-то в поведении
-            ребёнка вас беспокоит, обращайтесь к врачу или психологу — матрица этого
-            разговора не отменяет и не заменяет.
-          </p>
-        </div>
+        {/* Предупреждение приходит от типа разбора: один текст на все
+            места, где показывается детская. */}
+        <TypeNote note={view.note}>
+          Если что-то в поведении ребёнка вас беспокоит, обращайтесь к врачу
+          или психологу — матрица этого разговора не отменяет и не заменяет.
+        </TypeNote>
 
         <div style={S.purposeGrid}>
           {nature.map((item) => (
@@ -114,18 +113,12 @@ export default function DetskayaResult() {
         total={page.questionsTotal}
         open={page.questionsOpen}
         selfDate={page.urlDates[0]}
+        humanDates={page.humanDates}
+        unlocked={page.access.unlocked}
         lead="Разделы написаны для родителя: не «вы такой», а «ребёнок такой, и вот что с этим делать». Числа открыты все, под замком только трактовки."
       />
-    </>
-  );
-}
 
-function Warn() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-      <circle cx="12" cy="12" r="9" stroke={C.lilac} strokeWidth="1.6" />
-      <path d="M12 7.5v5.5" stroke={C.lilac} strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="12" cy="16.4" r="1.1" fill={C.lilac} />
-    </svg>
+      <FullMatrixBlock urlDates={page.urlDates} />
+    </>
   );
 }

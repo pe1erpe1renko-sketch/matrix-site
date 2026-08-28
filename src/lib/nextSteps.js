@@ -53,9 +53,9 @@ export const SPHERE_STEPS = {
   money: {
     icon: 'finansy', accent: C.gold,
     title: 'Это была короткая версия',
-    text: 'В финансовом разборе двадцать четыре вопроса: сценарий заработка, отношение к тратам, денежная программа рода.',
-    button: 'Открыть финансовый разбор',
-    to: (self) => `/finansy/${self}`,
+    text: 'В денежном разборе двадцать четыре вопроса: сценарий заработка, отношение к тратам, денежная программа рода.',
+    button: 'Открыть денежный разбор',
+    to: (self) => `/dengi/${self}`,
   },
 
   work: {
@@ -126,4 +126,5 @@ export const NEXT_PEOPLE = [
   { id: 'child',   name: 'Ребёнок',         sub: 'детская матрица',      icon: 'detskaya',     accent: C.gold,  to: (self, date) => `/detskaya/${date}`,            field: 'Дата рождения ребёнка' },
   { id: 'friend',  name: 'Друг',            sub: 'его матрица',          icon: 'people',       accent: C.lilac, to: (self, date) => `/matrica/${date}`,             field: 'Дата рождения друга' },
   { id: 'colleague', name: 'Деловой партнёр', sub: 'бизнес-совместимость', icon: 'biznes',     accent: C.gold,  to: (self, date) => `/biznes/${self}/${date}`,      field: 'Дата рождения делового партнёра' },
+  { id: 'momchild', name: 'Мама и ребёнок',  sub: 'ваша связь с ним',     icon: 'detskaya',     accent: C.pink,  to: (self, date) => `/mama-rebenok/${self}/${date}`, field: 'Дата рождения ребёнка' },
 ];

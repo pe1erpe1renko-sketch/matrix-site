@@ -4,7 +4,7 @@ import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { GLOBAL_CSS } from "../theme/globalCss.js";
 import { useBreakpoint, useIsTouch, TAP } from "../theme/responsive.js";
-import { CALC_NAV, ACCOUNT_NAV, activeNavId, calcById } from "../routes.js";
+import { CALC_NAV, MENU_NAV, ACCOUNT_NAV, activeNavId, calcById } from "../routes.js";
 import { Ic, Spark } from "./Icons.jsx";
 import Cursor from "./Cursor.jsx";
 import Sky from "./Sky.jsx";
@@ -116,7 +116,10 @@ export default function Layout() {
   const menuBody = (
     <>
       <nav style={S.nav}>
-        {CALC_NAV.map(navLink)}
+        {/* В меню шесть главных типов: одиннадцать в столбец не влезают.
+            Остальные открываются из карусели в форме и из блока
+            «кого посмотрим дальше» в конце разбора. */}
+        {MENU_NAV.map(navLink)}
         <div style={S.divider} />
         {ACCOUNT_NAV.map(navLink)}
       </nav>

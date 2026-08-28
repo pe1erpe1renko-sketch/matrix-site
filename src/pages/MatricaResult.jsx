@@ -138,6 +138,8 @@ export default function MatricaResult() {
         total={page.questionsTotal}
         open={page.questionsOpen}
         selfDate={page.urlDates[0]}
+        humanDates={page.humanDates}
+        unlocked={page.access.unlocked}
         openRequest={sphereRequest}
       />
 

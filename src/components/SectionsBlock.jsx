@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation, Link } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import SectionList from "./SectionList.jsx";
+import { backToReport } from "../lib/returnTo.js";
+import { TAP } from "../theme/responsive.js";
 
 /**
  * БЛОК РАЗБОРА
@@ -30,7 +32,9 @@ import SectionList from "./SectionList.jsx";
  */
 export default function SectionsBlock({
   sections, spheres, total, open, title, lead, background = C.bgAlt, openRequest, selfDate,
+  humanDates, unlocked,
 }) {
+  const location = useLocation();
   const [openId, setOpenId] = useState(null);
   const [searchParams] = useSearchParams();
   const askedSection = searchParams.get("section");
@@ -82,6 +86,32 @@ export default function SectionsBlock({
         {lead || "Выберите сферу — раскроется список вопросов. Нажмите вопрос, и откроется ответ по вашим числам. Числа посчитаны по всем вопросам сразу, под замком только трактовки."}
       </p>
       <SectionList sections={sections} openId={openId} onToggle={toggle} selfDate={selfDate} />
+
+      {/* ПЕЙВОЛЛ говорит про ДАТУ, а не про раздел: платят за дату,
+          а не за тип разбора, и человек должен видеть, что одна оплата
+          открывает все типы по этой же дате. */}
+      {humanDates && !unlocked && (
+        <div className="card" style={S.paywall}>
+          <div style={{ flex: "1 1 340px", minWidth: 0 }}>
+            <div style={S.paywallTitle}>
+              Оплата открывает всю матрицу по {humanDates.length > 1 ? "датам" : "дате"}{" "}
+              {humanDates.join(" и ")}
+            </div>
+            <p style={{ ...S.infoText, margin: "8px 0 0", maxWidth: 620 }}>
+              Все двенадцать сфер, все девяносто два вопроса и все типы разбора,
+              которые считаются по {humanDates.length > 1 ? "этим датам" : "этой дате"}.
+              Второй раз за ту же дату платить не нужно.
+            </p>
+          </div>
+          <Link to="/tarify" state={backToReport(location, openId)} className="btnGold"
+            style={{
+              ...S.ctaSmall, background: C.gold, color: C.ink, minHeight: TAP,
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+            }}>
+            Открыть разбор
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

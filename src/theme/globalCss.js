@@ -91,6 +91,10 @@ a { color: inherit; text-decoration: none; }
 .planBtn:not(:disabled):active { transform: scale(0.96); }
 @media (prefers-reduced-motion: reduce) { .planBtn:not(:disabled):active { transform: none; } }
 
+/* Карусель типов разбора. */
+.calcTab:hover { border-color: ${C.borderHi}; }
+.calcArrow:hover { border-color: ${C.lilac}; color: ${C.lilac}; }
+
 /* Кнопка возврата к разбору и чипы недавних расчётов. */
 .backLink:hover { background: rgba(228,190,114,0.2); box-shadow: 0 12px 34px -18px ${C.gold}; }
 .recentChip:hover { border-color: ${C.borderHi}; }

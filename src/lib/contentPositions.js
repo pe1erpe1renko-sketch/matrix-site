@@ -42,7 +42,7 @@ export const SECTIONS = [
   {
     id: 'personality',
     title: 'Личность',
-    lead: 'Кто вы на самом деле и каким вас видят снаружи.',
+    lead: 'Каким вас считывают в первые пять минут — и что вы прячете.',
     access: 'paid',
     slots: [
       { id: 'character_day',   label: 'Каким вас видят с первого взгляда', path: 'core.W', free: true },
@@ -61,7 +61,7 @@ export const SECTIONS = [
   {
     id: 'purpose',
     title: 'Предназначение',
-    lead: 'Зачем вы здесь и куда ведёт ваш путь.',
+    lead: 'Что вам дано сделать и почему без этого не отпускает.',
     access: 'paid',
     slots: [
       { id: 'purpose_personal',  label: 'Поиск себя',                      path: 'purpose.personal.result', free: true },
@@ -79,7 +79,7 @@ export const SECTIONS = [
   {
     id: 'money',
     title: 'Деньги',
-    lead: 'Где ваш поток усиливается, а где теряется.',
+    lead: 'Через что деньги приходят и в каком месте канал перекрыт.',
     access: 'paid',
     slots: [
       { id: 'money_channel_main', label: 'Ваш денежный канал',             path: 'core.SE', free: true },
@@ -99,7 +99,7 @@ export const SECTIONS = [
   {
     id: 'relations',
     title: 'Отношения',
-    lead: 'Ваш сценарий в любви и то, что его держит.',
+    lead: 'Почему одна и та же история повторяется с разными людьми.',
     access: 'paid',
     slots: [
       { id: 'relation_line',    label: 'Ваш сценарий в любви',            path: 'core.SW', free: true },
@@ -119,7 +119,7 @@ export const SECTIONS = [
   {
     id: 'karma',
     title: 'Карма',
-    lead: 'Глубинные задачи, которые приходят раз за разом.',
+    lead: 'Урок, который возвращается, пока вы его обходите.',
     access: 'paid',
     slots: [
       { id: 'karma_main',    label: 'Главная кармическая задача',        path: 'core.S', free: true },
@@ -137,7 +137,7 @@ export const SECTIONS = [
   {
     id: 'ancestry',
     title: 'Род',
-    lead: 'Что передано вам по обеим линиям и что с этим делать.',
+    lead: 'Что тянется от родителей и что можно остановить на себе.',
     access: 'paid',
     slots: [
       { id: 'male_result',   label: 'Итог мужской линии',                path: 'ancestral.male.result', free: true },
@@ -156,7 +156,7 @@ export const SECTIONS = [
   {
     id: 'resource',
     title: 'Ресурс и энергия',
-    lead: 'Что вас наполняет и куда утекают силы.',
+    lead: 'Почему сил нет даже после отдыха.',
     access: 'paid',
     slots: [
       { id: 'energy_source',  label: 'Что вас наполняет',                path: 'chakras.rows.3.physics', free: true },
@@ -174,7 +174,7 @@ export const SECTIONS = [
   {
     id: 'health',
     title: 'Здоровье',
-    lead: 'Зоны внимания в теле и в состоянии. Не диагноз.',
+    lead: 'Где тело сдаёт первым, когда вы перегружены.',
     access: 'paid',
     slots: [
       { id: 'health_physics',  label: 'Итог: физика',                    path: 'chakras.total.physics', free: true },
@@ -191,7 +191,7 @@ export const SECTIONS = [
   {
     id: 'family',
     title: 'Дети и родители',
-    lead: 'Что происходит в связи поколений.',
+    lead: 'Что вы передаёте детям, не замечая этого.',
     access: 'paid',
     slots: [
       { id: 'parents_link',    label: 'Связь с родителями',              path: 'chakras.rows.5.physics', free: true },
@@ -208,7 +208,7 @@ export const SECTIONS = [
   {
     id: 'work',
     title: 'Профессия и реализация',
-    lead: 'Где ваша энергия раскрывается в деле.',
+    lead: 'В каком деле вы вкладываете мало, а получаете много.',
     access: 'paid',
     slots: [
       { id: 'profession_talent', label: 'Профессиональный талант',       path: 'core.N', free: true },
@@ -226,7 +226,7 @@ export const SECTIONS = [
   {
     id: 'year',
     title: 'Личный год',
-    lead: 'Какая энергия ведёт вас ближайшие двенадцать месяцев.',
+    lead: 'Чем занят ваш год и что в нём стоит закрыть.',
     access: 'paid',
     yearly: true,
     slots: [
@@ -242,7 +242,7 @@ export const SECTIONS = [
   {
     id: 'forecast',
     title: 'Прогноз',
-    lead: 'Ваша энергия на сегодня и на текущий отрезок жизни.',
+    lead: 'Что за энергия у вас сегодня и когда сменится период.',
     access: 'free',
     slots: [
       { id: 'day_energy',  label: 'Аркан дня',                           path: 'today.dayArcana', daily: true },
@@ -265,6 +265,16 @@ export function resolvePath(matrix, path) {
   }
   return value;
 }
+
+/**
+ * ИЛЛЮСТРАЦИИ АРКАНОВ
+ * Файлы лежат в public/arcana/ и называются по номеру с ведущим нулём:
+ * 01.png … 22.png. Размер 800×1200, формат 2:3.
+ *
+ * Если файла нет — интерфейс показывает заглушку, ничего не ломается.
+ */
+export const arcanaImage = (arcana) =>
+  `/arcana/${String(arcana).padStart(2, '0')}.png`;
 
 /** Ключ текста в базе: 'money_channel_main_20' */
 export const textKey = (slotId, arcana) => `${slotId}_${arcana}`;
@@ -408,6 +418,49 @@ export const PAIR_SECTIONS = {
       slots: [
         { id: 'pair_merge_result',   label: 'Слияние',  path: 'purpose.social.result' },
         { id: 'pair_harmony_result', label: 'Гармония', path: 'purpose.spiritual.result' },
+      ],
+    },
+  ],
+
+  parentChild: [
+    {
+      id: 'mc_bond',
+      title: 'Что между вами происходит',
+      lead: 'Связь родителя и ребёнка в числах.',
+      access: 'free',
+      slots: [
+        { id: 'mc_core',  label: 'Ядро вашей связи',   path: 'core.C', free: true },
+        { id: 'mc_task',  label: 'Общая задача',       path: 'purpose.personal.result' },
+      ],
+    },
+    {
+      id: 'mc_approach',
+      title: 'Как к нему подойти',
+      lead: 'Что работает, а что вызывает сопротивление.',
+      access: 'paid',
+      slots: [
+        { id: 'mc_way',    label: 'Что его открывает',  path: 'core.SW' },
+        { id: 'mc_resist', label: 'Что вызывает бунт',  path: 'diagonals.SW.mid' },
+      ],
+    },
+    {
+      id: 'mc_friction',
+      title: 'Где вы упираетесь друг в друга',
+      lead: 'Повторяющийся сценарий и как из него выйти.',
+      access: 'paid',
+      slots: [
+        { id: 'mc_conflict', label: 'Точка трения',        path: 'diagonals.SW.outer' },
+        { id: 'mc_repeat',   label: 'Что повторяется',     path: 'core.S' },
+      ],
+    },
+    {
+      id: 'mc_rod',
+      title: 'Что тянется через вас обоих',
+      lead: 'Родовые программы, общие для вас двоих.',
+      access: 'paid',
+      slots: [
+        { id: 'mc_male',   label: 'По мужской линии',  path: 'ancestral.male.result' },
+        { id: 'mc_female', label: 'По женской линии',  path: 'ancestral.female.result' },
       ],
     },
   ],
@@ -569,22 +622,99 @@ export const CHILD_SECTIONS = [
   },
 ];
 
-/** Какие сферы показывает каждая страница. Единая точка правды для UI. */
+/**
+ * ТИПЫ РАЗБОРА
+ * ============
+ * Каждый тип — это НЕ отдельный расчёт, а фильтр: какие из 92 вопросов
+ * показать. Числа считаются одни и те же одним и тем же движком.
+ * Поэтому десять типов стоят ровно столько же, сколько один.
+ *
+ * ПРАВИЛО ОПЛАТЫ: платят за дату, а не за тип. Купили «Деньги» — открылась
+ * вся матрица по этой дате, включая вопросы, которых не было в фильтре.
+ * Поэтому под каждым разбором стоит кнопка «Показать всю матрицу».
+ *
+ * pair: true — расчёт по двум датам, через calculatePair().
+ * Парные типы списывают отдельную единицу из лимита тарифа.
+ */
+
 const byId = (...ids) => ids.map((id) => SECTIONS.find((s) => s.id === id)).filter(Boolean);
 
-export const PAGE_VIEWS = {
-  matrica: { title: 'Матрица судьбы', pair: false, sections: SECTIONS },
-  finansy: {
-    title: 'Финансы', pair: false,
+export const CALC_TYPES = [
+  {
+    id: 'matrica', slug: 'matrica', pair: false,
+    title: 'Матрица судьбы',
+    lead: 'Полный разбор: все двенадцать сфер и девяносто два вопроса.',
+    full: true,
+    sections: SECTIONS,
+  },
+  {
+    id: 'sovmestimost', slug: 'sovmestimost', pair: true,
+    title: 'Совместимость',
+    lead: 'Зачем вы встретились и на чём эти отношения держатся.',
+    sections: PAIR_SECTIONS.love,
+  },
+  {
+    id: 'dengi', slug: 'dengi', pair: false,
+    title: 'Деньги',
+    lead: 'Через что деньги приходят и в каком месте канал перекрыт.',
     sections: [...byId('money', 'work'), ...FINANCE_EXTRA],
   },
-  prognoz: {
-    title: 'Прогноз', pair: false,
-    sections: byId('forecast', 'year'),
+  {
+    id: 'mama-rebenok', slug: 'mama-rebenok', pair: true,
+    title: 'Мама и ребёнок',
+    lead: 'Что происходит между вами и как к нему подойти.',
+    note: 'Это карта особенностей, а не заключение о развитии.',
+    sections: PAIR_SECTIONS.parentChild,
   },
-  detskaya:     { title: 'Детская матрица',      pair: false, sections: CHILD_SECTIONS },
-  sovmestimost: { title: 'Совместимость',        pair: true,  sections: PAIR_SECTIONS.love },
-  biznes:       { title: 'Бизнес-совместимость', pair: true,  sections: PAIR_SECTIONS.business },
+  {
+    id: 'detskaya', slug: 'detskaya', pair: false,
+    title: 'Детская матрица',
+    lead: 'С чем ребёнок пришёл и в чём ему не надо мешать.',
+    note: 'Это карта особенностей, а не заключение о развитии. Мы не ставим диагнозов и не заменяем специалиста.',
+    sections: CHILD_SECTIONS,
+  },
+  {
+    id: 'karma', slug: 'karma', pair: false,
+    title: 'Карма',
+    lead: 'Урок, который возвращается, пока вы его обходите.',
+    sections: byId('karma', 'ancestry'),
+  },
+  {
+    id: 'zdorovie', slug: 'zdorovie', pair: false,
+    title: 'Здоровье',
+    lead: 'Где тело сдаёт первым, когда вы перегружены.',
+    note: 'Это зоны внимания, а не диагноз. При недомогании обращайтесь к врачу.',
+    sections: byId('health', 'resource'),
+  },
+  {
+    id: 'rod', slug: 'rod', pair: false,
+    title: 'Род',
+    lead: 'Что тянется от родителей и что можно остановить на себе.',
+    sections: byId('ancestry', 'family'),
+  },
+  {
+    id: 'prednaznachenie', slug: 'prednaznachenie', pair: false,
+    title: 'Предназначение',
+    lead: 'Что вам дано сделать и почему без этого не отпускает.',
+    sections: byId('purpose', 'work'),
+  },
+  {
+    id: 'biznes', slug: 'biznes', pair: true,
+    title: 'Бизнес-совместимость',
+    lead: 'Кто двигает дело, кто удерживает и где начнётся борьба.',
+    sections: PAIR_SECTIONS.business,
+  },
+];
+
+/** Тип по адресу страницы. */
+export const calcTypeBySlug = (slug) => CALC_TYPES.find((t) => t.slug === slug) || null;
+
+/** Прогноз живёт отдельно: это не разбор, а ежедневный возврат. */
+export const FORECAST_VIEW = {
+  id: 'prognoz', slug: 'prognoz', pair: false,
+  title: 'Прогноз',
+  lead: 'Что за энергия у вас сегодня и когда сменится период.',
+  sections: byId('forecast', 'year'),
 };
 
 /** Плоский список всех слотов — для подсчёта объёма базы и для админки. */
