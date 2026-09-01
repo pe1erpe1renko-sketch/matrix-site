@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { LEGAL_DOCS, legalDoc } from "../lib/legal.js";
+import { supportWay } from "../lib/support.js";
 import { TAP } from "../theme/responsive.js";
 import NotFound from "./NotFound.jsx";
 
@@ -97,9 +98,8 @@ export default function Docs() {
               По вопросам обращайтесь в поддержку.
             </p>
             <div style={{ fontSize: 13.5, color: C.muted, marginTop: 16, lineHeight: 1.6 }}>
-              Поддержка: Telegram <span style={{ color: C.lilac }}>@matrika_support</span>,
-              MAX <span style={{ color: C.lilac }}>@matrika</span>,
-              почта <span style={{ color: C.lilac }}>help@matrika.ru</span>.
+              Поддержка: <Way id="telegram" text="Telegram" />, <Way id="max" text="MAX" />{" "}
+              или почта <Way id="mail" />.
             </div>
           </div>
         )}
@@ -144,5 +144,18 @@ function BackButton() {
       <span style={{ fontSize: 17, lineHeight: 1, color: C.gold }}>←</span>
       <span>Назад</span>
     </button>
+  );
+}
+
+/** Ссылка на поддержку в тексте страницы. Адреса — в lib/support.js. */
+function Way({ id, text }) {
+  const way = supportWay(id);
+  if (!way) return null;
+  const mail = way.href.startsWith("mailto:");
+  return (
+    <a href={way.href} className="docLink" style={S.docLink}
+      target={mail ? undefined : "_blank"} rel={mail ? undefined : "noreferrer"}>
+      {text || way.value}
+    </a>
   );
 }

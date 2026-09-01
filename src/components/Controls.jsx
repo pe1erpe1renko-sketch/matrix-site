@@ -47,8 +47,14 @@ export function Switch({ on, onClick, label }) {
   );
 }
 
-/** Копирование в буфер. При отказе браузера текст всё равно можно выделить мышью. */
-export function CopyButton({ value, small = true }) {
+/**
+ * Копирование в буфер. При отказе браузера текст всё равно можно выделить мышью.
+ *
+ * tipAlign — куда смотрит подпись под кнопкой. По умолчанию по центру;
+ * "right" нужен там, где кнопка стоит у самого края узкой панели:
+ * подпись шире кнопки и центром вылезала бы за край экрана.
+ */
+export function CopyButton({ value, small = true, tipAlign = "center" }) {
   const [done, setDone] = useState(false);
 
   const copy = async () => {
@@ -76,7 +82,12 @@ export function CopyButton({ value, small = true }) {
             stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       )}
-      <span className="tip" style={{ ...S.tip, left: "50%", right: "auto", transform: "translateX(-50%)" }}>
+      <span className="tip" style={{
+        ...S.tip,
+        ...(tipAlign === "right"
+          ? { left: "auto", right: 0, transform: "none" }
+          : { left: "50%", right: "auto", transform: "translateX(-50%)" }),
+      }}>
         {done ? "Скопировано" : "Копировать"}
       </span>
     </button>

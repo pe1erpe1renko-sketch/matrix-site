@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { C } from "../theme/tokens.js";
 import { S } from "../theme/styles.js";
 import { useAccount } from "../lib/account.js";
+import { SUPPORT_WAYS } from "../lib/support.js";
+import { CopyButton } from "./Controls.jsx";
 import { TAP } from "../theme/responsive.js";
 
 /**
@@ -18,12 +20,6 @@ import { TAP } from "../theme/responsive.js";
  * Закрывается тремя способами: нажатием вне панели, клавишей Esc
  * и повторным нажатием на значок.
  */
-
-const WAYS = [
-  { name: "Telegram", value: "@matrika_support", note: "отвечаем быстрее всего", href: "https://t.me/matrika_support" },
-  { name: "MAX", value: "@matrika", note: "", href: null },
-  { name: "Почта", value: "help@matrika.ru", note: "для чеков и возвратов", href: "mailto:help@matrika.ru" },
-];
 
 export default function SupportButton() {
   const account = useAccount();
@@ -90,21 +86,41 @@ export default function SupportButton() {
             </p>
           )}
 
-          {WAYS.map((way) => {
-            const content = (
-              <>
-                <span style={{ color: C.white, fontSize: 14, minWidth: 66, textAlign: "left" }}>{way.name}</span>
-                <span style={{ color: C.lilac, fontSize: 13.5, flex: 1, textAlign: "left", minWidth: 0 }}>
-                  {way.value}
-                </span>
-              </>
-            );
+          {SUPPORT_WAYS.map((way) => {
             const style = { ...S.supRow, marginBottom: 8, minHeight: TAP, padding: "10px 13px" };
+            const name = <span style={S.supName}>{way.name}</span>;
+            const external = way.href && !way.href.startsWith("mailto:");
+
+            /*
+             * Почта — не ссылка целиком: рядом стоит кнопка копирования,
+             * а кнопка внутри ссылки — недопустимая вёрстка. Поэтому строка
+             * это блок, внутри которого адрес-ссылка и кнопка копирования
+             * живут отдельно. Копирование панель не закрывает: человек
+             * должен увидеть галочку «скопировано».
+             */
+            if (way.copy) {
+              return (
+                <div key={way.id} className="supRow" style={{ ...style, padding: "6px 13px" }}>
+                  {name}
+                  <a href={way.href} style={{ ...S.supValue, textDecoration: "none" }}
+                    onClick={() => setOpen(false)}>{way.value}</a>
+                  <CopyButton value={way.copy} tipAlign="right" />
+                </div>
+              );
+            }
+
             return way.href ? (
-              <a key={way.name} className="supRow" style={style} href={way.href}
-                target="_blank" rel="noreferrer" onClick={() => setOpen(false)}>{content}</a>
+              <a key={way.id} className="supRow" style={style} href={way.href}
+                target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined}
+                onClick={() => setOpen(false)}>
+                {name}
+                <span style={S.supValue}>{way.value}</span>
+              </a>
             ) : (
-              <div key={way.name} className="supRow" style={style}>{content}</div>
+              <div key={way.id} className="supRow" style={style}>
+                {name}
+                <span style={S.supValue}>{way.value}</span>
+              </div>
             );
           })}
         </div>

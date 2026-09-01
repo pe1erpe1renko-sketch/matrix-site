@@ -932,6 +932,9 @@ export const S = {
     background: "rgba(23,18,46,0.7)", border: `1px solid ${C.border}`,
     fontFamily: "inherit", transition: "all .16s ease",
   },
+  /* Строка панели поддержки: способ связи слева, значение справа. */
+  supName: { color: C.white, fontSize: 14, minWidth: 62, textAlign: "left", flexShrink: 0 },
+  supValue: { color: C.lilac, fontSize: 13.5, flex: 1, textAlign: "left", minWidth: 0, overflowWrap: "anywhere" },
   iconBtn: {
     position: "relative", background: "transparent", border: `1px solid ${C.border}`,
     color: C.muted, width: 38, height: 38, borderRadius: R.md,
